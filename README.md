@@ -1,4 +1,4 @@
-![logo](https://cdn.modrinth.com/data/cached_images/7c73588e07aa2b0965e0f412db16d0151528aa8d.png)
+![logo](https://i.imgur.com/hElpNHD.png)
 
 **LagFixer** is the ultimate performance boosting Minecraft plugin designed to optimize your server and eliminate unnecessary lag. By fine-tuning various server aspects and streamlining redundant features, LagFixer ensures a smoother and more enjoyable gameplay experience for all players.
 
@@ -102,6 +102,6 @@
 
 
 # Other plugins:
-[![gatekeeper](https://cdn.modrinth.com/data/cached_images/fab74841bc8f4ec95464fd5471b757f5e9d2ae90.png)](https://modrinth.com/plugin/gatekeeper-mc)
+[![gatekeeper](https://i.imgur.com/YHGjHR4.png)](https://modrinth.com/plugin/gatekeeper-mc)
 
-[![dynamicdns](https://cdn.modrinth.com/data/cached_images/486d341bda1b247961f8dd6eb7db0de93992d1b1.png)](https://modrinth.com/plugin/dynamicdns)
+[![dynamicdns](https://i.imgur.com/BikoONq.png)](https://modrinth.com/plugin/dynamicdns)
