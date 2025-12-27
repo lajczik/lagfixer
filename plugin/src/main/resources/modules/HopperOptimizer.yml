@@ -1,0 +1,31 @@
+HopperOptimizer:
+  enabled: true
+  worlds:
+    - '*'
+  values:
+    smart_throttling: true
+
+    # Enable chunk-based hopper limiting
+    chunk_limit:
+      enabled: false
+      # Maximum hoppers allowed per chunk
+      limit: 16
+
+    # Optimizes hoppers that have nothing to transfer
+    empty_hopper_optimization:
+      enabled: true
+      # How long to wait before checking empty hoppers again (milliseconds)
+      empty_check_delay: 100
+
+    # Optimizes hoppers that can't transfer because destination is full
+    full_hopper_optimization:
+      enabled: true
+      # How long to wait before checking full hoppers again (milliseconds)
+      full_check_delay: 80
+
+    # How often to run hopper optimization checks (milliseconds)
+    hopper_check_interval: 2000
+
+    # How long before a hopper is considered "inactive" (milliseconds)
+    # Inactive hoppers are checked less frequently
+    inactive_hopper_delay: 30000

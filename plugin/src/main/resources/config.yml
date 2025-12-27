@@ -1,0 +1,37 @@
+#░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+#░██╗░░░░░░█████╗░░██████╗░░░███████╗██╗██╗░░██╗███████╗██████╗░░
+#░██║░░░░░██╔══██╗██╔════╝░░░██╔════╝██║╚██╗██╔╝██╔════╝██╔══██╗░
+#░██║░░░░░███████║██║░░██╗░░░█████╗░░██║░╚███╔╝░█████╗░░██████╔╝░
+#░██║░░░░░██╔══██║██║░░╚██╗░░██╔══╝░░██║░██╔██╗░██╔══╝░░██╔══██╗░
+#░███████╗██║░░██║╚██████╔╝░░██║░░░░░██║██╔╝╚██╗███████╗██║░░██║░
+#░╚══════╝╚═╝░░╚═╝░╚═════╝░░░╚═╝░░░░░╚═╝╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝░
+#░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+# Some of the options below require a server restart or plugin reload.
+main:
+  prefix: "&8[&e&l⚡&8] "
+  # Displays LagFixer version info on hover.
+  prefix_hover: true
+  # Multithread synchronization has not been thoroughly tested.
+  threads: 1
+  # Update interval (in seconds) for TPS, MSPT, CPU, and other metrics.
+  monitor_interval: 5
+  # Automatically reports LagFixer errors and Spark profiler to our support team.
+  errors_reporter: true
+
+  updater: true
+  # Displays warnings for legacy methods without support.
+  warnings: true
+  # Optimized metrics available at https://bstats.org/plugin/bukkit/LagFixer/19292.
+  bStats: true
+
+  command:
+    permission: "lagfixer.command"
+    aliases:
+      - lf
+      - antilag
+      - lag
+
+  map:
+    enabled: true
+    interval: 3 # Update interval (in seconds) for the map handler (/lagfixer map). Recommended to be at least twice the monitor_interval.

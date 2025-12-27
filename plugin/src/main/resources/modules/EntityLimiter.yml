@@ -1,0 +1,36 @@
+EntityLimiter:
+  enabled: true
+  worlds: # Use '*' to enable for all worlds.
+    - '*'
+  values:
+    whitelist: # list of entities that will not be removed: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+      - VILLAGER
+      - ZOMBIE_VILLAGER
+      - ENDER_DRAGON
+      - WITHER
+      - WOLF
+      - CAT
+
+    ignore_models: true # If "true" the limit won't apply to entities from ModelEngine or MythicMobs
+    creatures: 15 # Animals and monsters per chunk (-1 to disable).
+    items: -1 # Dropped items per chunk (-1 to disable).
+    vehicles: 3 # Minecarts and boats per chunk (-1 to disable).
+    projectiles: 5 # Projectiles per chunk (-1 to disable).
+    reasons: # Spawn reasons: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html
+      - DEFAULT
+      - EGG
+      - NATURAL
+      - SPAWNER
+      - SPAWNER_EGG
+      - COMMAND
+
+    overflow_purge: # The overflow purge limits the number of entities per chunk, removing excess ones to prevent server lag caused by players trying to overload chunks.
+      enabled: false
+      interval: 30 # An interval in seconds that defines how often the excess entities in a chunk will be removed (per cycle)
+      limit_multiplier: 1.5 # Limit multiplier to not remove too many mobs
+      types:
+        creatures: true
+        items: false
+        vehicles: true
+        projectiles: true
+        named: false # If "false" overflow purge won't remove entities with a custom name
