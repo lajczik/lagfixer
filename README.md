@@ -42,6 +42,10 @@
 
 </details>
 
+## Downloads:
+- [Modrinth](https://modrinth.com/plugin/lagfixer) - (Use this for fresh updated versions)
+- [SpigotMC](https://www.spigotmc.org/resources/lagfixer-1-13-1-21-10-%E2%9A%A1%EF%B8%8Fbest-performance-solution-%EF%B8%8F-2100-servers-%E2%9C%85-lightweight-and-asynchronous.111684/)
+
 ## Modules:
 ### ⭐ MobAiReducer: (Impact on performance: VERY HIGH)
 - Replaces creature movement to optimize and reduce behavior.
