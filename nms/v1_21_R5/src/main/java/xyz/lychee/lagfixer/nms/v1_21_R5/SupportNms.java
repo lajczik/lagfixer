@@ -1,7 +1,9 @@
 package xyz.lychee.lagfixer.nms.v1_21_R5;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -32,17 +34,20 @@ public class SupportNms extends AbstractSupportNms {
         if (meta == null) {
             return is;
         }
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), RandomStringUtils.randomAlphabetic(8));
-        gameProfile.getProperties().put("textures", new Property("textures", base64));
-        ResolvableProfile resolvableProfile = new ResolvableProfile(gameProfile);
+        
         try {
+            UUID uuid = UUID.randomUUID();
+            GameProfile gameProfile = new GameProfile(uuid, uuid.toString().substring(0, 16));
+            gameProfile.getProperties().put("textures", new Property("textures", base64));
+
+            ResolvableProfile resolvableProfile = new ResolvableProfile(gameProfile);
+            
             Method mtd = meta.getClass().getDeclaredMethod("setProfile", ResolvableProfile.class);
             mtd.setAccessible(true);
             mtd.invoke(meta, resolvableProfile);
             is.setItemMeta(meta);
             return is;
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
             return is;
         }
     }

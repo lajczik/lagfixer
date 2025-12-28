@@ -176,9 +176,7 @@ public class SupportManager extends AbstractManager implements Listener {
 
         public DeprecatedBukkitSupport(Plugin plugin) {
             super(plugin);
-        }
 
-        private void initializeReflection() {
             try {
                 Object craftServer = Bukkit.getServer();
                 getServerMethod = craftServer.getClass().getMethod("getServer");
@@ -202,7 +200,6 @@ public class SupportManager extends AbstractManager implements Listener {
 
         @Override
         public double getTps() {
-            initializeReflection();
             if (getServerMethod == null || recentTpsField == null) return -1;
 
             int index = 2;
@@ -225,29 +222,32 @@ public class SupportManager extends AbstractManager implements Listener {
             ItemMeta meta = is.getItemMeta();
             if (meta == null) return is;
 
-            initializeReflection();
+            try {
+                UUID uuid = UUID.randomUUID();
+                GameProfile profile = new GameProfile(uuid, uuid.toString().substring(0, 8));
+                profile.getProperties().put("textures", new Property("textures", base64));
 
-            UUID uuid = UUID.randomUUID();
-            GameProfile profile = new GameProfile(uuid, uuid.toString().substring(0, 8));
-            profile.getProperties().put("textures", new Property("textures", base64));
+                if (setProfileMethod != null) {
+                    try {
+                        setProfileMethod.invoke(meta, profile);
+                        is.setItemMeta(meta);
+                        return is;
+                    } catch (Exception ignored) {}
+                }
 
-            if (setProfileMethod != null) {
-                try {
-                    setProfileMethod.invoke(meta, profile);
-                    is.setItemMeta(meta);
-                    return is;
-                } catch (Exception ignored) {}
+                if (profileField != null) {
+                    try {
+                        profileField.set(meta, profile);
+                        is.setItemMeta(meta);
+                        return is;
+                    } catch (Exception ignored) {}
+                }
+
+                return is;
             }
-
-            if (profileField != null) {
-                try {
-                    profileField.set(meta, profile);
-                    is.setItemMeta(meta);
-                    return is;
-                } catch (Exception ignored) {}
+            catch (Exception ignored) {
+                return is;
             }
-
-            return is;
         }
 
         @Override
@@ -257,7 +257,6 @@ public class SupportManager extends AbstractManager implements Listener {
 
         @Override
         public int getPlayerPing(Player player) {
-            initializeReflection();
             if (getHandleMethod == null || pingField == null) {
                 try {
                     getHandleMethod = player.getClass().getMethod("getHandle");

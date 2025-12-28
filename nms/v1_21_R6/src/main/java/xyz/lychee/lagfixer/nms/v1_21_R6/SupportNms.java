@@ -33,23 +33,23 @@ public class SupportNms extends AbstractSupportNms {
         if (meta == null) {
             return is;
         }
-
-        UUID uuid = UUID.randomUUID();
-        GameProfile gameProfile = new GameProfile(
-                uuid,
-                uuid.toString().substring(0, 16),
-                new PropertyMap(ImmutableMultimap.of("textures", new Property("textures", base64)))
-        );
-
-        ResolvableProfile resolvableProfile = ResolvableProfile.createResolved(gameProfile);
+        
         try {
+            UUID uuid = UUID.randomUUID();
+            GameProfile gameProfile = new GameProfile(
+                    uuid,
+                    uuid.toString().substring(0, 16),
+                    new PropertyMap(ImmutableMultimap.of("textures", new Property("textures", base64)))
+            );
+
+            ResolvableProfile resolvableProfile = ResolvableProfile.createResolved(gameProfile);
+            
             Method mtd = meta.getClass().getDeclaredMethod("setProfile", ResolvableProfile.class);
             mtd.setAccessible(true);
             mtd.invoke(meta, resolvableProfile);
             is.setItemMeta(meta);
             return is;
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
             return is;
         }
     }

@@ -3,6 +3,7 @@ version: ${lagfixer_version} [build ${lagfixer_build}]
 main: xyz.lychee.lagfixer.LagFixer
 author: lychee
 api-version: 1.13
+website: https://modrinth.com/plugin/lagfixer
 softdepend: [
   PlaceholderAPI,
   spark,

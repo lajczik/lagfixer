@@ -30,16 +30,18 @@ public class SupportNms extends AbstractSupportNms {
         if (meta == null) {
             return is;
         }
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), RandomStringUtils.randomAlphabetic(8));
-        gameProfile.getProperties().put("textures", new Property("textures", base64));
+
         try {
+            UUID uuid = UUID.randomUUID();
+            GameProfile gameProfile = new GameProfile(uuid, uuid.toString().substring(0, 16));
+            gameProfile.getProperties().put("textures", new Property("textures", base64));
+
             Method mtd = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
             mtd.setAccessible(true);
             mtd.invoke(meta, gameProfile);
             is.setItemMeta(meta);
             return is;
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
             return is;
         }
     }
