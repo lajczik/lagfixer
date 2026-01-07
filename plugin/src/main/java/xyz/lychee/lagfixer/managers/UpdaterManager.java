@@ -86,9 +86,7 @@ public class UpdaterManager extends AbstractManager implements Listener {
                 if ((this.difference >= 0 && this.difference < 2) || this.behind > 5) {
                     this.updater = true;
                 }
-            } catch (IOException ex) {
-                this.getPlugin().printError(ex);
-            }
+            } catch (IOException ignored) {}
 
             if (this.updater && this.compared < 0) {
                 this.getPlugin().getLogger().info(
