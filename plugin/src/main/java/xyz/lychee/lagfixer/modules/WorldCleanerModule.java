@@ -177,7 +177,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                 for (World world : this.getAllowedWorlds()) {
                     for (Entity ent : world.getEntities()) {
                         if (ent instanceof LivingEntity) {
-                            if (this.creatures_enabled && clearCreature((LivingEntity) ent)) {
+                            if (this.creatures_enabled && this.clearCreature((LivingEntity) ent)) {
                                 if (this.creatures_dropitems) {
                                     ((LivingEntity) ent).damage(Double.MAX_VALUE);
                                 }
@@ -185,7 +185,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                                 creatures++;
                             }
                         } else if (ent instanceof Item) {
-                            if (this.items_enabled && clearItem((Item) ent)) {
+                            if (this.items_enabled && this.clearItem((Item) ent)) {
                                 if (this.items_abyss_enabled && !this.items_abyss_blacklist.contains(((Item) ent).getItemStack().getType())) {
                                     Item item = (Item) ent;
                                     if (stacker != null) {
@@ -198,7 +198,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                                 items++;
                             }
                         } else if (ent instanceof Projectile) {
-                            if (this.projectiles_enabled && clearProjectile((Projectile) ent)) {
+                            if (this.projectiles_enabled && this.clearProjectile((Projectile) ent)) {
                                 ent.remove();
                                 projectiles++;
                             }
@@ -207,14 +207,14 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                 }
 
                 if (this.alerts_enabled && this.messages.containsKey(this.second)) {
-                    Component text = Language.createComponent(this.messages.get(this.second), true,
-                            Placeholder.unparsed("remaining", Integer.toString(this.second)),
-                            Placeholder.unparsed("items", Integer.toString(items)),
-                            Placeholder.unparsed("creatures", Integer.toString(creatures)),
-                            Placeholder.unparsed("projectiles", Integer.toString(projectiles))
+                    this.sendAlert(
+                            Language.createComponent(this.messages.get(this.second), true,
+                                    Placeholder.unparsed("remaining", Integer.toString(this.second)),
+                                    Placeholder.unparsed("items", Integer.toString(items)),
+                                    Placeholder.unparsed("creatures", Integer.toString(creatures)),
+                                    Placeholder.unparsed("projectiles", Integer.toString(projectiles))
+                            )
                     );
-                    if (this.alerts_message) this.alerts_audience.sendMessage(text);
-                    if (this.alerts_actionbar) this.alerts_audience.sendActionBar(text);
                 }
 
                 if (this.items_abyss_enabled) {
@@ -241,9 +241,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                     }
 
                     if (this.items_abyss_alerts) {
-                        Component open = this.getLanguage().getComponent("items.abyss.open", true);
-                        if (this.alerts_message) this.alerts_audience.sendMessage(open);
-                        if (this.alerts_actionbar) this.alerts_audience.sendActionBar(open);
+                        this.sendAlert(this.getLanguage().getComponent("items.abyss.open", true));
                     }
 
                     support.getFork().runLater(false, () -> {
@@ -256,25 +254,28 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                         this.inventories.clear();
 
                         if (this.items_abyss_alerts) {
-                            Component close = this.getLanguage().getComponent("items.abyss.close", true);
-                            if (this.alerts_message) this.alerts_audience.sendMessage(close);
-                            if (this.alerts_actionbar) this.alerts_audience.sendActionBar(close);
+                            this.sendAlert(this.getLanguage().getComponent("items.abyss.close", true));
                         }
                     }, this.items_abyss_close, TimeUnit.SECONDS);
                 }
                 this.second = this.interval + 1;
             } else if (this.alerts_enabled && this.messages.containsKey(this.second)) {
-                Component text = Language.createComponent(this.messages.get(this.second), true,
-                        Placeholder.unparsed("remaining", Integer.toString(this.second)),
-                        Placeholder.unparsed("items", Long.toString(support.getItems())),
-                        Placeholder.unparsed("creatures", Long.toString(support.getCreatures())),
-                        Placeholder.unparsed("projectiles", Long.toString(support.getProjectiles()))
+                this.sendAlert(
+                        Language.createComponent(this.messages.get(this.second), true,
+                                Placeholder.unparsed("remaining", Integer.toString(this.second)),
+                                Placeholder.unparsed("items", Long.toString(support.getItems())),
+                                Placeholder.unparsed("creatures", Long.toString(support.getCreatures())),
+                                Placeholder.unparsed("projectiles", Long.toString(support.getProjectiles()))
+                        )
                 );
-                if (this.alerts_message) this.alerts_audience.sendMessage(text);
-                if (this.alerts_actionbar) this.alerts_audience.sendActionBar(text);
             }
         }, 1L, 1L, TimeUnit.SECONDS);
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+    }
+
+    public void sendAlert(Component text) {
+        if (this.alerts_message) this.alerts_audience.sendMessage(text);
+        if (this.alerts_actionbar) this.alerts_audience.sendActionBar(text);
     }
 
     public boolean clearCreature(LivingEntity ent) {
