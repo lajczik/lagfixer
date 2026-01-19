@@ -38,6 +38,10 @@ dependencies {
 }
 
 tasks {
+    build {
+        dependsOn(shadowJar)
+    }
+
     shadowJar {
         archiveBaseName.set("LagFixer")
         archiveClassifier.set("")
