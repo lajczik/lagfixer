@@ -28,10 +28,10 @@ public class AbilityLimiterModule extends AbstractModule implements Listener {
     public AbilityLimiterModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, Impact.MEDIUM, "AbilityLimiter",
                 new String[]{
-                        "Limits rapid Trident and Elytra usage to prevent excessive chunk loading.",
-                        "Frequent high-speed travel can cause server lag and instability.",
-                        "AbilityLimiter allows adjusting the speed reduction to balance performance and player experience.",
-                        "Activating AbilityLimiter ensures smoother world loading, stable server performance, and controlled mobility."
+                        "限制三叉戟和鞘翅的快速使用，以防止过度加载区块。",
+                        "频繁的高速移动可能导致服务器卡顿和不稳定。",
+                        "AbilityLimiter允许调整减速幅度，以平衡性能和玩家体验。",
+                        "启用AbilityLimiter可确保更流畅的世界加载、稳定的服务器性能以及可控的移动能力。"
                 },
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTZmM2YwMzM0Yzk0MzhlOGM3NGMwZjIxNjdiMDkxN2QwZDQ2ZDk3MzYzNjk2NGY5MDI3NDJlZDU1NmZiMDc4MiJ9fX0=");
     }
@@ -110,4 +110,3 @@ public class AbilityLimiterModule extends AbstractModule implements Listener {
         HandlerList.unregisterAll(this);
     }
 }
-

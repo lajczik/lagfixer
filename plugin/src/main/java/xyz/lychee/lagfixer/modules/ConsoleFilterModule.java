@@ -65,10 +65,10 @@ public class ConsoleFilterModule extends AbstractModule {
     public ConsoleFilterModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, AbstractModule.Impact.VISUAL_ONLY, "ConsoleFilter",
                 new String[]{
-                        "Filters console messages based on predefined rules.",
-                        "Enhances clarity by selectively displaying essential messages.",
-                        "Reduces clutter and improves readability in multiplayer servers.",
-                        "Facilitates efficient server administration and enhances the user experience for both administrators and players."
+                        "根据预定义规则过滤控制台消息。",
+                        "通过选择性显示重要消息来增强清晰度。",
+                        "减少多人服务器中的杂乱信息并提高可读性。",
+                        "便于高效的服务器管理，并提升管理员和玩家的用户体验。"
                 },
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWNjNzg5ZjIzMDc5NGY5MGUzM2M0ZjlhZDAwNjk0YmMyYTJmZjVlOGI5YjM3NWRjMzUzMjQwMWIyODFmM2U1OCJ9fX0="
         );
@@ -144,4 +144,3 @@ public class ConsoleFilterModule extends AbstractModule {
         }
     }
 }
-

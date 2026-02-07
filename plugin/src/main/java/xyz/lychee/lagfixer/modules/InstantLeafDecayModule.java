@@ -30,10 +30,10 @@ public class InstantLeafDecayModule extends AbstractModule implements Listener {
     public InstantLeafDecayModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, AbstractModule.Impact.LOW, "InstantLeafDecay",
                 new String[]{
-                        "Ensures instant leaf removal, reducing leaf blocks for ticking.",
-                        "Vital for server performance by eliminating gradual leaf block processing.",
-                        "Optimizes server resources for smoother gameplay without decay overhead.",
-                        "Ideal for servers with forestry, managing leaf block accumulation."
+                        "确保即时移除树叶，减少需处理的树叶方块数量。",
+                        "通过消除渐进式树叶方块处理，对服务器性能至关重要。",
+                        "优化服务器资源，实现无腐烂开销的更流畅游戏体验。",
+                        "适合有林业活动的服务器，用于管理树叶方块的堆积。"
                 }, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWYyZDE0NjkyZDhiMGUzNTI2YTZmYWY0MjY2NzI3YmQwMmFhYTdiMDUyN2IxODVhY2Y3ZjBhYTY2NzkzZmZkYyJ9fX0=");
     }
 

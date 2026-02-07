@@ -28,7 +28,8 @@ public class MapCommand extends CommandManager.Subcommand {
     private MapHandler mapHandler;
 
     public MapCommand(CommandManager commandManager) {
-        super(commandManager, "map", "server load map monitor with mspt chart");
+        // 翻译：服务器负载监控地图（含MSPT图表）
+        super(commandManager, "map", "服务器负载监控地图（含MSPT图表）");
     }
 
     @Override
@@ -56,11 +57,12 @@ public class MapCommand extends CommandManager.Subcommand {
     @Override
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {
         if (this.mapHandler == null) {
+            // 翻译：地图当前不可用...
             MessageUtils.sendMessage(true, sender,
-                    "&7The map is currently unavailable." +
-                            "\nYou need to add the &e&n-Djava.awt.headless=true&7 flag when starting the application to resolve the issue." +
-                            "\nThis will enable headless mode and avoid the X11 display connection problem." +
-                            "\nPlease restart the server with this flag and check if the issue persists.");
+                    "&7地图当前不可用。" +
+                            "\n您需要在启动应用时添加 &e&n-Djava.awt.headless=true&7 标志来解决此问题。" +
+                            "\n这将启用无头模式，避免X11显示连接问题。" +
+                            "\n请使用此标志重新启动服务器，并检查问题是否仍然存在。");
             return false;
         }
 
@@ -132,7 +134,8 @@ public class MapCommand extends CommandManager.Subcommand {
 
             MapMeta meta = (MapMeta) this.mapItem.getItemMeta();
             meta.setMapView(this.mapView);
-            meta.setDisplayName(MessageUtils.fixColors(null, "&e⚡ &fServer monitor! &e⚡"));
+            // 翻译：⚡ 服务器监控！ ⚡
+            meta.setDisplayName(MessageUtils.fixColors(null, "&e⚡ &f服务器监控！ &e⚡"));
             this.mapItem.setItemMeta(meta);
 
             this.mapView.getRenderers().clear();
@@ -158,9 +161,10 @@ public class MapCommand extends CommandManager.Subcommand {
                 if (!this.shouldRender) return;
 
                 renderGraph();
+                // 翻译：文本格式
                 renderText(supportMspt ?
-                        String.format("Mspt: %.1f Tps: %.1f", monitor.getMspt(), monitor.getTps())
-                        : String.format("Tps: %.1f, Cpu: %.1f", monitor.getTps(), monitor.getCpuProcess())
+                        String.format("MSPT: %.1f TPS: %.1f", monitor.getMspt(), monitor.getTps())
+                        : String.format("TPS: %.1f, CPU: %.1f", monitor.getTps(), monitor.getCpuProcess())
                 );
 
                 for (int i = 0; i < this.pixels.length; i++) {

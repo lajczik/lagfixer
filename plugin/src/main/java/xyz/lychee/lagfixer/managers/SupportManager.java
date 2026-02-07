@@ -85,7 +85,7 @@ public class SupportManager extends AbstractManager implements Listener {
                 .max(Comparator.comparingInt(AbstractFork::getPriority))
                 .ifPresent(fork -> {
                     this.fork = fork;
-                    this.getPlugin().getLogger().info(" &8• &rLoaded fork support ~ " + this.fork.getClass().getCanonicalName());
+                    this.getPlugin().getLogger().info(" &8• &r已加载分支支持 ~ " + this.fork.getClass().getCanonicalName());
                 });
 
         Server server = Bukkit.getServer();
@@ -98,7 +98,7 @@ public class SupportManager extends AbstractManager implements Listener {
             if (lastPart.matches("v\\d+_\\d+_R\\d+")) {
                 this.nmsVersion = lastPart;
             } else {
-                this.getPlugin().getLogger().info("   &cPlugin is outdated, update from:");
+                this.getPlugin().getLogger().info("   &c插件已过时，请从以下地址更新：");
                 this.getPlugin().getLogger().info("   &chttps://modrinth.com/plugin/lagfixer");
                 this.nms = new DeprecatedBukkitSupport(this.getPlugin());
                 return;
@@ -111,10 +111,10 @@ public class SupportManager extends AbstractManager implements Listener {
             this.nms = (AbstractSupportNms) constructor.newInstance(this.getPlugin());
             Bukkit.getPluginManager().registerEvents(this.nms, this.getPlugin());
 
-            this.getPlugin().getLogger().info(" &8• &rLoaded nms support ~ " + this.nms.getClass().getCanonicalName());
+            this.getPlugin().getLogger().info(" &8• &r已加载NMS支持 ~ " + this.nms.getClass().getCanonicalName());
         } catch (Throwable ex) {
-            this.getPlugin().getLogger().info("   &cOptimal support not found, the plugin will use reflection methods!");
-            this.getPlugin().getLogger().info("   &7Supported versions: &e1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20 - 1.21.10");
+            this.getPlugin().getLogger().info("   &c未找到最优支持，插件将使用反射方法！");
+            this.getPlugin().getLogger().info("   &7支持版本: &e1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20 - 1.21.10");
             this.nms = new DeprecatedBukkitSupport(this.getPlugin());
         }
 

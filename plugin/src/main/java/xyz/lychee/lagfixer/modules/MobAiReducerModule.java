@@ -61,10 +61,10 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
     public MobAiReducerModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, AbstractModule.Impact.VERY_HIGH, "MobAiReducer",
                 new String[]{
-                        "Replaces creature movement to optimize and reduce behavior.",
-                        "Addresses inefficiencies caused by default animal behavior like unnecessary random movements or constant looking around.",
-                        "MobAiReducer intervenes by disabling unnecessary PathFinders or replacing them with more efficient ones.",
-                        "Crucial in scenarios with numerous animals as even minor movements can strain server resources."
+                        "替换生物移动方式以优化和减少行为消耗。",
+                        "解决默认动物行为导致的低效问题，如不必要的随机移动或持续环顾四周。",
+                        "MobAiReducer通过禁用不必要的寻路器或用更高效的寻路器替换来干预。",
+                        "在拥有大量动物的场景中至关重要，因为即使是微小的移动也可能消耗服务器资源。"
                 },
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGM3NTA1ZjIyNGQ1MTY0YTExN2Q4YzY5ZjAxNWY5OWVmZjQzNDQ3MWM4YTJkZjkwNzA5NmM0MjQyYzM1MjRlOCJ9fX0=");
     }
@@ -189,4 +189,3 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         public abstract void purge();
     }
 }
-

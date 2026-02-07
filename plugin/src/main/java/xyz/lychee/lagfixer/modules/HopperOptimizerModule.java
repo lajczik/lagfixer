@@ -55,10 +55,10 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
     public HopperOptimizerModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, Impact.HIGH, "HopperOptimizer",
                 new String[]{
-                        "Optymalizuje działanie lejków zmniejszając ich obciążenie serwera.",
-                        "Wprowadza inteligentne ograniczenia transferu przedmiotów.",
-                        "Zapobiega nadmiernej liczbie lejków w chunkach.",
-                        "Poprawia wydajność serwera przy dużej ilości lejków."
+                        "优化漏斗运作，降低其对服务器的负载。",
+                        "引入物品转移的智能限制。",
+                        "防止区块内漏斗数量过多。",
+                        "在大量漏斗存在时提升服务器性能。"
                 },
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGViODFlZjg5MDIzNzk2NTBiYTc5ZjQ1NzIzZDZiOWM4ODgzODhhMDBmYzRlMTkyZjM0NTRmZTE5Mzg4MmVlMSJ9fX0="
         );

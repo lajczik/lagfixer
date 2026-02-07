@@ -61,10 +61,10 @@ public class ExplosionOptimizerModule extends AbstractModule implements Listener
     public ExplosionOptimizerModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, Impact.HIGH, "ExplosionOptimizer",
                 new String[]{
-                        "Limits explosion power and prevents chain reactions to reduce lag and destruction.",
-                        "Useful for servers with frequent TNT, creepers, or End Crystal usage.",
-                        "Prevents excessive explosions from causing performance issues.",
-                        "Maintains stable server performance while controlling destructive events."
+                        "限制爆炸威力并防止连锁反应，以减少卡顿和破坏。",
+                        "适用于频繁使用TNT、苦力怕或末影水晶的服务器。",
+                        "防止过多爆炸导致性能问题。",
+                        "在控制破坏性事件的同时保持服务器性能稳定。"
                 },
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDgxNzliMTc1ZGFhNzlmNzNjNjY1YjYxMTYzMzY0ZjY2MjdlM2QwMmI3MjUzZDQyN2ViZDJmZjY4MThkZTZjZSJ9fX0="
         );
@@ -293,7 +293,8 @@ public class ExplosionOptimizerModule extends AbstractModule implements Listener
                             Float.parseFloat(split[1])
                     );
                 } catch (Exception e) {
-                    getPlugin().getLogger().warning("Unknown \"" + EntityType.class.getSimpleName() + "\" enum value: " + entity);
+                    // 翻译：未知的枚举值警告
+                    getPlugin().getLogger().warning("未知的\"" + EntityType.class.getSimpleName() + "\"枚举值: " + entity);
                 }
             }
         }

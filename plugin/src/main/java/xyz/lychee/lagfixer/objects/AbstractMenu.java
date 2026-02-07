@@ -25,16 +25,36 @@ import java.util.function.Consumer;
 
 @Getter
 public abstract class AbstractMenu implements Listener {
+    // 翻译：边框物品（保留符号）
     private static final @Getter ItemStack border = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("&8#").build();
+    // 翻译：填充物品（保留符号）
     private static final @Getter ItemStack filler = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setName("&8#").build();
+
+    // 翻译：已禁用状态物品
     private static final @Getter ItemStack disabled;
+    // 翻译：已启用状态物品
     private static final @Getter ItemStack enabled;
+    // 翻译：返回按钮物品
     private static final @Getter ItemStack back;
 
     static {
-        enabled = ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkwNzkzZjU2NjE2ZjEwMTUwMmRlMWQzNGViMjU0NGY2MDdkOTg5MDBlMzY5OTM2OTI5NTMxOWU2MzBkY2Y2ZCJ9fX0=").setName("&a&lENABLED!").setLore(" &8{*} &7Click to &cdisable &7this module!").build();
-        disabled = ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTRiZDlhNDViOTY4MWNlYTViMjhjNzBmNzVhNjk1NmIxZjU5NGZlYzg0MGI5NjA3Nzk4ZmIxZTcwNzc2NDQzMCJ9fX0=").setName("&c&lDISABLED!").setLore(" &8{*} &7Click to &aenable &7this module!").build();
-        back = ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjM0OTM5ZDI2NDQ0YTU3MzI3ZjA2NGMzOTI4ZGE2MWYzNmNhZjYyMmRlYmU3NGMzM2Y4ZjhhMzZkYTIyIn19fQ==").setName("&3&lPREVIOUS MENU!").setLore(" &8{*} &7Click to &3return &7to previous menu!").build();
+        // 翻译：已启用状态物品
+        enabled = ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTkwNzkzZjU2NjE2ZjEwMTUwMmRlMWQzNGViMjU0NGY2MDdkOTg5MDBlMzY5OTM2OTI5NTMxOWU2MzBkY2Y2ZCJ9fX0=")
+                .setName("&a&l已启用！")
+                .setLore(" &8{*} &7点击以&c禁用&7此模块！")
+                .build();
+
+        // 翻译：已禁用状态物品
+        disabled = ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTRiZDlhNDViOTY4MWNlYTViMjhjNzBmNzVhNjk1NmIxZjU5NGZlYzg0MGI5NjA3Nzk4ZmIxZTcwNzc2NDQzMCJ9fX0=")
+                .setName("&c&l已禁用！")
+                .setLore(" &8{*} &7点击以&a启用&7此模块！")
+                .build();
+
+        // 翻译：返回按钮物品
+        back = ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjM0OTM5ZDI2NDQ0YTU3MzI3ZjA2NGMzOTI4ZGE2MWYzNmNhZjYyMmRlYmU3NGMzM2Y4ZjhhMzZkYTIyIn19fQ==")
+                .setName("&3&l返回上一菜单！")
+                .setLore(" &8{*} &7点击以&3返回&7上一菜单！")
+                .build();
     }
 
     private final LagFixer plugin;
@@ -141,4 +161,3 @@ public abstract class AbstractMenu implements Listener {
         private final Consumer<InventoryClickEvent> eventConsumer;
     }
 }
-

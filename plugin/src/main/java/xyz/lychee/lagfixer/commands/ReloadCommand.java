@@ -12,7 +12,8 @@ public class ReloadCommand extends CommandManager.Subcommand {
     private volatile boolean reload = false;
 
     public ReloadCommand(CommandManager commandManager) {
-        super(commandManager, "reload", "reload all plugin configuration");
+        // 翻译：重载所有插件配置
+        super(commandManager, "reload", "重载所有插件配置");
     }
 
     @Override
@@ -24,7 +25,8 @@ public class ReloadCommand extends CommandManager.Subcommand {
     @Override
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {
         if (this.reload) {
-            return MessageUtils.sendMessage(true, sender, "&7Reload is running, wait for results in console!");
+            // 翻译：重载正在运行，请在控制台等待结果！
+            return MessageUtils.sendMessage(true, sender, "&7重载正在运行，请在控制台等待结果！");
         }
 
         this.reload = true;
@@ -51,25 +53,29 @@ public class ReloadCommand extends CommandManager.Subcommand {
                             m.setLoaded(true);
                         }
                         m.loadAllConfig();
-                        plugin.getLogger().info("&rConfiguration for &e" + m.getName() + " &rsuccessfully reloaded!");
+                        // 翻译：模块配置成功重载
+                        plugin.getLogger().info("&r模块 &e" + m.getName() + " &r的配置已成功重载！");
                     } else if (m.isLoaded()) {
                         m.disable();
                         m.setLoaded(false);
-                        plugin.getLogger().info("&rSuccessfully disabled module &e" + m.getName() + "&r!");
+                        // 翻译：成功禁用模块
+                        plugin.getLogger().info("&r成功禁用模块 &e" + m.getName() + "&r！");
                     }
                     m.getMenu().updateAll();
                 } catch (Exception ex) {
                     plugin.printError(ex);
-                    plugin.getLogger().info("&rError reloading configuration for &c" + m.getName() + "&r!");
+                    // 翻译：重载模块配置时出错
+                    plugin.getLogger().info("&r重载模块 &c" + m.getName() + " &r的配置时出错！");
                 }
             });
 
-            MessageUtils.sendMessage(true, sender, "&7Reloaded modules configurations in &f" + t.stop().getExecutingTime() + "&7ms." +
+            // 翻译：重载完成消息
+            MessageUtils.sendMessage(true, sender, "&7已在 &f" + t.stop().getExecutingTime() + "&7ms 内重载模块配置。" +
                     "\n " +
-                    "\n &7Working methods to apply all changes:" +
-                    "\n  &8{*} &7Server restart (&frecommended&7)" +
-                    "\n  &8{*} &7All plugins reload, command: &f/reload confirm" +
-                    "\n  &8{*} &7Plugman reload, command: &f/plugman reload LagFixer");
+                    "\n &7应用所有更改的有效方法：" +
+                    "\n  &8{*} &7重启服务器（&f推荐&7）" +
+                    "\n  &8{*} &7重载所有插件，命令：&f/reload confirm" +
+                    "\n  &8{*} &7使用Plugman重载，命令：&f/plugman reload LagFixer");
             this.reload = false;
         });
         thread.setName("LagFixer Reload");

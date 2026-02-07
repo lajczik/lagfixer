@@ -8,7 +8,7 @@ import xyz.lychee.lagfixer.utils.MessageUtils;
 
 public class MonitorCommand extends CommandManager.Subcommand {
     public MonitorCommand(CommandManager commandManager) {
-        super(commandManager, "monitor", "check server load statistics", "tps", "mspt");
+        super(commandManager, "monitor", "检查服务器负载统计", "tps", "mspt");
     }
 
     @Override
@@ -21,11 +21,11 @@ public class MonitorCommand extends CommandManager.Subcommand {
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {
         AbstractMonitor monitor = SupportManager.getInstance().getMonitor();
         return MessageUtils.sendMessage(true, sender,
-                "&7Command result: " +
-                        "\n &8{*} &fTps: &e" + monitor.getTps() +
-                        "\n &8{*} &fMspt: &e" + monitor.getMspt() +
-                        "\n &8{*} &fMemory: &e" + monitor.getRamUsed() + "&8/&e" + monitor.getRamTotal() + "&8/&e" + monitor.getRamMax() + " MB" +
-                        "\n &8{*} &fCpu process: &e" + monitor.getCpuProcess() + "%" +
-                        "\n &8{*} &fCpu system: &e" + monitor.getCpuSystem() + "%");
+                "&7命令结果：" +
+                        "\n &8{*} &fTPS: &e" + monitor.getTps() +
+                        "\n &8{*} &fMSPT: &e" + monitor.getMspt() +
+                        "\n &8{*} &f内存: &e" + monitor.getRamUsed() + "&8/&e" + monitor.getRamTotal() + "&8/&e" + monitor.getRamMax() + " MB" +
+                        "\n &8{*} &fCPU进程: &e" + monitor.getCpuProcess() + "%" +
+                        "\n &8{*} &fCPU系统: &e" + monitor.getCpuSystem() + "%");
     }
 }

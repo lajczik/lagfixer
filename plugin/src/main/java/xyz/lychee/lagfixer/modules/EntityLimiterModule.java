@@ -47,10 +47,10 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
     public EntityLimiterModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, AbstractModule.Impact.HIGH, "EntityLimiter",
                 new String[]{
-                        "Restricts the number of entities per chunk.",
-                        "Essential for survival servers with expansive animal farms.",
-                        "Prevents excessive entity accumulation and associated performance issues.",
-                        "Maintains stable performance levels even in environments with high entity density."
+                        "限制每个区块的实体数量。",
+                        "对于拥有大型动物农场的生存服务器至关重要。",
+                        "防止过多的实体积累及相关性能问题。",
+                        "即使在高实体密度的环境中也能保持稳定性能。"
                 }, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRjMzZjOWNiNTBhNTI3YWE1NTYwN2EwZGY3MTg1YWQyMGFhYmFhOTAzZThkOWFiZmM3ODI2MDcwNTU0MGRlZiJ9fX0="
         );
     }
@@ -191,4 +191,3 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
         }
     }
 }
-

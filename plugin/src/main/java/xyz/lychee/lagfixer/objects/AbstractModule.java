@@ -90,7 +90,8 @@ public abstract class AbstractModule {
 
         InputStream defStream = this.plugin.getResource(resourcePath);
         if (defStream == null) {
-            this.plugin.getLogger().warning("Couldn't find config file " + this.name + ".yml in resources");
+            // 翻译：在资源中找不到配置文件
+            this.plugin.getLogger().warning("在资源中找不到配置文件 " + this.name + ".yml");
             return;
         }
 
@@ -111,7 +112,8 @@ public abstract class AbstractModule {
 
         File parent = configFile.getParentFile();
         if (!parent.exists() && !parent.mkdirs()) {
-            this.plugin.getLogger().warning("Could not create directory: " + parent);
+            // 翻译：无法创建目录
+            this.plugin.getLogger().warning("无法创建目录: " + parent);
         }
 
         FileConfiguration mainCfg = this.plugin.getConfig();
@@ -124,7 +126,8 @@ public abstract class AbstractModule {
                 this.config.options().copyDefaults(true);
                 this.config.save(configFile);
 
-                mainCfg.set(sectionPath, "Configuration has been moved to \"LagFixer/modules/" + this.name + ".yml\"");
+                // 翻译：配置已移动到
+                mainCfg.set(sectionPath, "配置已移动到 \"LagFixer/modules/" + this.name + ".yml\"");
                 return;
             }
         }
@@ -162,12 +165,18 @@ public abstract class AbstractModule {
 
     @Getter
     public enum Impact {
-        VERY_HIGH("<bold><gradient:#069e00:#0aff00>VERY HIGH</gradient>"),
-        HIGH("<bold><gradient:#1fab1a:#3dff2b>HIGH</gradient>"),
-        MEDIUM("<bold><gradient:#a6ab1a:#ffe32b>MEDIUM</gradient>"),
-        LOW("<bold><gradient:#ab591a:#ff6b2b>LOW</gradient>"),
-        VERY_LOW("<bold><gradient:#ab1e1a:#ff322b>VERY LOW</gradient>"),
-        VISUAL_ONLY("<bold><gradient:#1a5eab:#26baff>VISUAL ONLY</gradient>");
+        // 翻译：非常高
+        VERY_HIGH("<bold><gradient:#069e00:#0aff00>非常高</gradient>"),
+        // 翻译：高
+        HIGH("<bold><gradient:#1fab1a:#3dff2b>高</gradient>"),
+        // 翻译：中
+        MEDIUM("<bold><gradient:#a6ab1a:#ffe32b>中</gradient>"),
+        // 翻译：低
+        LOW("<bold><gradient:#ab591a:#ff6b2b>低</gradient>"),
+        // 翻译：非常低
+        VERY_LOW("<bold><gradient:#ab1e1a:#ff322b>非常低</gradient>"),
+        // 翻译：仅视觉效果
+        VISUAL_ONLY("<bold><gradient:#1a5eab:#26baff>仅视觉效果</gradient>");
 
         private final Component component;
 
@@ -176,4 +185,3 @@ public abstract class AbstractModule {
         }
     }
 }
-

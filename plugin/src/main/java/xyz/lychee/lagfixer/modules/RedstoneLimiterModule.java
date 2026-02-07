@@ -45,11 +45,12 @@ public class RedstoneLimiterModule extends AbstractModule implements Listener {
     public RedstoneLimiterModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, Impact.MEDIUM, "RedstoneLimiter",
                 new String[]{
-                        "Disables demanding Redstone clocks to prevent server overload.",
-                        "Certain Redstone configurations can lead to performance degradation and crashes.",
-                        "Activating AntiRedstone preserves server stability and ensures responsiveness.",
-                        "Facilitates uninterrupted gameplay even with complex Redstone contraptions."
-                }, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjExNzZjNGQ2Mzk1ZmY1NzY3YTc0YTM2OWZlMzg2ZDA2Y2M2MGEyMDk3YmM1YTUzYmQwMDVlYWRkMGE3Y2JkNCJ9fX0=");
+                        "禁用高需求的红石时钟以防止服务器过载。",
+                        "某些红石配置可能导致性能下降和崩溃。",
+                        "激活AntiRedstone可保持服务器稳定性并确保响应性。",
+                        "即使存在复杂红石装置，也能保障不间断的游戏体验。"
+                }, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjExNzZjNGQ2Mzk1ZmY1NzY3YTc0YTM2OWZlMzg2ZDA2Y2M2MGEyMDk3YmM1YTUzYmQwMDVlYWRkMGE3Y2JkNCJ9fX0="
+        );
     }
 
     @EventHandler
@@ -196,4 +197,3 @@ public class RedstoneLimiterModule extends AbstractModule implements Listener {
         }
     }
 }
-

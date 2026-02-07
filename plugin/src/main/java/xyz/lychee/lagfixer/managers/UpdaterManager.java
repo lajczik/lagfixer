@@ -47,7 +47,7 @@ public class UpdaterManager extends AbstractManager implements Listener {
         if (e.getPlayer().isOp() && this.compared < 0 && this.updater) {
             SupportManager.getInstance().getFork().runLater(true, () -> {
                 MessageUtils.sendMessage(true, e.getPlayer(),
-                        "\nPlugin needs update, latest version: &f" + this.latestVersion +
+                        "\n插件需要更新，最新版本: &f" + this.latestVersion +
                                 "\n &8- &ehttps://modrinth.com/plugin/lagfixer/version/" + this.latestVersion +
                                 "\n"
                 );
@@ -91,11 +91,11 @@ public class UpdaterManager extends AbstractManager implements Listener {
             if (this.updater && this.compared < 0) {
                 this.getPlugin().getLogger().info(
                         String.format("\n&8∘₊✧────────────────────────────────✧₊∘" +
-                                        "\n&c&lLagFixer needs an update!" +
-                                        "\n&fVersion: &e&n%s&r -> &e&n%s&r" +
+                                        "\n&c&lLagFixer 需要更新！" +
+                                        "\n&f版本: &e&n%s&r -> &e&n%s&r" +
                                         "\n&ahttps://modrinth.com/plugin/lagfixer/version/%s" +
                                         "\n" +
-                                        "\n&6⚠ &7Updating this plugin is crucial! &6⚠" +
+                                        "\n&6⚠ &7更新此插件至关重要！ &6⚠" +
                                         "\n&8∘₊✧────────────────────────────────✧₊∘",
                                 this.currentVersion, this.latestVersion, this.latestVersion
                         )
@@ -222,4 +222,3 @@ public class UpdaterManager extends AbstractManager implements Listener {
         public String dependency_type;
     }
 }
-

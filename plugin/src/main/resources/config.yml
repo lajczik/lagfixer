@@ -7,31 +7,39 @@
 #░╚══════╝╚═╝░░╚═╝░╚═════╝░░░╚═╝░░░░░╚═╝╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝░
 #░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-# Some of the options below require a server restart or plugin reload.
+# 以下部分选项需要重启服务器或重新加载插件才能生效。
 main:
+  # 插件前缀，显示在消息前
   prefix: "&8[&e&l⚡&8] "
-  # Displays LagFixer version info on hover.
+  # 悬停显示LagFixer版本信息
   prefix_hover: true
-  # Multithread synchronization has not been thoroughly tested.
+  # 多线程同步尚未经过充分测试，请谨慎使用
   threads: 1
-  # Update interval (in seconds) for TPS, MSPT, CPU, and other metrics.
+  # TPS、MSPT、CPU等性能指标的更新间隔（单位：秒）
   monitor_interval: 5
-  # Automatically reports LagFixer errors and Spark profiler to our support team.
+  # 自动向技术支持团队报告LagFixer错误和Spark性能分析数据
   errors_reporter: true
 
+  # 启用插件更新检查
   updater: true
-  # Displays warnings for legacy methods without support.
+  # 对不受支持的旧版本方法显示警告信息
   warnings: true
-  # Optimized metrics available at https://bstats.org/plugin/bukkit/LagFixer/19292.
+  # 优化统计功能，数据可在 https://bstats.org/plugin/bukkit/LagFixer/19292 查看
   bStats: true
 
+  # 命令相关配置
   command:
+    # 使用LagFixer命令所需的权限
     permission: "lagfixer.command"
+    # 命令别名
     aliases:
       - lf
       - antilag
       - lag
 
+  # 地图显示功能配置
   map:
+    # 是否启用地图功能
     enabled: true
-    interval: 3 # Update interval (in seconds) for the map handler (/lagfixer map). Recommended to be at least twice the monitor_interval.
+    # 地图处理器(/lagfixer map)的更新间隔（单位：秒），建议至少是monitor_interval的两倍
+    interval: 3

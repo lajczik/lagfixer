@@ -50,8 +50,6 @@ public class ModuleManager extends AbstractManager {
 
     @Override
     public void load() {
-        //Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
-
         for (AbstractModule module : this.modules.values()) {
             try {
                 TimingUtil t = TimingUtil.startNew();
@@ -61,16 +59,19 @@ public class ModuleManager extends AbstractManager {
                 if (enabled) {
                     if (success) {
                         module.load();
-                        this.getPlugin().getLogger().info(" &8• &rSuccessfully loaded module " + module.getName() + " in " + t.stop().getExecutingTime() + "ms.");
+                        // 翻译：成功加载模块
+                        this.getPlugin().getLogger().info(" &8• &r成功加载模块 " + module.getName() + "，耗时 " + t.stop().getExecutingTime() + "ms。");
                     } else {
-                        this.getPlugin().getLogger().info(" &8• &rSkipping unsupported module " + module.getName() + " for " + Bukkit.getServer().getBukkitVersion() + ".");
+                        // 翻译：跳过不支持的模块
+                        this.getPlugin().getLogger().info(" &8• &r跳过不支持的模块 " + module.getName() + "（当前服务端版本：" + Bukkit.getServer().getBukkitVersion() + "）。");
                     }
                 }
 
                 module.setLoaded(success && enabled);
             } catch (Exception ex) {
                 module.setLoaded(false);
-                this.getPlugin().getLogger().info(" &8• &cSkipping module " + module.getName() + ", reason: " + ex.getMessage());
+                // 翻译：跳过模块
+                this.getPlugin().getLogger().info(" &8• &c跳过模块 " + module.getName() + "，原因：" + ex.getMessage());
                 this.getPlugin().printError(ex);
             }
 
@@ -86,17 +87,17 @@ public class ModuleManager extends AbstractManager {
 
     @Override
     public void disable() {
-        //HandlerList.unregisterAll(this);
-
         for (AbstractModule module : this.modules.values()) {
             if (!module.isLoaded()) continue;
 
             try {
                 TimingUtil t = TimingUtil.startNew();
                 module.disable();
-                this.getPlugin().getLogger().info(" • Successfully disabled module " + module.getName() + " in " + t.stop().getExecutingTime() + "ms.");
+                // 翻译：成功禁用模块
+                this.getPlugin().getLogger().info(" • 成功禁用模块 " + module.getName() + "，耗时 " + t.stop().getExecutingTime() + "ms。");
             } catch (Exception ex) {
-                this.getPlugin().getLogger().info(" • Error with disabling module " + module.getName() + ", reason: " + ex.getMessage());
+                // 翻译：禁用模块时出错
+                this.getPlugin().getLogger().info(" • 禁用模块 " + module.getName() + " 时出错，原因：" + ex.getMessage());
                 this.getPlugin().printError(ex);
             }
         }
@@ -107,4 +108,3 @@ public class ModuleManager extends AbstractManager {
         return true;
     }
 }
-

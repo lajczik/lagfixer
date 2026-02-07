@@ -25,12 +25,13 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
     public VehicleMotionReducerModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, AbstractModule.Impact.LOW, "VehicleMotionReducer",
                 new String[]{
-                        "Optimizes all vehicles such as Boats and Minecarts.",
-                        "Removes minecarts with chests spawned in mineshafts.",
-                        "Particularly useful when minecarts are frequently used on the server.",
-                        "Enhances server performance by optimizing vehicle mechanics and removing unnecessary entities."
+                        "优化所有载具，如船和矿车。",
+                        "移除在矿井中生成的带箱子的矿车。",
+                        "当服务器上频繁使用矿车时尤其有用。",
+                        "通过优化载具机制和移除不必要的实体来提升服务器性能。"
                 },
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTJjMjA1MGVjYTBlZmRkMDMxZTY1OGI5OTZjMjM5YmY3ZGEzYWVmODY1NjEyMzY3ZWQ5ZDg5NWFlN2EwZGE5ZiJ9fX0=");
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTJjMjA1MGVjYTBlZmRkMDMxZTY1OGI5OTZjMjM5YmY3ZGEzYWVmODY1NjEyMzY3ZWQ5ZDg5NWFlN2EwZGE5ZiJ9fX0="
+        );
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
@@ -96,4 +97,3 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
         public abstract boolean optimizeVehicle(Entity vehicle);
     }
 }
-

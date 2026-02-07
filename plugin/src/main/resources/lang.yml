@@ -7,46 +7,46 @@
 #░╚══════╝╚═╝░░╚═╝░╚═════╝░░░╚═╝░░░░░╚═╝╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝░
 #░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-#-----------------> TUTORIALS <-----------------#
+#-----------------> 使用教程 <-----------------#
 #
-# Hex colors and gradients usage:
+# 十六进制颜色和渐变色用法：
 # - https://docs.advntr.dev/minimessage/format.html
 #
-# (SOON) PlaceholderAPI usage:
-# - Format: <papi:[papi_placeholder]>
-# - Example: <papi:luckperms_prefix>
+# (即将支持) PlaceholderAPI 使用方法：
+# - 格式：<papi:[papi_placeholder]>
+# - 示例：<papi:luckperms_prefix>
 #
-#-----------------> TUTORIALS <-----------------#
+#-----------------> 使用教程 <-----------------#
 
-#soon it will be possible to translate all messages
+# 未来版本会支持所有消息的翻译哦～
 messages:
   Main:
-    no_access: "<gray>Missing permission to this module: <yellow><permission>"
-    disabled_module: "<gray>Module <yellow><module> <gray>is disabled, administration must enable this feature!"
-    player_only: "<gray>Command can be only executed by player!"
+    no_access: "<gray>呜～人家没有权限使用这个模块啦：<yellow><permission>"
+    disabled_module: "<gray>模块 <yellow><module> <gray>被禁用啦，管理员姐姐要记得启用这个功能哦！"
+    player_only: "<gray>这个命令只能由玩家执行啦～人家可是会守护服务器的哟！"
 
   RedstoneLimiter:
-    alert: "<gray>Blocked <yellow><ticks> <gray>redstone ticks at chunk in <gradient:#c48d00:#fffb00><location></gradient><gray>!"
-    cooldown: "<gray>You can use <material> again in <gradient:#c48d00:#fffb00><cooldown></gradient><gray>ms."
+    alert: "<gray>人家成功阻止了 <yellow><ticks> <gray>个红石信号在 <gradient:#c48d00:#fffb00><location></gradient><gray> 区块的泛滥！"
+    cooldown: "<gray>请在 <gradient:#c48d00:#fffb00><cooldown></gradient><gray>毫秒后再使用 <material> 吧～"
 
   WorldCleaner:
-    countingdown: # Message format -> "second=message"
-      - "15=<gradient:#ff3c00:#ffff00>Warning!</gradient> <gray>In <color:#ff8800><remaining> <gray>seconds the server will be cleared of entities and items!"
-      - "10=<gradient:#ff3c00:#ffff00>Warning!</gradient> <gray>In <color:#ff8800><remaining> <gray>seconds the server will be cleared of entities and items!"
-      - "5=<gradient:#ff3c00:#ffff00>Warning!</gradient> <gray>In <color:#ff8800><remaining> <gray>seconds the server will be cleared of entities and items!"
-      - "4=<gradient:#ff3c00:#ffff00>Warning!</gradient> <gray>In <color:#ff8800><remaining> <gray>seconds the server will be cleared of entities and items!"
-      - "3=<gradient:#ff3c00:#ffff00>Warning!</gradient> <gray>In <color:#ff8800><remaining> <gray>seconds the server will be cleared of entities and items!"
-      - "2=<gradient:#ff3c00:#ffff00>Warning!</gradient> <gray>In <color:#ff8800><remaining> <gray>seconds the server will be cleared of entities and items!"
-      - "1=<gradient:#ff3c00:#ffff00>Warning!</gradient> <gray>In <color:#ff8800><remaining> <gray>second the server will be cleared of entities and items!"
-      - "0=<gray>Successfully removed <color:#ff8800><items>x <gray>items, <color:#ff8800><creatures>x <gray>creatures and <color:#ff8800><projectiles>x <gray>projectiles!"
+    countingdown: # 消息格式 -> "秒数=消息"
+      - "15=<gradient:#ff3c00:#ffff00>注意啦！</gradient> <gray>还有 <color:#ff8800><remaining> <gray>秒人家就要清理服务器上的实体和物品了哦～"
+      - "10=<gradient:#ff3c00:#ffff00>注意啦！</gradient> <gray>还有 <color:#ff8800><remaining> <gray>秒人家就要清理服务器上的实体和物品了哦～"
+      - "5=<gradient:#ff3c00:#ffff00>注意啦！</gradient> <gray>还有 <color:#ff8800><remaining> <gray>秒人家就要清理服务器上的实体和物品了哦～"
+      - "4=<gradient:#ff3c00:#ffff00>注意啦！</gradient> <gray>还有 <color:#ff8800><remaining> <gray>秒人家就要清理服务器上的实体和物品了哦～"
+      - "3=<gradient:#ff3c00:#ffff00>注意啦！</gradient> <gray>还有 <color:#ff8800><remaining> <gray>秒人家就要清理服务器上的实体和物品了哦～"
+      - "2=<gradient:#ff3c00:#ffff00>注意啦！</gradient> <gray>还有 <color:#ff8800><remaining> <gray>秒人家就要清理服务器上的实体和物品了哦～"
+      - "1=<gradient:#ff3c00:#ffff00>注意啦！</gradient> <gray>还有 <color:#ff8800><remaining> <gray>秒人家就要清理服务器上的实体和物品了哦～"
+      - "0=<gray>人家清理完毕啦～成功移除了 <color:#ff8800><items>个 <gray>物品、<color:#ff8800><creatures>个 <gray>生物和 <color:#ff8800><projectiles>个 <gray>投掷物！"
     items:
-      abyss: #abyss is the place where all deleted items go, and players can get them back by typing the /abyss command
-        close: "<gray>The abyss has been successfully closed!"
-        open: "<gray>The abyss has been successfully opened, recover your items: <yellow>/abyss"
-        empty: "<gray>The abyss is <blue>empty<gray>, wait until it opens again!"
-        closed: "<gray>The abyss is <red>closed<gray>, wait until it opens again!"
-        opened: "<gray>The abyss inventory was successfully <green>opened<gray>!"
+      abyss: #垃圾桶是存放所有被删除物品的地方，玩家可以通过输入/abyss命令找回它们哦
+        close: "<gray>垃圾桶已经成功关闭啦！"
+        open: "<gray>垃圾桶已经开启啦，可以找回你的物品咯：<yellow>/abyss</yellow>"
+        empty: "<gray>垃圾桶现在是<blue>空的</blue>哦，等人家下次开启再来吧～"
+        closed: "<gray>垃圾桶现在是<red>关闭的</red>哦，等人家下次开启再来吧～"
+        opened: "<gray>垃圾桶成功<green>开启</green>啦！"
         gui:
-          name: "<white>Abyss! <dark_gray>(<gray>page <page><dark_gray>)"
-          previous: "<dark_gray>← <red><b>PREVIOUS PAGE!</b>"
-          next: "<dark_gray>→ <green><b>NEXT PAGE!</b>"
+          name: "<white>垃圾桶）让我看看是谁在翻垃圾~ <dark_gray>(<gray>第 <page> 页<dark_gray>)"
+          previous: "<dark_gray>← <red><b>上一页！</b>"
+          next: "<dark_gray>→ <green><b>下一页！</b>"

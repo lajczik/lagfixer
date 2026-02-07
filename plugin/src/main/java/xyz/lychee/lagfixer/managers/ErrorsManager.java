@@ -61,8 +61,9 @@ public class ErrorsManager extends AbstractManager {
                 Matcher matcher = pattern.matcher(event.getMessage().getFormattedMessage());
                 if (matcher.find()) {
                     sendProfiler(matcher.group());
+                    // 翻译：Spark性能分析器已发送
                     getPlugin().getLogger()
-                            .info("&7Spark profiler has been sent to our support to improve LagFixer optimizations and investigate what loads the server the most.");
+                            .info("&7Spark性能分析器已发送给我们的支持团队，以帮助改进LagFixer优化并调查服务器负载最高的原因。");
                 }
                 return Filter.Result.NEUTRAL;
             }
@@ -78,7 +79,8 @@ public class ErrorsManager extends AbstractManager {
 
         this.executor.scheduleAtFixedRate(this::processQueue, 1, 1, TimeUnit.MINUTES);
 
-        this.getPlugin().getLogger().info(" &8• &rStarted listening console for LagFixer errors!");
+        // 翻译：已开始监听控制台错误
+        this.getPlugin().getLogger().info(" &8• &r已开始监听控制台中的LagFixer错误！");
     }
 
     @Override
@@ -103,7 +105,7 @@ public class ErrorsManager extends AbstractManager {
     }
 
     /**
-     * Dodaje zadanie do kolejki jeśli nie ma go już w kolejce
+     * 如果任务不在队列中，则将其添加到队列
      */
     private void addToQueue(SendTask task) {
         for (SendTask queuedTask : sendQueue) {
@@ -122,21 +124,24 @@ public class ErrorsManager extends AbstractManager {
         if (stackTrace.isEmpty() || this.errors.containsKey(key)) return true;
 
         StringBuilder message = new StringBuilder();
-        message.append("LagFixer error message:\n");
+        message.append("LagFixer错误消息:\n");
         message.append("\n&8&m-------------------------------&r");
         message.append("\n");
-        message.append("\n&fAn error occurred in lagfixer:");
+        message.append("\n&fLagFixer发生错误:");
         message.append("\n &7-> &c").append(t.getClass().getSimpleName()).append(": ").append(t.getMessage());
         for (String str : stackTrace) {
             message.append("\n &7| &c").append(str);
         }
         message.append("\n");
-        message.append("\n&fOur support has been informed about it, it will be fixed soon.");
-        message.append("\n&fMake sure the LagFixer configuration is done correctly.");
-        message.append("\n&fIf you have any doubts, contact support: &nhttps://discord.gg/CFmzJjgZdu&r");
+        // 翻译：支持团队已收到通知
+        message.append("\n&f我们的支持团队已收到通知，将尽快修复。");
+        // 翻译：确保配置正确
+        message.append("\n&f请确保LagFixer配置正确。");
+        // 翻译：联系支持
+        message.append("\n&f如有疑问，请联系支持: &nhttps://discord.gg/CFmzJjgZdu&r");
         message.append("\n");
         message.append("\n&8&m-------------------------------\n");
-        this.getPlugin().getLogger().warning(message.toString());
+        this.getPlugin().getWarningLogger().warning(message.toString());
 
         this.errors.put(key, new Error(stackTrace, t));
 

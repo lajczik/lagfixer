@@ -75,7 +75,7 @@ public class CommandManager extends AbstractManager implements Listener, TabExec
             }
         }
 
-        StringBuilder help = new StringBuilder("Subcommands list:\n");
+        StringBuilder help = new StringBuilder("子指令列表:\n");
         for (Subcommand subCommand : this.subcommands.values()) {
             help.append("&8{*} &f/lagfixer &e")
                     .append(subCommand.getName())

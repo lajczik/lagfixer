@@ -79,9 +79,10 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
     public WorldCleanerModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, AbstractModule.Impact.MEDIUM, "WorldCleaner",
                 new String[]{
-                        "Cleans up old items on the ground to accelerate server performance.",
-                        "Accumulation of items over time contributes to server lag, especially in densely populated or active servers.",
-                        "Kills creatures to accelerate server performance.", "Players can retrieve items from the Abyss inventory using the /abyss command."
+                        "清理地面上的旧物品以提升服务器性能。",
+                        "物品随时间积累会导致服务器卡顿，尤其是在人口密集或活跃度高的服务器中。",
+                        "清除生物以提升服务器性能。",
+                        "玩家可以使用/abyss命令从深渊库存中取回物品。"
                 },
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTlkODA2Yjc1ZWM5NTAwNmM1ZWMzODY2YzU0OGM1NTcxYWYzZTc4OGM3ZDE2MjllZGU2NGJjMWI3NDg4NTljZCJ9fX0="
         );
@@ -385,13 +386,16 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                         int parsedIndex = Integer.parseInt(index);
                         this.messages.put(parsedIndex, message);
                     } catch (NumberFormatException e) {
-                        this.getPlugin().getLogger().warning("Invalid index format in countingdown message: " + index + " for message \"" + message + "\"");
+                        // 翻译：无效的索引格式警告
+                        this.getPlugin().getLogger().warning("倒计时消息索引格式无效: " + index + "，消息内容: \"" + message + "\"");
                     }
                 } else {
-                    this.getPlugin().getLogger().warning("Skipping malformed countingdown message (no \"=\" found): " + str);
+                    // 翻译：跳过格式错误的倒计时消息
+                    this.getPlugin().getLogger().warning("跳过格式错误的倒计时消息（未找到\"=\"）: " + str);
                 }
             } catch (Exception ex) {
-                this.getPlugin().getLogger().info("Error processing countingdown message: " + str);
+                // 翻译：处理倒计时消息时出错
+                this.getPlugin().getLogger().info("处理倒计时消息时出错: " + str);
                 this.getPlugin().printError(ex);
             }
         }
@@ -413,4 +417,3 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
         }
     }
 }
-

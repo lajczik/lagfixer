@@ -65,10 +65,10 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
     public LagShieldModule(LagFixer plugin, ModuleManager manager) {
         super(plugin, manager, AbstractModule.Impact.HIGH, "LagShield",
                 new String[]{
-                        "Monitors server load and adjusts settings during latency spikes.",
-                        "Addresses fluctuations in server performance to mitigate delays and lag.",
-                        "Dynamically adjusts settings, disables unnecessary features, and optimizes resources.",
-                        "Ensures smooth gameplay by minimizing the impact of performance fluctuations."
+                        "监控服务器负载并在延迟峰值时调整设置。",
+                        "应对服务器性能波动以减轻延迟和卡顿。",
+                        "动态调整设置、禁用非必要功能并优化资源。",
+                        "通过最小化性能波动的影响确保流畅的游戏体验。"
                 },
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmZjY2ZlNTA5NmEzMzViOWFiNzhhYjRmNzc4YWU0OTlmNGNjYWI0ZTJjOTVmYTM0OTIyN2ZkMDYwNzU5YmFhZiJ9fX0="
         );
@@ -293,4 +293,3 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
         public abstract void setEntityAi(Entity entity, boolean status);
     }
 }
-

@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 
 public class ClearCommand extends CommandManager.Subcommand {
     public ClearCommand(CommandManager commandManager) {
-        super(commandManager, "clear", "clear entities using rules in WorldCleaner");
+        // 翻译：使用WorldCleaner中的规则清理实体
+        super(commandManager, "clear", "使用WorldCleaner中的规则清理实体");
     }
 
     @Override
@@ -30,13 +31,15 @@ public class ClearCommand extends CommandManager.Subcommand {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
         if (args.length < 1) {
-            MessageUtils.sendMessage(true, sender, "&7Usage: &f/lagfixer clear <items|creatures|projectiles>");
+            // 翻译：用法提示
+            MessageUtils.sendMessage(true, sender, "&7用法: &f/lagfixer clear <items|creatures|projectiles>");
             return true;
         }
 
         WorldCleanerModule module = ModuleManager.getInstance().get(WorldCleanerModule.class);
         if (module == null || !module.isLoaded()) {
-            MessageUtils.sendMessage(true, sender, "&7WorldCleaner module is disabled!");
+            // 翻译：WorldCleaner模块已禁用
+            MessageUtils.sendMessage(true, sender, "&7WorldCleaner模块已禁用！");
             return true;
         }
 
@@ -53,7 +56,8 @@ public class ClearCommand extends CommandManager.Subcommand {
                             ai.incrementAndGet();
                         });
 
-                return MessageUtils.sendMessage(true, sender, "&7Successfully removed &e" + ai.get() + " &7items.");
+                // 翻译：成功移除物品
+                return MessageUtils.sendMessage(true, sender, "&7成功移除 &e" + ai.get() + " &7个物品。");
             case "creatures":
                 module.getAllowedWorldsStream()
                         .flatMap(w -> w.getEntitiesByClass(Mob.class).stream())
@@ -63,7 +67,8 @@ public class ClearCommand extends CommandManager.Subcommand {
                             ai.incrementAndGet();
                         });
 
-                return MessageUtils.sendMessage(true, sender, "&7Successfully removed &e" + ai.get() + " &7creatures.");
+                // 翻译：成功移除生物
+                return MessageUtils.sendMessage(true, sender, "&7成功移除 &e" + ai.get() + " &7个生物。");
             case "projectiles":
                 module.getAllowedWorldsStream()
                         .flatMap(w -> w.getEntitiesByClass(Projectile.class).stream())
@@ -73,9 +78,11 @@ public class ClearCommand extends CommandManager.Subcommand {
                             ai.incrementAndGet();
                         });
 
-                return MessageUtils.sendMessage(true, sender, "&7Successfully removed &e" + ai.get() + " &7projectiles.");
+                // 翻译：成功移除抛射物
+                return MessageUtils.sendMessage(true, sender, "&7成功移除 &e" + ai.get() + " &7个抛射物。");
             default:
-                return MessageUtils.sendMessage(true, sender, "&7Invalid clear type: &f" + type);
+                // 翻译：无效的清理类型
+                return MessageUtils.sendMessage(true, sender, "&7无效的清理类型: &f" + type);
         }
     }
 

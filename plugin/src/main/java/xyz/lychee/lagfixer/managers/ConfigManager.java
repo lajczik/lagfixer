@@ -54,7 +54,7 @@ public class ConfigManager extends AbstractManager implements Listener {
                 .clickEvent(ClickEvent.openUrl("https://bit.ly/lagfixer-modrinth"));
 
         if (config.getBoolean("main.prefix_hover")) {
-            TextComponent description = MessageUtils.colors(null, "&fLagFixer &e" + this.getPlugin().getDescription().getVersion() + "\n &8{*} &7Click to open plugin in modrinth!");
+            TextComponent description = MessageUtils.colors(null, "&fLagFixer &e" + this.getPlugin().getDescription().getVersion() + "\n &8{*} &7点击在modrinth上打开!");
             this.prefix = this.prefix.hoverEvent(HoverEvent.showText(Component.empty().append(this.prefix).append(description)));
         }
     }

@@ -8,7 +8,7 @@ import xyz.lychee.lagfixer.utils.MessageUtils;
 
 public class FreeCommand extends CommandManager.Subcommand {
     public FreeCommand(CommandManager commandManager) {
-        super(commandManager, "free", "run garbage collector");
+        super(commandManager, "free", "运行垃圾回收器");
     }
 
     @Override
@@ -33,10 +33,10 @@ public class FreeCommand extends CommandManager.Subcommand {
 
             long diff = before - after;
             if (diff <= 0) {
-                MessageUtils.sendMessage(true, sender, "&7Unable to free RAM, you need to remove jvm argument: &e&n-XX:+DisableExplicitGC&7!");
+                MessageUtils.sendMessage(true, sender, "&7无法释放内存，您需要移除JVM参数: &e&n-XX:+DisableExplicitGC&7！");
             } else {
                 long freedMB = diff / (1024 * 1024);
-                MessageUtils.sendMessage(true, sender, "&7Successfully freed &e" + freedMB + " &7MB of memory.");
+                MessageUtils.sendMessage(true, sender, "&7成功释放了 &e" + freedMB + " &7MB内存。");
             }
         });
         return true;
