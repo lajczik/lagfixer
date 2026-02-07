@@ -175,10 +175,10 @@ public class ConfigMenu extends AbstractMenu {
                 if (newState) {
                     this.module.load();
                     this.module.loadAllConfig();
-                    MessageUtils.sendMessage(true, human, "Enabled module &e" + this.module.getName());
+                    MessageUtils.sendMessage(true, human, "启用的模块 &e" + this.module.getName());
                 } else {
                     this.module.disable();
-                    MessageUtils.sendMessage(true, human, "Disabled module &e" + this.module.getName());
+                    MessageUtils.sendMessage(true, human, "禁用的的模块 &e" + this.module.getName());
                 }
 
                 this.module.setLoaded(newState);
@@ -187,7 +187,7 @@ public class ConfigMenu extends AbstractMenu {
 
                 this.updateAll();
             } catch (Exception ex) {
-                MessageUtils.sendMessage(true, human, "Error toggling module!");
+                MessageUtils.sendMessage(true, human, "错误：切换模块时出现问题!");
                 this.getPlugin().printError(ex);
             }
         }

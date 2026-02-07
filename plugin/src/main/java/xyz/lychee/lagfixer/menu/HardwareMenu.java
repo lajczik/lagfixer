@@ -20,10 +20,10 @@ import java.io.*;
 import java.util.List;
 
 public class HardwareMenu extends AbstractMenu {
-    private final ItemBuilder i1 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTJiMTcxMmI5MDdjZTZiMTQwMmVhYWMyOGVjMjRhNGQ5NTU2OGY0YWI4N2U1OTc5ODBjMTViMjJiYmJkN2E1In19fQ==", "&b\uD83C\uDF10 &f&lNetwork:");
-    private final ItemBuilder i2 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDU2Yzk0NjE5MDMxMjMxNjhjZTY2N2VhZDdlYTU2YTUxNjEzMDk3MDQ5YmE2NDc4MzJiMzcyMmFmZmJlYjYzNiJ9fX0=", "&9\uD83D\uDCBE &f&lProcessor:");
-    private final ItemBuilder i3 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjYwYjAwNGYzNjBlMjg4NTVjY2YxMjM1YzJiZGVhMGEyOTk3YjBiYzAzMjU4ZTJkYzI0YWI4YTI1NzBhZWE2In19fQ==", "&a\uD83C\uDF9E &f&lMemory:");
-    private final ItemBuilder i4 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjg5MWFmZDM5ZTJlNjczOGJjNmE4Yzg4YzI0OWZkYmNmNGE0NWM0YTI0MjQ3ZjFkMTBiYWUwYzY0ZDk5OTFlMSJ9fX0=", "&e\uD83D\uDCC2 &f&lDisk Storage:");
+    private final ItemBuilder i1 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTJiMTcxMmI5MDdjZTZiMTQwMmVhYWMyOGVjMjRhNGQ5NTU2OGY0YWI4N2U1OTc5ODBjMTViMjJiYmJkN2E1In19fQ==", "&b\uD83C\uDF10 &f&l网络:");
+    private final ItemBuilder i2 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDU2Yzk0NjE5MDMxMjMxNjhjZTY2N2VhZDdlYTU2YTUxNjEzMDk3MDQ5YmE2NDc4MzJiMzcyMmFmZmJlYjYzNiJ9fX0=", "&9\uD83D\uDCBE &f&l进程:");
+    private final ItemBuilder i3 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjYwYjAwNGYzNjBlMjg4NTVjY2YxMjM1YzJiZGVhMGEyOTk3YjBiYzAzMjU4ZTJkYzI0YWI4YTI1NzBhZWE2In19fQ==", "&a\uD83C\uDF9E &f&l内存:");
+    private final ItemBuilder i4 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjg5MWFmZDM5ZTJlNjczOGJjNmE4Yzg4YzI0OWZkYmNmNGE0NWM0YTI0MjQ3ZjFkMTBiYWUwYzY0ZDk5OTFlMSJ9fX0=", "&e\uD83D\uDCC2 &f&l磁盘:");
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final SystemInfo si;
     private final HardwareAbstractionLayer hal;
@@ -43,13 +43,13 @@ public class HardwareMenu extends AbstractMenu {
         this.fillButtons();
         this.getInv().setItem(11,
                 ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWY0NDZhOGY5Mjg0YzYyY2Y4ZDQ5MWZiZGIzMzhmZDM5ZWJiZWJlMzVlOTU5YzJmYzRmNzg2YzY3NTIyZWZiIn19fQ==")
-                        .setName("&4⚠ &c&lPERFORMANCE WARNING!")
+                        .setName("&4⚠ &c&l性能警告！")
                         .setLore(
-                                " &8{*} &7Heavy impact on servers with &c<4 &7CPU threads",
-                                " &8{*} &7Don't leave this GUI open indefinitely",
+                                " &8{*} &7在使用&c少于 4 个 &7CPU 线程的情况下，对服务器影响很大。",
+                                " &8{*} &7请不要一直保持这个图形用户界面（GUI）打开",
                                 " ",
-                                "&a✔ Asynchronous updates &8(&7non-blocking&8)",
-                                "&a✔ Auto-closes after inactivity"
+                                "&a✔ 异步更新 &8（非阻塞的）",
+                                "&a✔ 在无操作一段时间后会自动关闭"
                         ).build()
         );
         this.getInv().setItem(size - 1, ConfigMenu.getBack());
@@ -83,7 +83,7 @@ public class HardwareMenu extends AbstractMenu {
         this.hardwareData.setPhysicalCores(cpu.getPhysicalProcessorCount());
         this.hardwareData.setTotalMemory(memory.getTotal());
         this.hardwareData.setPageSize(memory.getPageSize());
-        this.hardwareData.setMemoryType(memory.getPhysicalMemory().isEmpty() ? "Unknown" : memory.getPhysicalMemory().get(0).getMemoryType());
+        this.hardwareData.setMemoryType(memory.getPhysicalMemory().isEmpty() ? "未知" : memory.getPhysicalMemory().get(0).getMemoryType());
         this.hardwareData.setDiskCount(disks.size());
         this.hardwareData.setPartitionCount(disks.stream().mapToInt(d -> d.getPartitions().size()).sum());
         this.hardwareData.setNetworkInterfaceCount(tempHal.getNetworkIFs().size());
@@ -101,7 +101,7 @@ public class HardwareMenu extends AbstractMenu {
     }
 
     private ItemBuilder skull(String textureHash, String name) {
-        return ItemBuilder.createSkull(textureHash).setName(name).setLore(" &8{*} &7Loading lore...");
+        return ItemBuilder.createSkull(textureHash).setName(name).setLore(" &8{*} &7正在加载...");
     }
 
     @Override
@@ -119,35 +119,35 @@ public class HardwareMenu extends AbstractMenu {
             }
 
             this.i1.setLore(
-                    " &8{*} &7Interfaces: &f" + this.hardwareData.getNetworkInterfaceCount(),
-                    " &8{*} &7Sent: &f" + FormatUtil.formatBytes(bytesSent),
-                    " &8{*} &7Received: &f" + FormatUtil.formatBytes(bytesRecv),
-                    " &8{*} &7Throughput: &f" + calculateNetworkSpeed(bytesSent, bytesRecv),
-                    "&7Network data updated in &e" + timing.stop().getExecutingTime() + "&7ms"
+                    " &8{*} &7接口数: &f" + this.hardwareData.getNetworkInterfaceCount(),
+                    " &8{*} &7发送: &f" + FormatUtil.formatBytes(bytesSent),
+                    " &8{*} &7接收: &f" + FormatUtil.formatBytes(bytesRecv),
+                    " &8{*} &7吞吐量: &f" + calculateNetworkSpeed(bytesSent, bytesRecv),
+                    "&7网络数据在 &e" + timing.stop().getExecutingTime() + "&7毫秒内完成更新"
             );
         }
         catch (Throwable t) {
             this.i1.setLore(
-                    " &8{*} &7An error occurred while",
-                    "&7retrieving network information :("
+                    " &8{*} &7获取网络信息时发生错误",
+                    "&7:( "
             );
         }
 
         timing.start();
         try {
             this.i2.setLore(
-                    " &8{*} &7Model: &f" + this.hardwareData.getCpuName(),
-                    " &8{*} &7Logical cores: &f" + this.hardwareData.getLogicalCores(),
-                    " &8{*} &7Physical cores: &f" + this.hardwareData.getPhysicalCores(),
-                    " &8{*} &7Microarchitecture: &f" + this.hardwareData.getCpuMicroarchitecture(),
-                    " &8{*} &7Frequency: &f" + FormatUtil.formatHertz(this.hardwareData.getCpuVendorFreq()),
-                    "&7Cpu data updated in &e" + timing.stop().getExecutingTime() + "&7ms"
+                    " &8{*} &7型号: &f" + this.hardwareData.getCpuName(),
+                    " &8{*} &7逻辑核心: &f" + this.hardwareData.getLogicalCores(),
+                    " &8{*} &7物理核心: &f" + this.hardwareData.getPhysicalCores(),
+                    " &8{*} &7微架构: &f" + this.hardwareData.getCpuMicroarchitecture(),
+                    " &8{*} &7频率: &f" + FormatUtil.formatHertz(this.hardwareData.getCpuVendorFreq()),
+                    "&7CPU数据在 &e" + timing.stop().getExecutingTime() + "&7毫秒内更新"
             );
         }
         catch (Throwable t) {
             this.i2.setLore(
-                    " &8{*} &7An error occurred while",
-                    "&7retrieving processer information :("
+                    " &8{*} &7获取处理器信息时发生错误",
+                    "&7:( "
             );
         }
 
@@ -159,21 +159,21 @@ public class HardwareMenu extends AbstractMenu {
             VirtualMemory swap = memory.getVirtualMemory();
 
             this.i3.setLore(
-                    " &8{*} &7Total RAM: &f" + FormatUtil.formatBytesDecimal(this.hardwareData.getTotalMemory()),
-                    " &8{*} &7Used RAM: &f" + FormatUtil.formatBytesDecimal(usedMem) +
+                    " &8{*} &7总内存: &f" + FormatUtil.formatBytesDecimal(this.hardwareData.getTotalMemory()),
+                    " &8{*} &7已用内存: &f" + FormatUtil.formatBytesDecimal(usedMem) +
                             String.format(" (&f%.1f%%&7)", memPercent),
-                    " &8{*} &7Available RAM: &f" + FormatUtil.formatBytesDecimal(memory.getAvailable()),
-                    " &8{*} &7Page Size: &f" + FormatUtil.formatBytesDecimal(this.hardwareData.getPageSize()),
-                    " &8{*} &7Memory Type: &f" + this.hardwareData.getMemoryType(),
-                    " &8{*} &7Swap Total: &f" + FormatUtil.formatBytesDecimal(swap.getSwapTotal()),
-                    " &8{*} &7Swap Used: &f" + FormatUtil.formatBytesDecimal(swap.getSwapUsed()),
-                    "&7Memory data updated in &e" + timing.stop().getExecutingTime() + "&7ms"
+                    " &8{*} &7可用内存: &f" + FormatUtil.formatBytesDecimal(memory.getAvailable()),
+                    " &8{*} &7页面大小: &f" + FormatUtil.formatBytesDecimal(this.hardwareData.getPageSize()),
+                    " &8{*} &7内存类型: &f" + this.hardwareData.getMemoryType(),
+                    " &8{*} &7交换空间总量: &f" + FormatUtil.formatBytesDecimal(swap.getSwapTotal()),
+                    " &8{*} &7已用交换空间: &f" + FormatUtil.formatBytesDecimal(swap.getSwapUsed()),
+                    "&7内存数据在 &e" + timing.stop().getExecutingTime() + "&7毫秒内更新"
             );
         }
         catch (Throwable t) {
             this.i3.setLore(
-                    " &8{*} &7An error occurred while",
-                    "&7retrieving memory information :("
+                    " &8{*} &7获取内存信息时发生错误",
+                    "&7:( "
             );
         }
 
@@ -204,23 +204,23 @@ public class HardwareMenu extends AbstractMenu {
                     (usedDiskSpace * 100.0) / totalDiskSpace : 0;
 
             this.i4.setLore(
-                    " &8{*} &7Physical Disks: &f" + this.hardwareData.getDiskCount(),
-                    " &8{*} &7Partitions: &f" + this.hardwareData.getPartitionCount(),
-                    " &8{*} &7Total Capacity: &f" + FormatUtil.formatBytes(totalDiskSpace),
-                    " &8{*} &7Used Space: &f" + FormatUtil.formatBytes(usedDiskSpace) +
+                    " &8{*} &7物理磁盘: &f" + this.hardwareData.getDiskCount(),
+                    " &8{*} &7分区: &f" + this.hardwareData.getPartitionCount(),
+                    " &8{*} &7总容量: &f" + FormatUtil.formatBytes(totalDiskSpace),
+                    " &8{*} &7已用空间: &f" + FormatUtil.formatBytes(usedDiskSpace) +
                             String.format(" (&f%.1f%%&7)", diskUsagePercent),
-                    " &8{*} &7Read Data: &f" + FormatUtil.formatBytes(totalReadBytes) +
-                            " (&f" + readOps + " ops&7)",
-                    " &8{*} &7Written Data: &f" + FormatUtil.formatBytes(totalWriteBytes) +
-                            " (&f" + writeOps + " ops&7)",
-                    " &8{*} &7Disk Queues: &f" + queueLength,
-                    "&7Storage data updated in &e" + timing.stop().getExecutingTime() + "&7ms"
+                    " &8{*} &7读取数据: &f" + FormatUtil.formatBytes(totalReadBytes) +
+                            " (&f" + readOps + " 次操作&7)",
+                    " &8{*} &7写入数据: &f" + FormatUtil.formatBytes(totalWriteBytes) +
+                            " (&f" + writeOps + " 次操作&7)",
+                    " &8{*} &7磁盘队列: &f" + queueLength,
+                    "&7存储数据在 &e" + timing.stop().getExecutingTime() + "&7毫秒内更新"
             );
         }
         catch (Throwable t) {
             this.i4.setLore(
-                    " &8{*} &7An error occurred while",
-                    "&7retrieving storage information :("
+                    " &8{*} &7获取存储信息时发生错误",
+                    "&7:( "
             );
         }
 
@@ -233,7 +233,7 @@ public class HardwareMenu extends AbstractMenu {
             lastNetworkUpdate = System.currentTimeMillis();
             prevBytesSent = currentSent;
             prevBytesRecv = currentRecv;
-            return "Calculating...";
+            return "计算中...";
         }
 
         double sentSpeed = (currentSent - prevBytesSent) / (timeDiff / 1000.0);
@@ -243,7 +243,7 @@ public class HardwareMenu extends AbstractMenu {
         prevBytesSent = currentSent;
         prevBytesRecv = currentRecv;
 
-        return String.format("&a▲&f%s/s &c▼&f%s/s", FormatUtil.formatBytesDecimal((long) sentSpeed), FormatUtil.formatBytesDecimal((long) recvSpeed));
+        return String.format("&a▲&f%s/秒 &c▼&f%s/秒", FormatUtil.formatBytesDecimal((long) sentSpeed), FormatUtil.formatBytesDecimal((long) recvSpeed));
     }
 
     @Override

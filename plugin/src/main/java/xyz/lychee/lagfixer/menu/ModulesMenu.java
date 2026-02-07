@@ -35,16 +35,21 @@ public class ModulesMenu extends AbstractMenu {
             this.itemClickEvent(slot, () -> {
                 ItemMeta meta = is.getItemMeta();
                 if (meta != null) {
-                    meta.setDisplayName(MessageUtils.fixColors(null, "&6&l⭐ &f&lModule: &e&l" + module.getName()));
+                    meta.setDisplayName(MessageUtils.fixColors(null, "&6&l⭐ &f&l模块: &e&l" + module.getName()));
                     ArrayList<String> lore = new ArrayList<>();
 
-                    lore.add(MessageUtils.fixColors(null, " &8{*} &7Status: " + (module.isLoaded() ? "&a&lENABLED" : "&c&lDISABLED")));
-                    lore.add(MessageUtils.fixColors(null, " &8{*} &7Customizable values: &e" + module.getSection().getValues(true).values().stream().filter(obj -> !(obj instanceof ConfigurationSection)).count()));
-                    lore.add(MessageUtils.fixColors(null, " &8{*} &7Performance: " + Language.getSerializer().serialize(module.getImpact().getComponent())));
+                    // 翻译状态标签
+                    lore.add(MessageUtils.fixColors(null, " &8{*} &7状态: " + (module.isLoaded() ? "&a&l已启用" : "&c&l已禁用")));
+                    // 翻译可自定义值标签
+                    lore.add(MessageUtils.fixColors(null, " &8{*} &7可自定义值: &e" + module.getSection().getValues(true).values().stream().filter(obj -> !(obj instanceof ConfigurationSection)).count()));
+                    // 翻译性能影响标签
+                    lore.add(MessageUtils.fixColors(null, " &8{*} &7性能影响: " + Language.getSerializer().serialize(module.getImpact().getComponent())));
                     lore.add("");
-                    lore.add(MessageUtils.fixColors(null, "&b&nClick to modify configuration!"));
+                    // 翻译点击提示
+                    lore.add(MessageUtils.fixColors(null, "&b&n点击修改配置！"));
                     lore.add("");
-                    lore.add(MessageUtils.fixColors(null, "&eDescription:"));
+                    // 翻译描述标签
+                    lore.add(MessageUtils.fixColors(null, "&e描述:"));
 
                     for (String line : module.getDescription()) {
                         StringBuilder lineBuilder = new StringBuilder(" &8{*} &7");
@@ -81,4 +86,3 @@ public class ModulesMenu extends AbstractMenu {
         return MenuCommand.getInstance().getMainMenu();
     }
 }
-
