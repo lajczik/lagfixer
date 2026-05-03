@@ -1,4 +1,4 @@
-<div align="center">
+<div class="center">
   <img src="https://i.imgur.com/hElpNHD.png" alt="LagFixer Logo" width="600"/>
 
   <br>
@@ -18,12 +18,10 @@
 
 ---
 
-## ⚡ At a Glance
-
-| ⚙️ Requirements | 📦 Supported Versions |
-| :--- | :--- |
-| **Java:** 8 or later | **Main:** `1.16.5`, `1.17.1`, `1.18.2`, `1.19.4`, `1.20 - 26.1.2` |
-| **Server:** `1.13.2` - `26.1.2` | **Range:** Most modules run on a wider range `[1.13.2 - 26.1.2]` |
+## ⚡ Requirements & Compatibility
+- **Java:** 8 or later
+- **Server:** Bukkit/Spigot/Paper, hybrid Forge, etc.
+- **Version range:** `1.13.2` – `26.1.2`
 
 ## 🧩 Modules Overview
 
@@ -57,13 +55,57 @@
 <summary><b>📊 Placeholders</b></summary>
 <br>
 
+## 📈 Performance Metrics
 | Placeholder | Description |
 | :--- | :--- |
 | `%lagfixer_tps%` | Current ticks per second (TPS) |
+| `%lagfixer_tps_color%` | TPS with color coding (green ≥18, yellow ≥15, red <15) |
 | `%lagfixer_mspt%` | Current milliseconds per tick (MSPT) |
-| `%lagfixer_cpuprocess%`| Current process CPU usage |
+| `%lagfixer_mspt_color%` | MSPT with color coding (green ≤40, yellow ≤50, red >50) |
+| `%lagfixer_cpuprocess%` | Current process CPU usage |
 | `%lagfixer_cpusystem%` | Current system CPU usage |
-| `%lagfixer_worldcleaner%`| Countdown to the next world clean |
+
+## 🧬 Entity Counts
+| Placeholder | Description |
+| :--- | :--- |
+| `%lagfixer_entities%` / `%lagfixer_entities_total%` | Total loaded entities |
+| `%lagfixer_mobs%` / `%lagfixer_entities_mobs%` | Total mobs/creatures |
+| `%lagfixer_items%` / `%lagfixer_entities_items%` | Total item entities |
+| `%lagfixer_projectiles%` / `%lagfixer_entities_projectiles%` | Total projectiles |
+| `%lagfixer_vehicles%` / `%lagfixer_entities_vehicles%` | Total vehicles |
+
+## 💾 Memory Stats
+| Placeholder | Description |
+| :--- | :--- |
+| `%lagfixer_memory_used%` / `%lagfixer_ram_used%` | Used memory (MB) |
+| `%lagfixer_memory_max%` / `%lagfixer_ram_max%` | Maximum available memory (MB) |
+| `%lagfixer_memory_free%` / `%lagfixer_ram_free%` | Free memory (MB) |
+| `%lagfixer_memory_percent%` / `%lagfixer_ram_percent%` | Used memory percentage |
+| `%lagfixer_memory_bar%` | Visual progress bar of memory usage |
+
+## 🌐 Server Stats
+| Placeholder | Description |
+| :--- | :--- |
+| `%lagfixer_players%` / `%lagfixer_online%` | Current online players |
+| `%lagfixer_players_max%` / `%lagfixer_max_players%` | Maximum players allowed |
+| `%lagfixer_worlds%` | Number of loaded worlds |
+| `%lagfixer_chunks%` / `%lagfixer_loaded_chunks%` | Total loaded chunks |
+| `%lagfixer_uptime%` | Server uptime (HH:MM:SS) |
+| `%lagfixer_uptime_hours%` | Server uptime in hours |
+| `%lagfixer_uptime_minutes%` | Server uptime in minutes |
+| `%lagfixer_uptime_seconds%` | Server uptime in seconds |
+
+## 🧹 WorldCleaner Timer
+| Placeholder | Description |
+| :--- | :--- |
+| `%lagfixer_worldcleaner%` / `%lagfixer_worldcleaner_timer%` | Seconds until next world clean (e.g., `45s`) |
+| `%lagfixer_worldcleaner_seconds%` | Raw seconds until next world clean |
+| `%lagfixer_worldcleaner_formatted%` | Formatted countdown (MM:SS) |
+| `%lagfixer_worldcleaner_interval%` | Interval between world cleans (seconds) |
+| `%lagfixer_worldcleaner_enabled%` | Whether WorldCleaner is enabled (`true`/`false`) |
+| `%lagfixer_worldcleaner_progress%` | Progress percentage towards next clean |
+| `%lagfixer_worldcleaner_bar%` | Visual progress bar for world clean timer |
+
 </details>
 
 <details>
@@ -82,7 +124,7 @@
 
 Check out my other projects:
 
-<div align="center">
+<div class="center">
   <a href="https://modrinth.com/plugin/gatekeeper-mc">
     <img src="https://i.imgur.com/YHGjHR4.png" alt="Gatekeeper" width="45%">
   </a>
