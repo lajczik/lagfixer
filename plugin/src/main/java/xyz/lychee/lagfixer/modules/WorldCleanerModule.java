@@ -28,6 +28,7 @@ import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
+import xyz.lychee.lagfixer.objects.WorldsMonitor;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 import xyz.lychee.lagfixer.utils.ReflectionUtils;
 
@@ -260,12 +261,13 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                 }
                 this.second = this.interval + 1;
             } else if (this.alerts_enabled && this.messages.containsKey(this.second)) {
+                WorldsMonitor worldsMonitor = support.getWorldsMonitor();
                 this.sendAlert(
                         Language.createComponent(this.messages.get(this.second), true,
                                 Placeholder.unparsed("remaining", Integer.toString(this.second)),
-                                Placeholder.unparsed("items", Long.toString(support.getItems())),
-                                Placeholder.unparsed("creatures", Long.toString(support.getCreatures())),
-                                Placeholder.unparsed("projectiles", Long.toString(support.getProjectiles()))
+                                Placeholder.unparsed("items", Long.toString(worldsMonitor.getItems())),
+                                Placeholder.unparsed("creatures", Long.toString(worldsMonitor.getCreatures())),
+                                Placeholder.unparsed("projectiles", Long.toString(worldsMonitor.getProjectiles()))
                         )
                 );
             }

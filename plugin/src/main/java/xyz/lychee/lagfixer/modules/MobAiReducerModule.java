@@ -77,7 +77,7 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         ) return;
 
         if (this.async) {
-            SupportManager.getInstance().getExecutor().execute(() -> this.mobAiReducer.optimize(e.getEntity(), false));
+            SupportManager.getInstance().getFork().runNow(true, e.getLocation(), () -> this.mobAiReducer.optimize(e.getEntity(), false));
         } else {
             this.mobAiReducer.optimize(e.getEntity(), false);
         }

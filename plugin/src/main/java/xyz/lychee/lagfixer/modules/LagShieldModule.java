@@ -76,7 +76,7 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
 
     @Override
     public void run() {
-        double tps = SupportManager.getInstance().getMonitor().getTps();
+        double tps = SupportManager.getInstance().getResourceMonitor().getTps();
         boolean oldMobAi = this.mobAi;
 
         this.entitySpawn = tps < this.entitySpawn_tps;

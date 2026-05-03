@@ -12,8 +12,6 @@ main:
   prefix: "&8[&e&l⚡&8] "
   # Displays LagFixer version info on hover.
   prefix_hover: true
-  # Multithread synchronization has not been thoroughly tested.
-  threads: 1
 
   monitor:
     # Monitor for TPS, MSPT, CPU, and other metrics.
@@ -28,9 +26,15 @@ main:
       # Update interval in seconds
       interval: 30
 
+    # Map server load chart (/lagfixer map)
+    map:
+      enabled: true
+      # Update interval in seconds
+      interval: 3
+
   # Automatically reports LagFixer errors and Spark profiler to our support team.
   errors_reporter: true
-
+  # Automatically checks for updates and notifies the console and players with permission.
   updater: true
   # Displays warnings for legacy methods without support.
   warnings: true
@@ -43,7 +47,3 @@ main:
       - lf
       - antilag
       - lag
-
-  map:
-    enabled: true
-    interval: 3 # Update interval (in seconds) for the map handler (/lagfixer map). Recommended to be at least twice the monitor_interval.

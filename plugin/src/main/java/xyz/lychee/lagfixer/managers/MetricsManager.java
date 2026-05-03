@@ -50,11 +50,11 @@ public class MetricsManager
             this.uuid = cfg.getString("serverUuid");
         }
         this.metricsBase = new MetricsBase(19292, Runnable::run);
-        this.addCustomChart(new SingleLineChart("entities", () -> SupportManager.getInstance().getEntities()));
-        this.addCustomChart(new SingleLineChart("creatures", () -> SupportManager.getInstance().getCreatures()));
-        this.addCustomChart(new SingleLineChart("items", () -> SupportManager.getInstance().getItems()));
-        this.addCustomChart(new SingleLineChart("projectiles", () -> SupportManager.getInstance().getProjectiles()));
-        this.addCustomChart(new SingleLineChart("vehicles", () -> SupportManager.getInstance().getVehicles()));
+        this.addCustomChart(new SingleLineChart("entities", () -> SupportManager.getInstance().getWorldsMonitor().getEntities()));
+        this.addCustomChart(new SingleLineChart("creatures", () -> SupportManager.getInstance().getWorldsMonitor().getCreatures()));
+        this.addCustomChart(new SingleLineChart("items", () -> SupportManager.getInstance().getWorldsMonitor().getItems()));
+        this.addCustomChart(new SingleLineChart("projectiles", () -> SupportManager.getInstance().getWorldsMonitor().getProjectiles()));
+        this.addCustomChart(new SingleLineChart("vehicles", () -> SupportManager.getInstance().getWorldsMonitor().getVehicles()));
         this.addCustomChart(new AdvancedPie("modules", () -> {
             Map<String, Integer> values = new HashMap<>();
             Set<AbstractModule> modules = new HashSet<>(ModuleManager.getInstance().getModules().values());

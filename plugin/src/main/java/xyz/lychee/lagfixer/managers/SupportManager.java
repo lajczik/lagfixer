@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
@@ -16,8 +15,6 @@ import xyz.lychee.lagfixer.support.SpigotSupport;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Stream;
 
 @Getter
@@ -26,7 +23,6 @@ public class SupportManager extends AbstractManager implements Listener {
     private static @Getter SupportManager instance;
 
     private final Map<String, String> versions = new HashMap<>();
-    private ScheduledExecutorService executor;
     private BukkitTask task = null;
     private String nmsVersion = null;
     private AbstractFork fork = null;
@@ -60,14 +56,6 @@ public class SupportManager extends AbstractManager implements Listener {
 
     @Override
     public void load() {
-        FileConfiguration cfg = this.getPlugin().getConfig();
-        int threads = cfg.getInt("main.threads", 1);
-        if (threads > 1) {
-            this.executor = Executors.newScheduledThreadPool(threads);
-        } else {
-            this.executor = Executors.newSingleThreadScheduledExecutor();
-        }
-
         Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
 
         Stream.of(new SpigotSupport(this.getPlugin()), new PaperSupport(this.getPlugin()))
@@ -125,11 +113,6 @@ public class SupportManager extends AbstractManager implements Listener {
         if (this.task != null && !this.task.isCancelled()) {
             this.task.cancel();
         }
-        try {
-            if (this.executor != null) {
-                this.executor.shutdown();
-            }
-        } catch (Throwable ignored) {}
     }
 
     @Override

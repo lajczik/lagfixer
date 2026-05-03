@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.*;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.Language;
@@ -21,7 +22,6 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class MapCommand extends CommandManager.Subcommand {
@@ -33,7 +33,8 @@ public class MapCommand extends CommandManager.Subcommand {
 
     @Override
     public void load() {
-        boolean enabled = this.getCommandManager().getPlugin().getConfig().getBoolean("main.map.enabled", true);
+        FileConfiguration config = this.getCommandManager().getPlugin().getConfig();
+        boolean enabled = config.getBoolean("main.monitor.map.enabled");
         if (enabled) {
             try {
                 this.mapHandler = new MapHandler(this.getCommandManager().getPlugin());
@@ -102,7 +103,7 @@ public class MapCommand extends CommandManager.Subcommand {
         private int bufferIndex;
         private int dataCount;
         private volatile boolean shouldRender = true;
-        private ScheduledFuture<?> task;
+        private BukkitTask task;
 
         public MapHandler(LagFixer plugin) throws AWTError {
             this.plugin = plugin;
@@ -110,13 +111,13 @@ public class MapCommand extends CommandManager.Subcommand {
 
             FileConfiguration config = plugin.getConfig();
             MapView tempMap = null;
-            if (config.isSet("main.map.id")) {
-                tempMap = Bukkit.getServer().getMap(config.getInt("main.map.id"));
+            if (config.isSet("main.monitor.map.id")) {
+                tempMap = Bukkit.getServer().getMap(config.getInt("main.monitor.map.id"));
             }
 
             if (tempMap == null) {
                 this.mapView = Bukkit.createMap(Bukkit.getWorlds().get(0));
-                config.set("main.map.id", this.mapView.getId());
+                config.set("main.monitor.map.id", this.mapView.getId());
                 plugin.saveConfig();
             } else {
                 this.mapView = tempMap;
@@ -139,10 +140,10 @@ public class MapCommand extends CommandManager.Subcommand {
         }
 
         public void load() {
-            int interval = this.plugin.getConfig().getInt("main.map.interval");
+            int interval = this.plugin.getConfig().getInt("main.monitor.map.interval");
 
-            SupportManager support = SupportManager.getInstance();
-            task = support.getExecutor().scheduleWithFixedDelay(() -> {
+            this.task = SupportManager.getInstance().getFork().runTimer(true, () -> {
+                SupportManager support = SupportManager.getInstance();
                 ResourceMonitor monitor = support.getResourceMonitor();
                 boolean supportMspt = support.getFork().isSupportMspt();
                 int pixelY = supportMspt ? msptToPixelY(monitor.getMspt()) : tpsToPixelY(monitor.getTps());
@@ -243,7 +244,9 @@ public class MapCommand extends CommandManager.Subcommand {
         }
 
         public void unload() {
-            if (this.task != null) this.task.cancel(true);
+            if (this.task != null && !this.task.isCancelled()) {
+                this.task.cancel();
+            }
             this.g2d.dispose();
         }
 
