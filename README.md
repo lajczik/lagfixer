@@ -5,6 +5,7 @@
   <br>
 
   <p>
+    <a href="https://lajczik.gitbook.io/lagfixer"><img src="https://img.shields.io/badge/Wiki-Gitbook-969393?style=for-the-badge&logo=gitbook" alt="Wiki"></a>
     <a href="https://modrinth.com/plugin/lagfixer"><img src="https://img.shields.io/badge/Download-Modrinth-00AF5C?style=for-the-badge&logo=modrinth" alt="Modrinth"></a>
     <a href="https://github.com/lajczik/lagfixer"><img src="https://img.shields.io/badge/Source-GitHub-181717?style=for-the-badge&logo=github" alt="GitHub"></a>
     <a href="https://discord.gg/CFmzJjgZdu"><img src="https://img.shields.io/badge/Support-Discord-5865F2?style=for-the-badge&logo=discord" alt="Discord"></a>
