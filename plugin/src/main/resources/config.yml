@@ -17,7 +17,7 @@ main:
   # Update interval (in seconds) for TPS, MSPT, CPU, and other metrics.
   monitor_interval: 5
   # Automatically reports LagFixer errors and Spark profiler to our support team.
-  errors_reporter: false
+  errors_reporter: true
 
   updater: true
   # Displays warnings for legacy methods without support.
