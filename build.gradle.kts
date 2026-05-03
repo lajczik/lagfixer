@@ -3,11 +3,11 @@ plugins {
     id("com.gradleup.shadow") version "9.4.1"
 }
 
-val spigotRepo = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/";
-val paperRepo = "https://repo.papermc.io/repository/maven-public/";
-val sonatypeRepo = "https://oss.sonatype.org/content/groups/public/";
+val spigotRepo = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+val paperRepo = "https://repo.papermc.io/repository/maven-public/"
+val sonatypeRepo = "https://oss.sonatype.org/content/groups/public/"
 val jitpack = "https://jitpack.io"
-val mojang = "https://libraries.minecraft.net";
+val mojang = "https://libraries.minecraft.net"
 
 version = "1.5.3"
 extra["lagfixer_version"] = version
@@ -46,7 +46,6 @@ tasks {
     shadowJar {
         archiveBaseName.set("LagFixer")
         archiveClassifier.set("")
-        archiveVersion.set("")
 
         relocate("net.kyori", "xyz.lychee.lagfixer.libs.kyori")
         destinationDirectory.set(file("C:/Users/lajczi/Desktop/testowy/plugins"))
@@ -60,7 +59,7 @@ java {
 }
 
 allprojects {
-    group = "xyz.lychee";
+    group = "xyz.lychee"
 
     apply(plugin = "java-library")
 
