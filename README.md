@@ -1,4 +1,4 @@
-<div class="center">
+<div style="display: flex; flex-direction: column; align-items: center;">
   <img src="https://i.imgur.com/hElpNHD.png" alt="LagFixer Logo" width="600"/>
 
   <br>
@@ -117,14 +117,11 @@
 </details>
 
 ## 📈 Metrics
-
 ![bStats](https://bstats.org/signatures/bukkit/LagFixer.svg)
 
 ## 🌌 Other Plugins
-
 Check out my other projects:
-
-<div class="center">
+<div style="display: flex; flex-direction: column; align-items: center;">
   <a href="https://modrinth.com/plugin/gatekeeper-mc">
     <img src="https://i.imgur.com/YHGjHR4.png" alt="Gatekeeper" width="45%">
   </a>
