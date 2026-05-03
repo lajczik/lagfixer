@@ -4,6 +4,8 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import net.minecraft.server.v1_16_R3.*;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_16_R3.event.CraftEventFactory;
 import org.bukkit.event.EventHandler;
@@ -138,14 +140,25 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
     public void onSpawn(ChunkLoadEvent e) {
         if (!this.getModule().canContinue(e.getWorld())) return;
 
-        SupportManager.getInstance().getExecutor().execute(() -> {
-            org.bukkit.entity.Entity[] entities = e.getChunk().getEntities();
-            for (org.bukkit.entity.Entity entity : entities) {
-                if (this.getModule().isEnabled(entity)) {
-                    this.optimize(entity, false);
-                }
+        if (this.getModule().isAsync()) {
+            Chunk chunk = e.getChunk();
+            SupportManager.getInstance().getFork()
+                    .runNow(
+                            true,
+                            new Location(chunk.getWorld(), chunk.getX() << 4, 64, chunk.getZ() << 4),
+                            () -> this.optimizeEntities(e.getChunk().getEntities())
+                    );
+        } else {
+            this.optimizeEntities(e.getChunk().getEntities());
+        }
+    }
+
+    public void optimizeEntities(org.bukkit.entity.Entity[] array) {
+        for (org.bukkit.entity.Entity entity : array) {
+            if (this.getModule().isEnabled(entity)) {
+                this.optimize(entity, false);
             }
-        });
+        }
     }
 
     public void removeGoals(Set<PathfinderGoalWrapped> goals, Predicate<PathfinderGoalWrapped> filter) {

@@ -7,6 +7,7 @@ plugins {
 dependencies {
     paperweight.paperDevBundle("26.1.2.build.+")
     compileOnly(project(":plugin"))
+    compileOnly(project(":support:common"))
 }
 
 tasks {

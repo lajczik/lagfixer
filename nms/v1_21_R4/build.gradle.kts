@@ -10,7 +10,7 @@ paperweight {
 dependencies {
     paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
     compileOnly(project(":plugin"))
-    //compileOnly(project(":nms:v1_21_R3"))
+    compileOnly(project(":support:common"))
 }
 
 tasks {

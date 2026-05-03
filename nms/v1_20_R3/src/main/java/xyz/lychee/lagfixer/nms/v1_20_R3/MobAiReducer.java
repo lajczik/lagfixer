@@ -22,6 +22,8 @@ import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory;
 import org.bukkit.event.EventHandler;
@@ -155,7 +157,13 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
         if (!this.getModule().canContinue(e.getWorld())) return;
 
         if (this.getModule().isAsync()) {
-            SupportManager.getInstance().getExecutor().execute(() -> this.optimizeEntities(e.getEntities()));
+            Chunk chunk = e.getChunk();
+            SupportManager.getInstance().getFork()
+                    .runNow(
+                            true,
+                            new Location(chunk.getWorld(), chunk.getX() << 4, 64, chunk.getZ() << 4), 
+                            () -> this.optimizeEntities(e.getEntities())
+                    );
         } else {
             this.optimizeEntities(e.getEntities());
         }
