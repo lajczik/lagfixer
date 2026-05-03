@@ -14,7 +14,7 @@ import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.Language;
 import xyz.lychee.lagfixer.managers.CommandManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
-import xyz.lychee.lagfixer.objects.AbstractMonitor;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.awt.*;
@@ -143,7 +143,7 @@ public class MapCommand extends CommandManager.Subcommand {
 
             SupportManager support = SupportManager.getInstance();
             task = support.getExecutor().scheduleWithFixedDelay(() -> {
-                AbstractMonitor monitor = support.getMonitor();
+                ResourceMonitor monitor = support.getResourceMonitor();
                 boolean supportMspt = support.getFork().isSupportMspt();
                 int pixelY = supportMspt ? msptToPixelY(monitor.getMspt()) : tpsToPixelY(monitor.getTps());
 

@@ -4,9 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.*;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
@@ -17,11 +15,9 @@ import xyz.lychee.lagfixer.support.SpigotSupport;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Getter
@@ -29,21 +25,19 @@ import java.util.stream.Stream;
 public class SupportManager extends AbstractManager implements Listener {
     private static @Getter SupportManager instance;
 
-    private final Map<String, String> versions;
+    private final Map<String, String> versions = new HashMap<>();
     private ScheduledExecutorService executor;
     private BukkitTask task = null;
     private String nmsVersion = null;
     private AbstractFork fork = null;
     private ISupportNms nms = null;
-    private AbstractMonitor monitor = new MXBeanMonitor();
-    private int entities = 0, creatures = 0, items = 0, projectiles = 0, vehicles = 0;
+    private ResourceMonitor resourceMonitor = new ResourceMonitor();
+    private WorldsMonitor worldsMonitor = new WorldsMonitor();
 
     public SupportManager(LagFixer plugin) {
         super(plugin);
 
         instance = this;
-
-        this.versions = new HashMap<>();
 
         this.versions.put("1.20.5", "v1_20_R4");
         this.versions.put("1.20.6", "v1_20_R4");
@@ -121,33 +115,8 @@ public class SupportManager extends AbstractManager implements Listener {
             this.nms = new ReflectionSupportNms();
         }
 
-        this.monitor.start(cfg.getInt("main.monitor_interval"));
-        this.task = this.getFork().runTimer(false, () -> {
-            int entities = 0, creatures = 0, items = 0, projectiles = 0, vehicles = 0;
-
-            for (World world : Bukkit.getWorlds()) {
-                List<Entity> list = world.getEntities();
-                entities += list.size();
-
-                for (Entity entity : list) {
-                    if (entity instanceof Mob) {
-                        creatures++;
-                    } else if (entity instanceof Vehicle) {
-                        vehicles++;
-                    } else if (entity instanceof Item) {
-                        items++;
-                    } else if (entity instanceof Projectile) {
-                        projectiles++;
-                    }
-                }
-            }
-
-            this.entities = entities;
-            this.creatures = creatures;
-            this.items = items;
-            this.projectiles = projectiles;
-            this.vehicles = vehicles;
-        }, 15, 30, TimeUnit.SECONDS);
+        this.resourceMonitor.start();
+        this.worldsMonitor.start();
     }
 
     @Override

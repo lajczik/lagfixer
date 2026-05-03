@@ -1,9 +1,7 @@
 package xyz.lychee.lagfixer.menu;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -13,15 +11,14 @@ import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractMenu;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-import xyz.lychee.lagfixer.objects.AbstractMonitor;
-import xyz.lychee.lagfixer.objects.ISupportNms;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
+import xyz.lychee.lagfixer.objects.WorldsMonitor;
 import xyz.lychee.lagfixer.utils.ItemBuilder;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.util.Collections;
 
 public class MainMenu extends AbstractMenu {
-
     private final ItemBuilder i1 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWMyZmYyNDRkZmM5ZGQzYTJjZWY2MzExMmU3NTAyZGM2MzY3YjBkMDIxMzI5NTAzNDdiMmI0NzlhNzIzNjZkZCJ9fX0=", "&f&lConfiguration:");
     private final ItemBuilder i2 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWNjNzg5ZjIzMDc5NGY5MGUzM2M0ZjlhZDAwNjk0YmMyYTJmZjVlOGI5YjM3NWRjMzUzMjQwMWIyODFmM2U1OCJ9fX0=", "&f&lServer informations:");
     private final ItemBuilder i3 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTI4OWQ1YjE3ODYyNmVhMjNkMGIwYzNkMmRmNWMwODVlODM3NTA1NmJmNjg1YjVlZDViYjQ3N2ZlODQ3MmQ5NCJ9fX0=", "&f&lWorlds informations:");
@@ -57,35 +54,26 @@ public class MainMenu extends AbstractMenu {
                 "&eClick to modify configuration!"
         );
 
-        AbstractMonitor monitor = support.getMonitor();
+        ResourceMonitor resourceMonitor = support.getResourceMonitor();
         i2.setLore(
-                " &8{*} &7Tps: &e" + monitor.getTps(),
-                " &8{*} &7Mspt: &e" + monitor.getMspt(),
-                " &8{*} &7Memory: &e" + monitor.getRamUsed() + "&8/&e" + monitor.getRamTotal() + "&8/&e" + monitor.getRamMax() + " MB",
-                " &8{*} &7Cpu process: &e" + monitor.getCpuProcess() + "&f%",
-                " &8{*} &7Cpu system: &e" + monitor.getCpuSystem() + "&f%",
+                " &8{*} &7Tps: &e" + resourceMonitor.getTps(),
+                " &8{*} &7Mspt: &e" + resourceMonitor.getMspt(),
+                " &8{*} &7Memory: &e" + resourceMonitor.getRamUsed() + "&8/&e" + resourceMonitor.getRamTotal() + "&8/&e" + resourceMonitor.getRamMax() + " MB",
+                " &8{*} &7Cpu process: &e" + resourceMonitor.getCpuProcess() + "&f%",
+                " &8{*} &7Cpu system: &e" + resourceMonitor.getCpuSystem() + "&f%",
                 "",
                 "&eClick to open hardware menu!"
         );
 
-        int chunks = 0, tiles = 0;
-        ISupportNms nms = support.getNms();
-        for (World w : Bukkit.getWorlds()) {
-            Chunk[] loaded = w.getLoadedChunks();
-            chunks += loaded.length;
-            for (Chunk chunk : loaded) {
-                tiles += nms.getTileEntitiesCount(chunk);
-            }
-        }
-
+        WorldsMonitor worldsMonitor = support.getWorldsMonitor();
         i3.setLore(
-                " &8{*} &7Chunks: &e" + chunks,
-                " &8{*} &7Entities: &e" + support.getEntities(),
-                " &8{*} &7Creatures: &e" + support.getCreatures(),
-                " &8{*} &7Items: &e" + support.getItems(),
-                " &8{*} &7Projectiles: &e" + support.getProjectiles(),
-                " &8{*} &7Vehicles: &e" + support.getVehicles(),
-                " &8{*} &7Tile entities: &e" + tiles,
+                " &8{*} &7Chunks: &e" + worldsMonitor.getChunks(),
+                " &8{*} &7Entities: &e" + worldsMonitor.getEntities(),
+                " &8{*} &7Creatures: &e" + worldsMonitor.getCreatures(),
+                " &8{*} &7Items: &e" + worldsMonitor.getItems(),
+                " &8{*} &7Projectiles: &e" + worldsMonitor.getProjectiles(),
+                " &8{*} &7Vehicles: &e" + worldsMonitor.getVehicles(),
+                " &8{*} &7Tile entities: &e" + worldsMonitor.getTiles(),
                 " &8{*} &7Players: &e" + Bukkit.getOnlinePlayers().size() + "&8/&e" + Bukkit.getMaxPlayers(),
                 "",
                 "&eClick to open cleaner menu!"

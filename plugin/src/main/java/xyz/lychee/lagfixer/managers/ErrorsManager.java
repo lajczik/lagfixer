@@ -16,7 +16,8 @@ import org.bukkit.Bukkit;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.commands.BenchmarkCommand;
 import xyz.lychee.lagfixer.objects.AbstractManager;
-import xyz.lychee.lagfixer.objects.AbstractMonitor;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
+import xyz.lychee.lagfixer.objects.WorldsMonitor;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -164,26 +165,27 @@ public class ErrorsManager extends AbstractManager {
     private JsonObject createJson() {
         UpdaterManager updater = UpdaterManager.getInstance();
         SupportManager support = SupportManager.getInstance();
-        AbstractMonitor monitor = support.getMonitor();
-        JsonObject jo = new JsonObject();
+        ResourceMonitor resourceMonitor = support.getResourceMonitor();
+        WorldsMonitor worldsMonitor = support.getWorldsMonitor();
 
+        JsonObject jo = new JsonObject();
         jo.addProperty("bukkit", Bukkit.getName() + " " + Bukkit.getServer().getBukkitVersion());
         jo.addProperty("version", this.getPlugin().getDescription().getVersion());
         jo.addProperty("uuid", this.uuid.toString());
-        jo.addProperty("entities", support.getEntities());
-        jo.addProperty("creatures", support.getCreatures());
-        jo.addProperty("items", support.getItems());
-        jo.addProperty("projectiles", support.getProjectiles());
-        jo.addProperty("vehicles", support.getVehicles());
+        jo.addProperty("entities", worldsMonitor.getEntities());
+        jo.addProperty("creatures", worldsMonitor.getCreatures());
+        jo.addProperty("items", worldsMonitor.getItems());
+        jo.addProperty("projectiles", worldsMonitor.getProjectiles());
+        jo.addProperty("vehicles", worldsMonitor.getVehicles());
         jo.addProperty("players", Bukkit.getOnlinePlayers().size());
         jo.addProperty("maxplayers", Bukkit.getMaxPlayers());
-        jo.addProperty("cpuprocess", monitor.getCpuProcess());
-        jo.addProperty("cpusystem", monitor.getCpuSystem());
-        jo.addProperty("ramused", monitor.getRamUsed());
-        jo.addProperty("ramtotal", monitor.getRamTotal());
-        jo.addProperty("ramfree", monitor.getRamFree());
-        jo.addProperty("tps", monitor.getTps());
-        jo.addProperty("mspt", monitor.getMspt());
+        jo.addProperty("cpuprocess", resourceMonitor.getCpuProcess());
+        jo.addProperty("cpusystem", resourceMonitor.getCpuSystem());
+        jo.addProperty("ramused", resourceMonitor.getRamUsed());
+        jo.addProperty("ramtotal", resourceMonitor.getRamTotal());
+        jo.addProperty("ramfree", resourceMonitor.getRamFree());
+        jo.addProperty("tps", resourceMonitor.getTps());
+        jo.addProperty("mspt", resourceMonitor.getMspt());
         jo.addProperty("current_version", updater.getCurrentVersion());
         jo.addProperty("latest_version", updater.getLatestVersion());
         jo.addProperty("difference_version", updater.getDifference());
@@ -211,9 +213,7 @@ public class ErrorsManager extends AbstractManager {
             while (is.read(data, 0, data.length) != -1) {}
             is.close();
             conn.disconnect();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        } catch (IOException ignored) {}
     }
 
     private List<String> filterStackTrace(Throwable ex) {

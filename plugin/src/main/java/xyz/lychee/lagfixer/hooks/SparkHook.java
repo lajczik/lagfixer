@@ -14,7 +14,7 @@ import xyz.lychee.lagfixer.managers.ErrorsManager;
 import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractHook;
-import xyz.lychee.lagfixer.objects.MXBeanMonitor;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,11 +29,11 @@ public class SparkHook extends AbstractHook {
     @Override
     public void load() {
         SupportManager support = SupportManager.getInstance();
-        support.getMonitor().stop();
+        support.getResourceMonitor().stop();
 
         SparkMonitor monitor = new SparkMonitor();
-        monitor.start(this.getPlugin().getConfig().getInt("main.monitor_interval"));
-        support.setMonitor(monitor);
+        monitor.start();
+        support.setResourceMonitor(monitor);
 
         this.task = SupportManager.getInstance().getFork().runTimer(false, () -> {
             if (ErrorsManager.getInstance().isEnabled() && Bukkit.getOnlinePlayers().size() > 20) {
@@ -49,7 +49,7 @@ public class SparkHook extends AbstractHook {
         }
     }
 
-    static class SparkMonitor extends MXBeanMonitor {
+    static class SparkMonitor extends ResourceMonitor {
         private final Spark spark = SparkProvider.get();
 
         @Override

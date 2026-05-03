@@ -14,8 +14,20 @@ main:
   prefix_hover: true
   # Multithread synchronization has not been thoroughly tested.
   threads: 1
-  # Update interval (in seconds) for TPS, MSPT, CPU, and other metrics.
-  monitor_interval: 5
+
+  monitor:
+    # Monitor for TPS, MSPT, CPU, and other metrics.
+    resource:
+      enabled: true
+      # Update interval in seconds
+      interval: 5
+
+    # Monitor for counting entities and chunks.
+    worlds:
+      enabled: true
+      # Update interval in seconds
+      interval: 30
+
   # Automatically reports LagFixer errors and Spark profiler to our support team.
   errors_reporter: true
 

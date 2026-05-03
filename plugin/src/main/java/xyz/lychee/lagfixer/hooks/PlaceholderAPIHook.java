@@ -14,7 +14,8 @@ import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.modules.WorldCleanerModule;
 import xyz.lychee.lagfixer.objects.AbstractHook;
-import xyz.lychee.lagfixer.objects.AbstractMonitor;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
+import xyz.lychee.lagfixer.objects.WorldsMonitor;
 
 import java.lang.management.ManagementFactory;
 
@@ -81,58 +82,59 @@ public class PlaceholderAPIHook extends AbstractHook {
         }
 
         public String response(String id) {
-            AbstractMonitor monitor = SupportManager.getInstance().getMonitor();
             SupportManager support = SupportManager.getInstance();
+            ResourceMonitor resourceMonitor = support.getResourceMonitor();
+            WorldsMonitor worldsMonitor = support.getWorldsMonitor();
             WorldCleanerModule worldCleaner = ModuleManager.getInstance().get(WorldCleanerModule.class);
             Runtime runtime = Runtime.getRuntime();
 
             switch (id.toLowerCase()) {
                 // ==================== Performance Metrics ====================
                 case "tps": {
-                    return Double.toString(monitor.getTps());
+                    return Double.toString(resourceMonitor.getTps());
                 }
                 case "tps_color": {
                     // Returns TPS with color code based on value
-                    double tps = monitor.getTps();
+                    double tps = resourceMonitor.getTps();
                     String color = tps >= 18 ? "&a" : (tps >= 15 ? "&e" : "&c");
                     return color + String.format("%.1f", tps);
                 }
                 case "mspt": {
-                    return Double.toString(monitor.getMspt());
+                    return Double.toString(resourceMonitor.getMspt());
                 }
                 case "mspt_color": {
-                    double mspt = monitor.getMspt();
+                    double mspt = resourceMonitor.getMspt();
                     String color = mspt <= 40 ? "&a" : (mspt <= 50 ? "&e" : "&c");
                     return color + String.format("%.1f", mspt);
                 }
                 case "cpu":
                 case "cpuprocess": {
-                    return Double.toString(monitor.getCpuProcess());
+                    return Double.toString(resourceMonitor.getCpuProcess());
                 }
                 case "cpusystem": {
-                    return Double.toString(monitor.getCpuSystem());
+                    return Double.toString(resourceMonitor.getCpuSystem());
                 }
 
                 // ==================== Entity Counts ====================
                 case "entities":
                 case "entities_total": {
-                    return Integer.toString(support.getEntities());
+                    return Integer.toString(worldsMonitor.getEntities());
                 }
                 case "entities_mobs":
                 case "mobs": {
-                    return Integer.toString(support.getCreatures());
+                    return Integer.toString(worldsMonitor.getCreatures());
                 }
                 case "entities_items":
                 case "items": {
-                    return Integer.toString(support.getItems());
+                    return Integer.toString(worldsMonitor.getItems());
                 }
                 case "entities_projectiles":
                 case "projectiles": {
-                    return Integer.toString(support.getProjectiles());
+                    return Integer.toString(worldsMonitor.getProjectiles());
                 }
                 case "entities_vehicles":
                 case "vehicles": {
-                    return Integer.toString(support.getVehicles());
+                    return Integer.toString(worldsMonitor.getVehicles());
                 }
 
                 // ==================== Memory Stats ====================

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.managers.CommandManager;
 import xyz.lychee.lagfixer.managers.ErrorsManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
-import xyz.lychee.lagfixer.objects.AbstractMonitor;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 import xyz.lychee.lagfixer.utils.TimingUtil;
 
@@ -32,7 +32,7 @@ public class BenchmarkCommand extends CommandManager.Subcommand {
             return MessageUtils.sendMessage(true, sender, "&7Benchmark is running, wait for results in console!");
         }
 
-        AbstractMonitor monitor = SupportManager.getInstance().getMonitor();
+        ResourceMonitor monitor = SupportManager.getInstance().getResourceMonitor();
         if (monitor.getMspt() > 10.0) {
             return MessageUtils.sendMessage(true, sender, "&7Server MSPT is too &chigh&7, the result may be incorrect!");
         }
