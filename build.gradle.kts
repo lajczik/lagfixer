@@ -1,6 +1,7 @@
 plugins {
-    id("java-library")
+    id("java")
     id("com.gradleup.shadow") version "9.4.1"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21" apply false
 }
 
 val spigotRepo = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
@@ -52,16 +53,10 @@ tasks {
     }
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
-    }
-}
-
 allprojects {
     group = "xyz.lychee"
 
-    apply(plugin = "java-library")
+    apply(plugin = "java")
 
     repositories {
         mavenLocal()

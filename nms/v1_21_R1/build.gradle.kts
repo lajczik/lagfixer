@@ -1,10 +1,6 @@
 plugins {
-    id("java-library")
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
-}
-
-repositories {
-    maven("https://github.com/Euphillya/FoliaDevBundle/raw/gh-pages/")
+    id("java")
+    id("io.papermc.paperweight.userdev")
 }
 
 paperweight {
