@@ -42,9 +42,9 @@ public abstract class AbstractFork {
 
     public abstract BukkitTask runTimer(boolean async, Runnable runnable, long initialDelayInMs, long delayInMs);
 
-    public abstract BukkitTask runLater(boolean async, Runnable runnable, long delay, TimeUnit var5);
+    public abstract BukkitTask runLater(boolean async, Runnable runnable, long delay, TimeUnit unit);
 
-    public abstract BukkitTask runTimer(boolean async, Runnable runnable, long initialDelay, long delay, TimeUnit var7);
+    public abstract BukkitTask runTimer(boolean async, Runnable runnable, long initialDelay, long delay, TimeUnit unit);
 
 }
 
