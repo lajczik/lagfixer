@@ -1,22 +1,49 @@
-![logo](https://i.imgur.com/hElpNHD.png)
+<div align="center">
+  <img src="https://i.imgur.com/hElpNHD.png" alt="LagFixer Logo" width="600"/>
 
-**LagFixer** is the ultimate performance boosting Minecraft plugin designed to optimize your server and eliminate
-unnecessary lag. By fine-tuning various server aspects and streamlining redundant features, LagFixer ensures a smoother
-and more enjoyable gameplay experience for all players.
+  <br>
+  <br>
 
-## Requirements:
+  <p>
+    <a href="https://modrinth.com/plugin/lagfixer"><img src="https://img.shields.io/badge/Download-Modrinth-00AF5C?style=for-the-badge&logo=modrinth" alt="Modrinth"></a>
+    <a href="https://github.com/lajczik/lagfixer"><img src="https://img.shields.io/badge/Source-GitHub-181717?style=for-the-badge&logo=github" alt="GitHub"></a>
+    <a href="https://discord.gg/CFmzJjgZdu"><img src="https://img.shields.io/badge/Support-Discord-5865F2?style=for-the-badge&logo=discord" alt="Discord"></a>
+  </p>
 
-- Java 8 or later
-- Server version 1.13.2 - 26.1.2
+  <p><b>LagFixer helps improve server performance by optimizing the Minecraft engine.</b><br>
+    While the paper itself is well optimized, some of its functions still require improvement.
+    It won’t fix all lag by itself, but it can noticeably reduce it when used alongside well coded plugins and a solid server setup.
+    It is not intended to resolve issues caused by low quality or poorly configured plugins.</p>
+</div>
 
-## Supported versions:
+---
 
-- 1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20-26.1.2
-- Most modules run on a wider range of versions [1.16.5 - 26.1.2]
-- Forge based spigot forks: [Mohist](https://mohistmc.com/), [Arclight](https://github.com/IzzelAliz/Arclight) etc.
+## ⚡ At a Glance
+
+| ⚙️ Requirements | 📦 Supported Versions |
+| :--- | :--- |
+| **Java:** 8 or later | **Main:** `1.16.5`, `1.17.1`, `1.18.2`, `1.19.4`, `1.20 - 26.1.2` |
+| **Server:** `1.13.2` - `26.1.2` | **Range:** Most modules run on a wider range `[1.13.2 - 26.1.2]` |
+
+## 🧩 Modules Overview
+
+| Module | Impact | Description & Features |
+| :--- | :---: | :--- |
+| **MobAiReducer** | 🔴 **VERY HIGH** | Replaces creature movement to optimize behavior. Disables unnecessary PathFinders. Crucial for massive animal farms. |
+| **EntityLimiter** | 🔴 **HIGH** | Restricts the number of entities per chunk. Prevents excessive entity accumulation. |
+| **LagShield** | 🔴 **HIGH** | Monitors server load and dynamically adjusts settings during latency spikes. |
+| **ExplosionOptimizer**| 🔴 **HIGH** | Limits explosion power and chain reactions (TNT, creepers, End Crystals). |
+| **ItemsCleaner** | 🟡 **MEDIUM** | Cleans up old items on the ground. Includes `/abyss` command for players to retrieve lost items. |
+| **RedstoneLimiter** | 🟡 **MEDIUM** | Disables demanding Redstone clocks to prevent server overload and crashes. |
+| **VehicleMotion** | 🟡 **MEDIUM** | Optimizes boats and minecarts. Automatically removes chest minecarts spawned in mineshafts. |
+| **AbilityLimiter** | 🟡 **MEDIUM** | Limits rapid Trident and Elytra usage to prevent excessive, fast-paced chunk loading. |
+| **ConsoleFilter** | 🟢 **VISUAL** | Filters console messages based on predefined rules. Enhances log clarity and reduces console clutter. |
+
+## 🛠️ Features & Integration
 
 <details>
-<summary>Supported plugins</summary>
+<summary><b>🔌 Supported Plugins</b></summary>
+<br>
 
 - [PlaceholderAPI](https://www.spigotmc.org/resources/6245/)
 - [WildStacker](https://bg-software.com/wildstacker/)
@@ -24,105 +51,43 @@ and more enjoyable gameplay experience for all players.
 - [RoseStacker](https://www.spigotmc.org/resources/82729/)
 - [LevelledMobs](https://www.spigotmc.org/resources/74304/)
 - [Spark](https://spark.lucko.me/download)
-
 </details>
 
 <details>
-<summary>Placeholders</summary>
+<summary><b>📊 Placeholders</b></summary>
+<br>
 
-- %lagfixer_tps% - Current ticks per second
-- %lagfixer_mspt% - Current miliseconds per tick
-- %lagfixer_cpuprocess% - Current process cpu usage
-- %lagfixer_cpusystem% - Current system cpu usage
-- %lagfixer_worldcleaner% - Countdown to world clean
-
+| Placeholder | Description |
+| :--- | :--- |
+| `%lagfixer_tps%` | Current ticks per second (TPS) |
+| `%lagfixer_mspt%` | Current milliseconds per tick (MSPT) |
+| `%lagfixer_cpuprocess%`| Current process CPU usage |
+| `%lagfixer_cpusystem%` | Current system CPU usage |
+| `%lagfixer_worldcleaner%`| Countdown to the next world clean |
 </details>
 
 <details>
-<summary>Commands</summary>
+<summary><b>💻 Commands</b></summary>
+<br>
 
-- /lagfixer - main plugin command
-- /abyss - the place where deleted items go
-
+- `/lagfixer` - Main plugin command
+- `/abyss` - The place where deleted items go (recovery)
 </details>
 
-## Downloads:
+## 📈 Metrics
 
-- [Modrinth](https://modrinth.com/plugin/lagfixer) - (Use this for fresh updated versions)
-- [SpigotMC](https://www.spigotmc.org/resources/lagfixer-1-13-1-21-10-%E2%9A%A1%EF%B8%8Fbest-performance-solution-%EF%B8%8F-2100-servers-%E2%9C%85-lightweight-and-asynchronous.111684/)
+![bStats](https://bstats.org/signatures/bukkit/LagFixer.svg)
 
-## Modules:
+## 🌌 Other Plugins
 
-### ⭐ MobAiReducer: (Impact on performance: VERY HIGH)
+Check out my other projects:
 
-- Replaces creature movement to optimize and reduce behavior.
-- Addresses inefficiencies caused by default animal behavior like unnecessary random movements or constant looking
-  around.
-- LagFixer intervenes by disabling unnecessary PathFinders or replacing them with more efficient ones.
-- Crucial in scenarios with numerous animals as even minor movements can strain server resources.
-
-### ⭐ ItemsCleaner (Impact on performance: MEDIUM)
-
-- Cleans up old items on the ground to accelerate server performance.
-- Accumulation of items over time contributes to server lag, especially in densely populated or active servers.
-- Removes extraneous items promptly to relieve server burden.
-- Players can retrieve items from the Abyss inventory using the /abyss command.
-
-### ⭐ EntityLimiter (Impact on performance: HIGH)
-
-- Restricts the number of entities per chunk.
-- Essential for survival servers with expansive animal farms.
-- Prevents excessive entity accumulation and associated performance issues.
-- Maintains stable performance levels even in environments with high entity density.
-
-### ⭐ LagShield (Impact on performance: HIGH)
-
-- Monitors server load and adjusts settings during latency spikes.
-- Addresses fluctuations in server performance to mitigate delays and lag.
-- Dynamically adjusts settings, disables unnecessary features, and optimizes resources.
-- Ensures smooth gameplay by minimizing the impact of performance fluctuations.
-
-### ⭐ RedstoneLimiter (Impact on performance: MEDIUM)
-
-- Disables demanding Redstone clocks to prevent server overload.
-- Certain Redstone configurations can lead to performance degradation and crashes.
-- Activating AntiRedstone preserves server stability and ensures responsiveness.
-- Facilitates uninterrupted gameplay even with complex Redstone contraptions.
-
-### ⭐ ExplosionOptimizer (Impact on performance: HIGH)
-
-- Limits explosion power and prevents chain reactions to reduce lag and destruction.
-- Useful for servers with frequent TNT, creepers, or End Crystal usage.
-- Prevents excessive explosions from causing performance issues.
-- Maintains stable server performance while controlling destructive events.
-
-### ⭐ ConsoleFilter (Impact on performance: VISUAL ONLY)
-
-- Filters console messages based on predefined rules.
-- Enhances clarity by selectively displaying essential messages.
-- Reduces clutter and improves readability in multiplayer servers.
-- Facilitates efficient server administration and enhances the user experience for both administrators and players.
-
-### ⭐ VehicleMotionReducer (Impact on performance: MEDIUM)
-
-- Optimizes all vehicles such as Boats and Minecarts.
-- Removes minecarts with chests spawned in mineshafts.
-- Particularly useful when minecarts are frequently used on the server.
-- Enhances server performance by optimizing vehicle mechanics and removing unnecessary entities.
-
-### ⭐ AbilityLimiter (Impact on performance: MEDIUM)
-
-- Limits rapid Trident and Elytra usage to prevent excessive chunk loading.
-- Frequent high-speed travel can cause server lag and instability.
-- AbilityLimiter allows adjusting the speed reduction to balance performance and player experience.
-- Activating AbilityLimiter ensures smoother world loading, stable server performance, and controlled mobility.
-
-## Metrics bStats:
-
-![bStats:](https://bstats.org/signatures/bukkit/LagFixer.svg)
-
-# Other plugins:
-
-[![gatekeeper](https://i.imgur.com/YHGjHR4.png)](https://modrinth.com/plugin/gatekeeper-mc)
-
-[![dynamicdns](https://i.imgur.com/BikoONq.png)](https://modrinth.com/plugin/dynamicdns)
+<div align="center">
+  <a href="https://modrinth.com/plugin/gatekeeper-mc">
+    <img src="https://i.imgur.com/YHGjHR4.png" alt="Gatekeeper" width="45%">
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://modrinth.com/plugin/dynamicdns">
+    <img src="https://i.imgur.com/BikoONq.png" alt="DynamicDNS" width="45%">
+  </a>
+</div>
