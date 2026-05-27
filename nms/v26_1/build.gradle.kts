@@ -1,7 +1,12 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow")
     id("io.papermc.paperweight.userdev")
+}
+
+paperweight {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 dependencies {
