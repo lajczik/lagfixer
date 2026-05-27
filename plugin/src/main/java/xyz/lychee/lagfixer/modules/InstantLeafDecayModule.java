@@ -84,8 +84,7 @@ public class InstantLeafDecayModule extends AbstractModule implements Listener {
 
     private boolean isValidLeaf(Block block) {
         BlockData blockData = block.getBlockData();
-        if (blockData instanceof Leaves) {
-            Leaves leaves = (Leaves) blockData;
+        if (blockData instanceof Leaves leaves) {
             return leaves.getDistance() >= this.treeDistance && !leaves.isPersistent();
         }
         return false;

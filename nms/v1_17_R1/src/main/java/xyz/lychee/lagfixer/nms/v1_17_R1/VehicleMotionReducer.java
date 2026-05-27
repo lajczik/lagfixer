@@ -6,7 +6,6 @@ import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftBoat;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftMinecart;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftMinecartChest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -37,21 +36,14 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
 
     @Override
     public boolean optimizeVehicle(org.bukkit.entity.Entity vehicle) {
-        if (vehicle instanceof CraftBoat) {
+        if (vehicle instanceof CraftBoat boat) {
             if (!this.getModule().isBoat()) return false;
 
-            return this.processEntity(((CraftBoat) vehicle).getHandle());
-        } else if (vehicle instanceof CraftMinecart) {
+            return this.processEntity(boat.getHandle());
+        } else if (vehicle instanceof CraftMinecart minecart) {
             if (!this.getModule().isMinecart()) return false;
 
-            if (vehicle instanceof CraftMinecartChest && getModule().isMinecart_remove_chest()) {
-                AbstractMinecartContainer mc = ((CraftMinecartChest) vehicle).getHandle();
-                mc.clearContent();
-                mc.removeVehicle();
-                return true;
-            }
-
-            return this.processEntity(((CraftMinecart) vehicle).getHandle());
+            return this.processEntity(minecart.getHandle());
         }
         return false;
     }

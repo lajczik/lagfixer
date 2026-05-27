@@ -246,11 +246,10 @@ public class ErrorsManager extends AbstractManager {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof ThrowableKey)) return false;
-            ThrowableKey that = (ThrowableKey) o;
-            return type.equals(that.type) &&
-                    Objects.equals(message, that.message) &&
-                    Objects.equals(causeKey, that.causeKey);
+            if (!(o instanceof ThrowableKey that)) return false;
+            return Objects.equals(type, that.type)
+                    && Objects.equals(message, that.message)
+                    && Objects.equals(causeKey, that.causeKey);
         }
 
         @Override

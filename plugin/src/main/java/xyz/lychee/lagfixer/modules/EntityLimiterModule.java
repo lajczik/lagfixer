@@ -129,24 +129,30 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
                         for (Entity entity : entities) {
                             if (this.whitelist.contains(entity.getType())
                                     || (!this.overflow_named && entity.getCustomName() != null)
-                                    || (!this.ignore_models && HookManager.getInstance().getModel().hasModel(entity))) {
+                                    || (!this.ignore_models && HookManager.getInstance().hasModel(entity))) {
                                 continue;
                             }
 
                             boolean removed = false;
 
-                            if (entity instanceof Mob) {
-                                if (creatures < limit_creatures) creatures++;
-                                else if (checkCreatures) removed = true;
-                            } else if (entity instanceof Item) {
-                                if (items < limit_items) items++;
-                                else if (checkItems) removed = true;
-                            } else if (entity instanceof Vehicle) {
-                                if (vehicles < limit_vehicles) vehicles++;
-                                else if (checkVehicles) removed = true;
-                            } else if (entity instanceof Projectile) {
-                                if (projectiles < limit_projectiles) projectiles++;
-                                else if (checkProjectiles) removed = true;
+                            switch (entity) {
+                                case Mob ignored -> {
+                                    if (creatures < limit_creatures) creatures++;
+                                    else if (checkCreatures) removed = true;
+                                }
+                                case Item ignored -> {
+                                    if (items < limit_items) items++;
+                                    else if (checkItems) removed = true;
+                                }
+                                case Vehicle ignored -> {
+                                    if (vehicles < limit_vehicles) vehicles++;
+                                    else if (checkVehicles) removed = true;
+                                }
+                                case Projectile ignored -> {
+                                    if (projectiles < limit_projectiles) projectiles++;
+                                    else if (checkProjectiles) removed = true;
+                                }
+                                default -> {}
                             }
 
                             if (removed) {

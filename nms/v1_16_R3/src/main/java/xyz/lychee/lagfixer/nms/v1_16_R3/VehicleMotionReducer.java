@@ -3,7 +3,6 @@ package xyz.lychee.lagfixer.nms.v1_16_R3;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftBoat;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecart;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecartChest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -31,20 +30,16 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
 
     @Override
     public boolean optimizeVehicle(org.bukkit.entity.Entity vehicle) {
-        if (vehicle instanceof CraftBoat) {
-            if (getModule().isBoat()) {
-                return processEntity(((CraftBoat) vehicle).getHandle());
-            }
-            return false;
-        } else if (!(vehicle instanceof CraftMinecart) || !getModule().isMinecart()) {
-            return false;
-        } else if ((vehicle instanceof CraftMinecartChest) && getModule().isMinecart_remove_chest()) {
-            EntityMinecartContainer mc = ((CraftMinecartChest) vehicle).getHandle();
-            mc.clear();
-            mc.die();
-            return true;
+        if (vehicle instanceof CraftBoat boat) {
+            if (!this.getModule().isBoat()) return false;
+
+            return this.processEntity(boat.getHandle());
+        } else if (vehicle instanceof CraftMinecart minecart) {
+            if (!this.getModule().isMinecart()) return false;
+
+            return this.processEntity(minecart.getHandle());
         }
-        return processEntity(((CraftMinecart) vehicle).getHandle());
+        return false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

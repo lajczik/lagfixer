@@ -45,14 +45,14 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
 
     @Override
     public boolean optimizeVehicle(Entity vehicle) {
-        if (vehicle instanceof CraftBoat) {
+        if (vehicle instanceof CraftBoat boat) {
             if (!this.getModule().isBoat()) return false;
 
-            return this.processEntity(((CraftBoat) vehicle).getHandle());
-        } else if (vehicle instanceof CraftMinecart) {
+            return this.processEntity(boat.getHandle());
+        } else if (vehicle instanceof CraftMinecart minecart) {
             if (!this.getModule().isMinecart()) return false;
 
-            return this.processEntity(((CraftMinecart) vehicle).getHandle());
+            return this.processEntity(minecart.getHandle());
         }
         return false;
     }
@@ -81,14 +81,14 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
     }
 
     private void copyItems(VehicleEntity from, VehicleEntity to) {
-        if (from instanceof ContainerEntity && to instanceof ContainerEntity) {
-            for (int i = 0; i < ((ContainerEntity) from).getContainerSize(); i++) {
-                ItemStack is = ((ContainerEntity) from).getItem(i);
+        if (from instanceof ContainerEntity fromContainer && to instanceof ContainerEntity toContainer) {
+            for (int i = 0; i < fromContainer.getContainerSize(); i++) {
+                ItemStack is = fromContainer.getItem(i);
                 if (!is.isEmpty()) {
-                    ((ContainerEntity) to).setItem(i, is.copyAndClear());
+                    toContainer.setItem(i, is.copyAndClear());
                 }
             }
-            ((ContainerEntity) from).clearContent();
+            fromContainer.clearContent();
         }
     }
 

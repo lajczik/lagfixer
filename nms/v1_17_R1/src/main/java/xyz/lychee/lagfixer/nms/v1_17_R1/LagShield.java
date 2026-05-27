@@ -37,8 +37,8 @@ public class LagShield extends LagShieldModule.NMS {
 
     @Override
     public void setEntityAi(Entity ent, boolean bl) {
-        if (ent instanceof CraftCreature) {
-            PathfinderMob mob = ((CraftCreature) ent).getHandle();
+        if (ent instanceof CraftCreature creature) {
+            PathfinderMob mob = creature.getHandle();
             if (mob.isNoAi() != bl) return;
 
             mob.setNoAi(!bl);

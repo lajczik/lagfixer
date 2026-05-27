@@ -57,10 +57,13 @@ public class MapCommand extends CommandManager.Subcommand {
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {
         if (this.mapHandler == null) {
             MessageUtils.sendMessage(true, sender,
-                    "&7The map is currently unavailable." +
-                            "\nYou need to add the &e&n-Djava.awt.headless=true&7 flag when starting the application to resolve the issue." +
-                            "\nThis will enable headless mode and avoid the X11 display connection problem." +
-                            "\nPlease restart the server with this flag and check if the issue persists.");
+                    """
+                            &7The map is currently unavailable.
+                            You need to add the &e&n-Djava.awt.headless=true&7 flag when starting the application to resolve the issue.
+                            This will enable headless mode and avoid the X11 display connection problem.
+                            Please restart the server with this flag and check if the issue persists.
+                            """
+            );
             return false;
         }
 
@@ -116,7 +119,7 @@ public class MapCommand extends CommandManager.Subcommand {
             }
 
             if (tempMap == null) {
-                this.mapView = Bukkit.createMap(Bukkit.getWorlds().get(0));
+                this.mapView = Bukkit.createMap(Bukkit.getWorlds().getFirst());
                 config.set("main.monitor.map.id", this.mapView.getId());
                 plugin.saveConfig();
             } else {
@@ -211,12 +214,12 @@ public class MapCommand extends CommandManager.Subcommand {
         private int msptToPixelY(double mspt) {
             double clamped = Math.min(mspt, 200.0);
             double scale = (clamped - 10.0) / 125.0;
-            scale = Math.max(0.0, Math.min(1.0, scale));
+            scale = Math.clamp(scale, 0.0, 1.0);
             return (int) Math.round(3 + (1.0 - scale) * 118.0);
         }
 
         private int tpsToPixelY(double tps) {
-            double clamped = Math.max(15.0, Math.min(20.0, tps));
+            double clamped = Math.clamp(tps, 15.0, 20.0);
             double scale = (clamped - 15.0) / 5.0;
             return (int) Math.round(3 + scale * 118.0);
         }

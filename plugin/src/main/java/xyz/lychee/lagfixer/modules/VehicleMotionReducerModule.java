@@ -36,14 +36,14 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onEntityPlace(EntityPlaceEvent event) {
         Entity entity = event.getEntity();
-        if (!event.isCancelled() && this.canContinue(entity.getWorld()) && entity instanceof Vehicle) {
-            Vehicle vehicle = (Vehicle) entity;
+        if (!event.isCancelled() && this.canContinue(entity.getWorld()) && entity instanceof Vehicle vehicle) {
+            Player player = event.getPlayer();
+
             boolean cancel = this.vehicleMotionReducer.optimizeVehicle(vehicle);
 
             if (cancel) {
                 event.setCancelled(true);
 
-                Player player = event.getPlayer();
                 if (player != null && player.getGameMode() != GameMode.CREATIVE) {
                     PlayerInventory inventory = player.getInventory();
 

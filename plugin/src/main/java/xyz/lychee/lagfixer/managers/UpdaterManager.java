@@ -16,6 +16,7 @@ import xyz.lychee.lagfixer.utils.MessageUtils;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class UpdaterManager extends AbstractManager implements Listener {
             try {
                 this.currentVersion = this.getPlugin().getDescription().getVersion().split(" ")[0].trim();
 
-                URL url = new URL("https://api.modrinth.com/v2/project/lagfixer/version");
+                URL url = URI.create("https://api.modrinth.com/v2/project/lagfixer/version").toURL();
                 InputStreamReader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
                 Type listType = new TypeToken<ArrayList<ModrinthVersion>>() {}.getType();
                 List<ModrinthVersion> versions = gson.fromJson(reader, listType);
@@ -72,7 +73,7 @@ public class UpdaterManager extends AbstractManager implements Listener {
                 if (!versions.isEmpty()) {
                     versions.sort((v1, v2) -> this.comparator.compare(v2.getVersion_number(), v1.getVersion_number()));
 
-                    ModrinthVersion latest = versions.get(0);
+                    ModrinthVersion latest = versions.getFirst();
                     this.latestVersion = latest.getVersion_number();
                     this.behind = this.calculateBuildsBehind(versions);
                 } else {
@@ -90,13 +91,16 @@ public class UpdaterManager extends AbstractManager implements Listener {
 
             if (this.updater && this.compared < 0) {
                 this.getPlugin().getLogger().info(
-                        String.format("\n&8∘₊✧────────────────────────────────✧₊∘" +
-                                        "\n&c&lLagFixer needs an update!" +
-                                        "\n&fVersion: &e&n%s&r -> &e&n%s&r" +
-                                        "\n&ahttps://modrinth.com/plugin/lagfixer/version/%s" +
-                                        "\n" +
-                                        "\n&6⚠ &7Updating this plugin is crucial! &6⚠" +
-                                        "\n&8∘₊✧────────────────────────────────✧₊∘",
+                        String.format("""
+                                        
+                                        &8∘₊✧────────────────────────────────✧₊∘
+                                        &c&lLagFixer needs an update!
+                                        &fVersion: &e&n%s&r -> &e&n%s&r
+                                        &ahttps://modrinth.com/plugin/lagfixer/version/%s
+                                        
+                                        &6⚠ &7Updating this plugin is crucial! &6⚠
+                                        &8∘₊✧────────────────────────────────✧₊∘
+                                        """,
                                 this.currentVersion, this.latestVersion, this.latestVersion
                         )
                 );
