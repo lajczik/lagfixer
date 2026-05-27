@@ -12,13 +12,12 @@ import xyz.lychee.lagfixer.utils.TimingUtil;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Getter
 public class LagFixer extends JavaPlugin {
     private static @Getter LagFixer instance;
     private final ArrayList<AbstractManager> managers = new ArrayList<>();
-    private final Logger logger = new ColoredLogger();
+    private final ColoredLogger logger = new ColoredLogger();
     private BukkitAudiences audiences;
 
     @Override
@@ -26,7 +25,7 @@ public class LagFixer extends JavaPlugin {
         instance = this;
         this.audiences = BukkitAudiences.create(this);
         this.managers.clear();
-        this.sendHeader();
+        this.logger.sendHeader(this.getDescription().getVersion());
         this.loadManager(new ErrorsManager(this));
         this.loadManager(new ConfigManager(this));
         this.loadManager(new SupportManager(this));
@@ -48,7 +47,7 @@ public class LagFixer extends JavaPlugin {
                 this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fDisabling manager...");
                 TimingUtil t = TimingUtil.startNew();
                 manager.disable();
-                this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fDisabled manager in &e" + t.stop().getExecutingTime() + "ms&f!");
+                this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fDisabled manager in &e" + t.stop() + "&f!");
             } catch (Exception ex) {
                 this.printError(ex);
             }
@@ -62,21 +61,6 @@ public class LagFixer extends JavaPlugin {
         HandlerList.unregisterAll(this);
     }
 
-    public void sendHeader() {
-        this.getLogger().info("&fRemember to leave a rating!&r &e&l★ ★ ★ ★ ★" +
-                "\n\n\n\n\n" +
-                "\n&fLagFixer " + this.getDescription().getVersion() + " - Best Performance Solution!&r" +
-                "\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░" +
-                "\n░██╗░░░░░░█████╗░░██████╗░░░███████╗██╗██╗░░██╗███████╗██████╗░░" +
-                "\n░██║░░░░░██╔══██╗██╔════╝░░░██╔════╝██║╚██╗██╔╝██╔════╝██╔══██╗░" +
-                "\n░██║░░░░░███████║██║░░██╗░░░█████╗░░██║░╚███╔╝░█████╗░░██████╔╝░" +
-                "\n░██║░░░░░██╔══██║██║░░╚██╗░░██╔══╝░░██║░██╔██╗░██╔══╝░░██╔══██╗░" +
-                "\n░███████╗██║░░██║╚██████╔╝░░██║░░░░░██║██╔╝╚██╗███████╗██║░░██║░" +
-                "\n░╚══════╝╚═╝░░╚═╝░╚═════╝░░░╚═╝░░░░░╚═╝╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝░" +
-                "\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░" +
-                "\n\n\n\n\n");
-    }
-
     public void loadManager(AbstractManager manager) {
         if (!manager.isEnabled()) {
             return;
@@ -86,7 +70,7 @@ public class LagFixer extends JavaPlugin {
             this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fEnabling manager...");
             TimingUtil t = TimingUtil.startNew();
             manager.load();
-            this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fEnabled manager in &e" + t.stop().getExecutingTime() + "ms&f!");
+            this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fEnabled manager in &e" + t.stop() + "&f!");
         } catch (Exception ex) {
             this.printError(ex);
         }
