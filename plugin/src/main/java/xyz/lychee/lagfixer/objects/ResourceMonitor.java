@@ -19,7 +19,7 @@ public class ResourceMonitor extends AbstractMonitor {
     private long ramTotal;
 
     public ResourceMonitor() {
-        super("resource");
+        super(true, "resource");
     }
 
     public double cpuProcess() {
@@ -27,7 +27,7 @@ public class ResourceMonitor extends AbstractMonitor {
     }
 
     public double cpuSystem() {
-        return this.osBean.getSystemCpuLoad() * 100.0;
+        return this.osBean.getCpuLoad() * 100.0;
     }
 
     public double tps() {

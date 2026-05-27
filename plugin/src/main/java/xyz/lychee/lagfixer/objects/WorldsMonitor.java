@@ -20,7 +20,7 @@ public class WorldsMonitor extends AbstractMonitor {
     private int chunks = 0;
 
     public WorldsMonitor() {
-        super("worlds");
+        super(false, "worlds");
     }
 
     @Override
