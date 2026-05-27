@@ -3,6 +3,7 @@ package xyz.lychee.lagfixer.objects;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.HookManager;
 
@@ -21,7 +22,8 @@ public abstract class AbstractHook {
     }
 
     public boolean isSupported() {
-        return Bukkit.getPluginManager().getPlugin(this.name) != null;
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(this.name);
+        return plugin != null && plugin.isEnabled();
     }
 
     public abstract void load() throws Exception;
