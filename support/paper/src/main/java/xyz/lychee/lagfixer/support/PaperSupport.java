@@ -66,6 +66,14 @@ public class PaperSupport extends AbstractFork {
     }
 
     @Override
+    public void unregisterCommand(String name) {
+        PluginCommand cmd = Bukkit.getPluginCommand(name);
+        if (cmd == null) return;
+
+        cmd.unregister(Bukkit.getCommandMap());
+    }
+
+    @Override
     public BukkitTask runNow(boolean async, @Nullable Location loc, Runnable run) {
         if (!getPlugin().isEnabled()) {
             return new FoliaTask(getPlugin(), null);

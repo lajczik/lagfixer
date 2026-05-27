@@ -54,12 +54,25 @@ public class SpigotSupport extends AbstractFork {
 
             final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCommandMap.setAccessible(true);
-            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-            commandMap.register(name, cmd);
+            cmd.register((CommandMap) bukkitCommandMap.get(Bukkit.getServer()));
             return cmd;
         } catch (Exception ex) {
             //this.getPlugin().printError(ex);
             return null;
+        }
+    }
+
+    @Override
+    public void unregisterCommand(String name) {
+        try {
+            PluginCommand cmd = Bukkit.getServer().getPluginCommand(name);
+            if (cmd == null) return;
+
+            final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            bukkitCommandMap.setAccessible(true);
+            cmd.unregister((CommandMap) bukkitCommandMap.get(Bukkit.getServer()));
+        } catch (Exception ex) {
+            //this.getPlugin().printError(ex);
         }
     }
 

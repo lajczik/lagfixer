@@ -36,6 +36,8 @@ public abstract class AbstractFork {
 
     public abstract PluginCommand registerCommand(Plugin plugin, String name, List<String> aliases, CommandExecutor executor);
 
+    public abstract void unregisterCommand(String name);
+
     public abstract BukkitTask runNow(boolean async, Location loc, Runnable runnable);
 
     public abstract BukkitTask runLater(boolean async, Runnable runnable, long delayInMs);
