@@ -61,7 +61,7 @@ public class BenchmarkCommand extends CommandManager.Subcommand {
                 String result = b.getResult().toString();
                 ErrorsManager.getInstance().sendBenchmark(b);
 
-                MessageUtils.sendMessage(true, sender, "&7Benchmark done in &f" + t.stop().getExecutingTime() + "&7ms, results:&f" + result);
+                MessageUtils.sendMessage(true, sender, "&7Benchmark done in &f" + t.stop() + "&7, results:&f" + result);
                 this.getCommandManager().getPlugin().getLogger().info(result);
             } catch (Exception e) {
                 MessageUtils.sendMessage(true, sender, "&cBenchmark error: " + e.getMessage());
