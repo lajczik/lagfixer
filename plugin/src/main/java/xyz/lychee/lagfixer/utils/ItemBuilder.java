@@ -9,15 +9,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import xyz.lychee.lagfixer.managers.SupportManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Getter
 public class ItemBuilder {
     private final ItemStack item;
+    private String displayName = null;
+    private List<String> lore = new ArrayList<>();
+    private boolean glow = false;
+    private Map<Enchantment, Integer> enchantments = new HashMap<>();
 
     public ItemBuilder(Material m) {
         this(m, 1);
@@ -35,12 +35,15 @@ public class ItemBuilder {
         return new ItemBuilder(SupportManager.getInstance().getNms().createSkull(base64));
     }
 
-    public ItemBuilder clone() {
-        try {
-            return (ItemBuilder) super.clone();
-        } catch (CloneNotSupportedException ignored) {
-            return new ItemBuilder(this.item.clone());
-        }
+    public ItemBuilder copy() {
+        ItemBuilder item = new ItemBuilder(this.item.clone());
+
+        item.displayName = this.displayName;
+        item.lore = this.lore;
+        item.glow = this.glow;
+        item.enchantments = this.enchantments;
+
+        return item;
     }
 
     public ItemMeta getMeta() {
@@ -48,12 +51,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder setName(String name) {
-        if (this.item.getType() == Material.AIR) {
-            return this;
-        }
-        ItemMeta meta = this.item.getItemMeta();
-        meta.setDisplayName(MessageUtils.fixColors(null, name));
-        this.item.setItemMeta(meta);
+        this.displayName = MessageUtils.fixColors(null, name);
         return this;
     }
 
@@ -62,13 +60,8 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder addUnsafeEnchantment(Enchantment ench, int level) {
-        this.item.addUnsafeEnchantment(ench, level);
-        return this;
-    }
-
-    public ItemBuilder removeEnchantment(Enchantment ench) {
-        this.item.removeEnchantment(ench);
+    public ItemBuilder removeEnchantment(Enchantment enchantment) {
+        this.enchantments.remove(enchantment);
         return this;
     }
 
@@ -79,92 +72,23 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder addEnchant(Enchantment ench, int level) {
-        ItemMeta meta = this.item.getItemMeta();
-        meta.addEnchant(ench, level, true);
-        this.item.setItemMeta(meta);
+    public ItemBuilder addEnchant(Enchantment enchantment, int level) {
+        this.enchantments.put(enchantment, level);
         return this;
     }
 
     public ItemBuilder addEnchantments(Map<Enchantment, Integer> enchantments) {
-        this.item.addEnchantments(enchantments);
+        this.enchantments.putAll(enchantments);
         return this;
     }
 
     public ItemBuilder setLore(String... lore) {
-        if (this.item.getType() == Material.AIR) {
-            return this;
-        }
-        ItemMeta meta = this.item.getItemMeta();
-        meta.setLore(Arrays.stream(lore).map(str -> MessageUtils.fixColors(null, str)).collect(Collectors.toList()));
-        this.item.setItemMeta(meta);
+        this.lore = Arrays.stream(lore).map(str -> MessageUtils.fixColors(null, str)).toList();
         return this;
     }
 
     public ItemBuilder setLore(List<String> lore) {
-        if (this.item.getType() == Material.AIR) {
-            return this;
-        }
-        ItemMeta meta = this.item.getItemMeta();
-        meta.setLore(lore.stream().map(str -> MessageUtils.fixColors(null, str)).collect(Collectors.toList()));
-        this.item.setItemMeta(meta);
-        return this;
-    }
-
-    public ItemBuilder removeLoreLine(String line) {
-        if (this.item.getType() == Material.AIR) {
-            return this;
-        }
-        ItemMeta meta = this.item.getItemMeta();
-        ArrayList lore = new ArrayList(meta.getLore());
-        if (!lore.contains(line)) {
-            return this;
-        }
-        lore.remove(line);
-        meta.setLore(lore);
-        this.item.setItemMeta(meta);
-        return this;
-    }
-
-    public ItemBuilder removeLoreLine(int index) {
-        if (this.item.getType() == Material.AIR) {
-            return this;
-        }
-        ItemMeta meta = this.item.getItemMeta();
-        ArrayList lore = new ArrayList(meta.getLore());
-        if (index < 0 || index > lore.size()) {
-            return this;
-        }
-        lore.remove(index);
-        meta.setLore(lore);
-        this.item.setItemMeta(meta);
-        return this;
-    }
-
-    public ItemBuilder addLoreLine(String line) {
-        if (this.item.getType() == Material.AIR) {
-            return this;
-        }
-        ItemMeta meta = this.item.getItemMeta();
-        ArrayList<String> lore = new ArrayList<String>();
-        if (meta.hasLore()) {
-            lore.addAll(meta.getLore());
-        }
-        lore.add(line);
-        meta.setLore(lore);
-        this.item.setItemMeta(meta);
-        return this;
-    }
-
-    public ItemBuilder addLoreLine(String line, int pos) {
-        if (this.item.getType() == Material.AIR) {
-            return this;
-        }
-        ItemMeta meta = this.item.getItemMeta();
-        ArrayList<String> lore = new ArrayList<String>(meta.getLore());
-        lore.set(pos, line);
-        meta.setLore(lore);
-        this.item.setItemMeta(meta);
+        this.lore = lore.stream().map(str -> MessageUtils.fixColors(null, str)).toList();
         return this;
     }
 
@@ -174,24 +98,39 @@ public class ItemBuilder {
     }
 
     public ItemStack build() {
+        if (this.item == null || this.item.getType() == Material.AIR)
+            return this.item;
+
+        ItemMeta meta = this.item.getItemMeta();
+        if (meta == null)
+            return this.item;
+
+        if (this.glow) {
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addEnchant(Enchantment.DURABILITY, 1, true);
+        }
+
+        if (this.displayName != null) {
+            meta.setDisplayName(this.displayName);
+        }
+
+        if (this.lore != null) {
+            meta.setLore(this.lore);
+        }
+
+        if (this.enchantments != null) {
+            for (Map.Entry<Enchantment, Integer> entry : this.enchantments.entrySet()) {
+                meta.addEnchant(entry.getKey(), entry.getValue(), true);
+            }
+        }
+
+        this.item.setItemMeta(meta);
         return this.item;
     }
 
     public ItemBuilder setGlow(boolean glow) {
-        if (this.item.getType() == Material.AIR) {
-            return this;
-        }
-        ItemMeta meta = this.item.getItemMeta();
-        if (glow) {
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            meta.addEnchant(Enchantment.DURABILITY, 1, true);
-        } else {
-            meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
-            meta.removeEnchant(Enchantment.DURABILITY);
-        }
-        this.item.setItemMeta(meta);
+        this.glow = glow;
         return this;
     }
-
 }
 

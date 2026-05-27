@@ -3,14 +3,13 @@ package xyz.lychee.lagfixer.menu;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.Language;
 import xyz.lychee.lagfixer.commands.MenuCommand;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.objects.AbstractMenu;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-import xyz.lychee.lagfixer.utils.MessageUtils;
+import xyz.lychee.lagfixer.utils.ItemBuilder;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,41 +30,38 @@ public class ModulesMenu extends AbstractMenu {
             int i = index++;
             int slot = i + 10 + i / 7 * 2;
 
-            ItemStack is = module.getBaseSkull().clone();
+            ItemBuilder ib = module.getBaseSkull().copy();
             this.itemClickEvent(slot, () -> {
-                ItemMeta meta = is.getItemMeta();
-                if (meta != null) {
-                    meta.setDisplayName(MessageUtils.fixColors(null, "&6&l⭐ &f&lModule: &e&l" + module.getName()));
-                    ArrayList<String> lore = new ArrayList<>();
+                ArrayList<String> lore = new ArrayList<>();
 
-                    lore.add(MessageUtils.fixColors(null, " &8{*} &7Status: " + (module.isLoaded() ? "&a&lENABLED" : "&c&lDISABLED")));
-                    lore.add(MessageUtils.fixColors(null, " &8{*} &7Customizable values: &e" + module.getSection().getValues(true).values().stream().filter(obj -> !(obj instanceof ConfigurationSection)).count()));
-                    lore.add(MessageUtils.fixColors(null, " &8{*} &7Performance: " + Language.getSerializer().serialize(module.getImpact().getComponent())));
-                    lore.add("");
-                    lore.add(MessageUtils.fixColors(null, "&b&nClick to modify configuration!"));
-                    lore.add("");
-                    lore.add(MessageUtils.fixColors(null, "&eDescription:"));
+                lore.add(" &8{*} &7Status: " + (module.isLoaded() ? "&a&lENABLED" : "&c&lDISABLED"));
+                lore.add(" &8{*} &7Customizable values: &e" + module.getSection().getValues(true).values().stream().filter(obj -> !(obj instanceof ConfigurationSection)).count());
+                lore.add(" &8{*} &7Performance: " + Language.getSerializer().serialize(module.getImpact().getComponent()));
+                lore.add("");
+                lore.add("&b&nClick to modify configuration!");
+                lore.add("");
+                lore.add("&eDescription:");
 
-                    for (String line : module.getDescription()) {
-                        StringBuilder lineBuilder = new StringBuilder(" &8{*} &7");
-                        int wordCount = 0;
-                        for (String word : line.split("\\s+")) {
-                            if (wordCount < 5 && lineBuilder.length() < 40) {
-                                lineBuilder.append(word).append(' ');
-                                ++wordCount;
-                                continue;
-                            }
-                            lore.add(MessageUtils.fixColors(null, lineBuilder.toString().trim()));
-                            lineBuilder = new StringBuilder("&7").append(word).append(' ');
-                            wordCount = 1;
+                for (String line : module.getDescription()) {
+                    StringBuilder lineBuilder = new StringBuilder(" &8{*} &7");
+                    int wordCount = 0;
+                    for (String word : line.split("\\s+")) {
+                        if (wordCount < 5 && lineBuilder.length() < 40) {
+                            lineBuilder.append(word).append(' ');
+                            ++wordCount;
+                            continue;
                         }
-                        if (lineBuilder.length() == 0) continue;
-                        lore.add(MessageUtils.fixColors(null, lineBuilder.toString().trim()));
+                        lore.add(lineBuilder.toString().trim());
+                        lineBuilder = new StringBuilder("&7").append(word).append(' ');
+                        wordCount = 1;
                     }
-                    meta.setLore(lore);
-                    is.setItemMeta(meta);
+                    if (lineBuilder.isEmpty()) continue;
+                    lore.add(lineBuilder.toString().trim());
                 }
-                return is;
+
+                return ib.setName("&6&l⭐ &f&lModule: &e&l" + module.getName())
+                        .setLore(lore)
+                        .build();
             }, e -> e.getWhoClicked().openInventory(module.getMenu().getInv()));
         }
     }
