@@ -4,6 +4,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.*;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 
@@ -59,7 +60,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 
@@ -81,7 +82,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 
@@ -102,7 +103,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 
@@ -123,7 +124,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 
@@ -144,7 +145,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 
@@ -165,7 +166,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 
@@ -192,7 +193,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 
@@ -213,7 +214,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NonNull Entity entity) {
             return false;
         }
 

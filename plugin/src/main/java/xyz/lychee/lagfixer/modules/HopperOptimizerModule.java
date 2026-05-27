@@ -156,8 +156,7 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
 
     private boolean isInventoryEmpty(Inventory inventory) {
         ItemStack[] contents = inventory.getContents();
-        for (int i = 0; i < contents.length; i++) {
-            ItemStack item = contents[i];
+        for (ItemStack item : contents) {
             if (item != null && item.getType() != Material.AIR) {
                 return false;
             }

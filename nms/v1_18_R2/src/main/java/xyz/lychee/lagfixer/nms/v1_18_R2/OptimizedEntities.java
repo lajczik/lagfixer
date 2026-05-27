@@ -3,6 +3,7 @@ package xyz.lychee.lagfixer.nms.v1_18_R2;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -13,7 +14,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NotNull Entity entity) {
             return false;
         }
 
@@ -34,7 +35,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NotNull Entity entity) {
             return false;
         }
 
@@ -55,7 +56,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NotNull Entity entity) {
             return false;
         }
 
@@ -76,7 +77,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NotNull Entity entity) {
             return false;
         }
 
@@ -97,7 +98,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NotNull Entity entity) {
             return false;
         }
 
@@ -116,7 +117,7 @@ public interface OptimizedEntities {
         OMinecartSpawner(MinecartSpawner other) {
             super((EntityType<? extends MinecartSpawner>) other.getType(), other.level);
 
-            Optional.ofNullable(other.getSpawner().nextSpawnData)
+            Optional.of(other.getSpawner().nextSpawnData)
                     .flatMap(sd -> EntityType.by(sd.getEntityToSpawn()))
                     .ifPresent(type ->
                             this.getSpawner().setEntityId(type)
@@ -124,7 +125,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NotNull Entity entity) {
             return false;
         }
 
@@ -145,7 +146,7 @@ public interface OptimizedEntities {
         }
 
         @Override
-        public boolean canCollideWith(Entity entity) {
+        public boolean canCollideWith(@NotNull Entity entity) {
             return false;
         }
 

@@ -175,7 +175,7 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
             SupportManager.getInstance().getFork()
                     .runNow(
                             true,
-                            new Location(chunk.getWorld(), chunk.getX() << 4, 64, chunk.getZ() << 4), 
+                            new Location(chunk.getWorld(), chunk.getX() << 4, 64, chunk.getZ() << 4),
                             () -> this.optimizeEntities(e.getEntities())
                     );
         } else {
