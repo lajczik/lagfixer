@@ -2,6 +2,8 @@ package xyz.lychee.lagfixer.modules;
 
 import lombok.Getter;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -70,8 +72,10 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
     private boolean items_abyss_enabled;
     private volatile boolean items_abyss_opened = false;
     private boolean items_abyss_alerts;
+    private Sound items_abyss_open_sound;
     private boolean items_abyss_itemdespawn;
     private String items_abyss_permission;
+    private List<String> items_abyss_aliases = Collections.emptyList();
     private int items_abyss_close;
 
     private boolean projectiles_enabled;
@@ -148,11 +152,11 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
             text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", this.items_abyss_permission));
         } else if (!this.items_abyss_opened) {
             text = this.getLanguage().getComponent("items.abyss.closed", true);
-        } else if (sender instanceof Player) {
+        } else if (sender instanceof Player player) {
             if (this.inventories.isEmpty()) {
                 text = this.getLanguage().getComponent("items.abyss.empty", true);
             } else {
-                ((Player) sender).openInventory(this.inventories.get(0));
+                player.openInventory(this.inventories.getFirst());
                 text = this.getLanguage().getComponent("items.abyss.opened", true);
             }
         } else {
@@ -168,7 +172,8 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
     @Override
     public void load() throws IOException {
         SupportManager support = SupportManager.getInstance();
-        support.getFork().registerCommand(this.getPlugin(), "abyss", Collections.emptyList(), this);
+        support.getFork().registerCommand(this.getPlugin(), "abyss", this.items_abyss_aliases, this);
+
         this.task = SupportManager.getInstance().getFork().runTimer(false, () -> {
             if (--this.second <= 0) {
                 HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
@@ -177,18 +182,17 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
 
                 for (World world : this.getAllowedWorlds()) {
                     for (Entity ent : world.getEntities()) {
-                        if (ent instanceof LivingEntity) {
-                            if (this.creatures_enabled && this.clearCreature((LivingEntity) ent)) {
+                        if (ent instanceof LivingEntity livingEntity) {
+                            if (this.creatures_enabled && this.clearCreature(livingEntity)) {
                                 if (this.creatures_dropitems) {
-                                    ((LivingEntity) ent).damage(Double.MAX_VALUE);
+                                    livingEntity.damage(Double.MAX_VALUE);
                                 }
                                 ent.remove();
                                 creatures++;
                             }
-                        } else if (ent instanceof Item) {
-                            if (this.items_enabled && this.clearItem((Item) ent)) {
-                                if (this.items_abyss_enabled && !this.items_abyss_blacklist.contains(((Item) ent).getItemStack().getType())) {
-                                    Item item = (Item) ent;
+                        } else if (ent instanceof Item item) {
+                            if (this.items_enabled && this.clearItem(item)) {
+                                if (this.items_abyss_enabled && !this.items_abyss_blacklist.contains(item.getItemStack().getType())) {
                                     if (stacker != null) {
                                         stacker.addItemsToList(item, this.items);
                                     } else {
@@ -198,8 +202,8 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                                 ent.remove();
                                 items++;
                             }
-                        } else if (ent instanceof Projectile) {
-                            if (this.projectiles_enabled && this.clearProjectile((Projectile) ent)) {
+                        } else if (ent instanceof Projectile projectile) {
+                            if (this.projectiles_enabled && this.clearProjectile(projectile)) {
                                 ent.remove();
                                 projectiles++;
                             }
@@ -218,9 +222,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                     );
                 }
 
-                if (this.items_abyss_enabled) {
-                    this.items_abyss_opened = true;
-
+                if (this.items_abyss_enabled && !this.items.isEmpty()) {
                     String guiName = this.getLanguage().getString("items.abyss.gui.name", true);
                     Collection<ItemStack> toStore = new ArrayList<>(this.items);
                     this.items.clear();
@@ -241,8 +243,16 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                         this.inventories.add(inv);
                     }
 
+                    if (this.inventories.isEmpty()) {
+                        return;
+                    }
+
+                    this.items_abyss_opened = true;
                     if (this.items_abyss_alerts) {
                         this.sendAlert(this.getLanguage().getComponent("items.abyss.open", true));
+                        if (this.items_abyss_open_sound != null) {
+                            this.alerts_audience.playSound(this.items_abyss_open_sound);
+                        }
                     }
 
                     support.getFork().runLater(false, () -> {
@@ -286,11 +296,8 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
         }
 
         HookManager hm = HookManager.getInstance();
-        if (this.creatures_ignore_models) {
-            HookManager.ModelContainer model = hm.getModel();
-            if (model != null && model.hasModel(ent)) {
-                return false;
-            }
+        if (this.creatures_ignore_models && hm.hasModel(ent)) {
+            return false;
         }
 
         LevelledMobsHook lvlHook = hm.getHook(LevelledMobsHook.class);
@@ -335,7 +342,6 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
         this.alerts_audience = this.getPlugin().getAudiences()
                 .filter(s -> s instanceof Player && (permissionDisabled || s.hasPermission(permission)));
 
-
         this.creatures_enabled = this.getSection().getBoolean("creatures.enabled");
         if (this.creatures_enabled) {
             this.creatures_named = this.getSection().getBoolean("creatures.named");
@@ -356,7 +362,30 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
             this.items_abyss_enabled = this.getSection().getBoolean("items.abyss.enabled");
             if (this.items_abyss_enabled) {
                 this.items_abyss_alerts = this.getSection().getBoolean("items.abyss.alerts");
-                this.items_abyss_permission = this.getSection().getString("items.abyss.permission");
+
+                boolean open_sound = this.getSection().getBoolean("items.abyss.open_sound.enabled");
+                if (open_sound) {
+                    double volume = this.getSection().getDouble("items.abyss.open_sound.volume");
+                    double pitch = this.getSection().getDouble("items.abyss.open_sound.pitch");
+                    String sound = this.getSection().getString("items.abyss.open_sound.sound");
+
+                    if (Key.parseable(sound)) {
+                        try {
+                            this.items_abyss_open_sound = Sound.sound(
+                                    Key.key(Key.MINECRAFT_NAMESPACE, sound.toLowerCase()),
+                                    Sound.Source.MASTER,
+                                    (float) Math.clamp(volume, 0.0, 1.0),
+                                    (float) Math.clamp(pitch, 0.0, 2.0)
+                            );
+                        } catch (Exception e) {
+                            this.items_abyss_open_sound = null;
+                        }
+                    } else {
+                        this.items_abyss_open_sound = null;
+                    }
+                }
+                this.items_abyss_permission = this.getSection().getString("items.abyss.command.permission");
+                this.items_abyss_aliases = this.getSection().getStringList("items.abyss.command.aliases");
                 this.items_abyss_itemdespawn = this.getSection().getBoolean("items.abyss.item_despawn");
                 this.items_abyss_close = this.getSection().getInt("items.abyss.close");
                 ReflectionUtils.convertEnums(Material.class, this.items_abyss_blacklist, this.getSection().getStringList("items.abyss.blacklist"));
@@ -377,24 +406,20 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
 
         this.messages.clear();
         for (String str : Language.getYaml().getStringList("messages." + this.getName() + ".countingdown")) {
-            try {
-                int equalSignIndex = str.indexOf('=');
-                if (equalSignIndex != -1) {
-                    String index = str.substring(0, equalSignIndex);
-                    String message = str.substring(equalSignIndex + 1);
+            int equalSignIndex = str.indexOf('=');
+            if (equalSignIndex == -1) {
+                this.getPlugin().getLogger().warning("Skipping malformed countingdown message (no \"=\" found): " + str);
+                continue;
+            }
 
-                    try {
-                        int parsedIndex = Integer.parseInt(index);
-                        this.messages.put(parsedIndex, message);
-                    } catch (NumberFormatException e) {
-                        this.getPlugin().getLogger().warning("Invalid index format in countingdown message: " + index + " for message \"" + message + "\"");
-                    }
-                } else {
-                    this.getPlugin().getLogger().warning("Skipping malformed countingdown message (no \"=\" found): " + str);
-                }
-            } catch (Exception ex) {
-                this.getPlugin().getLogger().info("Error processing countingdown message: " + str);
-                this.getPlugin().printError(ex);
+            String index = str.substring(0, equalSignIndex);
+            String message = str.substring(equalSignIndex + 1);
+
+            try {
+                int parsedIndex = Integer.parseInt(index);
+                this.messages.put(parsedIndex, message);
+            } catch (NumberFormatException e) {
+                this.getPlugin().getLogger().warning("Invalid index format in countingdown message: " + index + " for message \"" + message + "\"");
             }
         }
 
@@ -413,6 +438,8 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
         if (this.task != null && !this.task.isCancelled()) {
             this.task.cancel();
         }
+
+        SupportManager.getInstance().getFork().unregisterCommand("abyss");
     }
 }
 
