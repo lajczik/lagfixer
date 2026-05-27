@@ -64,6 +64,7 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
                 );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void optimize(org.bukkit.entity.Entity ent, boolean init) {
         if (!(ent instanceof CraftCreature) || this.fieldGoals == null) return;
@@ -125,7 +126,7 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
             if (!toRemove.isEmpty()) goals.removeAll(toRemove);
             if (!toAdd.isEmpty()) goals.addAll(toAdd);
         } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
+            this.getModule().getPlugin().printError(ex);
         }
     }
 
