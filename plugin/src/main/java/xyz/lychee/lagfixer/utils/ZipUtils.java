@@ -15,34 +15,21 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public final class ZipUtils {
-    private static final int BUFFER_LEN = 8192;
-
-    private ZipUtils() {
-        throw new UnsupportedOperationException("u can't instantiate me...");
-    }
-
     public static boolean zipFiles(Collection<String> srcFiles, String zipFilePath) throws IOException {
         return ZipUtils.zipFiles(srcFiles, zipFilePath, null);
     }
-
 
     public static boolean zipFiles(Collection<String> srcFilePaths, String zipFilePath, String comment) throws IOException {
         if (srcFilePaths == null || zipFilePath == null) {
             return false;
         }
-        ZipOutputStream zos = null;
-        try {
-            zos = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFilePath)));
+
+        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFilePath)))){
             for (String srcFile : srcFilePaths) {
                 if (ZipUtils.zipFile(new File(srcFile), "", zos, comment)) continue;
                 return false;
             }
             return true;
-        } finally {
-            if (zos != null) {
-                zos.finish();
-                zos.close();
-            }
         }
     }
 
@@ -50,24 +37,16 @@ public final class ZipUtils {
         return ZipUtils.zipFiles(srcFiles, zipFile, null);
     }
 
-
     public static boolean zipFiles(Collection<File> srcFiles, File zipFile, String comment) throws IOException {
         if (srcFiles == null || zipFile == null) {
             return false;
         }
-        ZipOutputStream zos = null;
-        try {
-            zos = new ZipOutputStream(Files.newOutputStream(zipFile.toPath()));
+        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipFile.toPath()))) {
             for (File srcFile : srcFiles) {
                 if (ZipUtils.zipFile(srcFile, "", zos, comment)) continue;
                 return false;
             }
             return true;
-        } finally {
-            if (zos != null) {
-                zos.finish();
-                zos.close();
-            }
         }
     }
 
@@ -88,8 +67,7 @@ public final class ZipUtils {
             return false;
         }
         try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipFile.toPath()))) {
-            boolean bl = ZipUtils.zipFile(srcFile, "", zos, comment);
-            return bl;
+            return ZipUtils.zipFile(srcFile, "", zos, comment);
         }
     }
 
@@ -124,57 +102,6 @@ public final class ZipUtils {
         return true;
     }
 
-    public static List<File> unzipFile(String zipFilePath, String destDirPath) throws IOException {
-        return ZipUtils.unzipFileByKeyword(zipFilePath, destDirPath, null);
-    }
-
-    public static List<File> unzipFile(File zipFile, File destDir) throws IOException {
-        return ZipUtils.unzipFileByKeyword(zipFile, destDir, null);
-    }
-
-    public static List<File> unzipFileByKeyword(String zipFilePath, String destDirPath, String keyword) throws IOException {
-        return ZipUtils.unzipFileByKeyword(new File(zipFilePath), new File(destDirPath), keyword);
-    }
-
-
-    public static List<File> unzipFileByKeyword(File zipFile, File destDir, String keyword) throws IOException {
-        ArrayList<File> files;
-        block9:
-        {
-            if (zipFile == null || destDir == null) {
-                return null;
-            }
-            files = new ArrayList<File>();
-            ZipFile zip = new ZipFile(zipFile);
-            Enumeration<? extends ZipEntry> entries = zip.entries();
-            try {
-                if (keyword.contentEquals(" ")) {
-                    while (entries.hasMoreElements()) {
-                        ZipEntry entry = entries.nextElement();
-                        String entryName = entry.getName().replace("\\", "/");
-                        if (entryName.contains("../")) continue;
-                        if (ZipUtils.unzipChildFile(destDir, files, zip, entry, entryName)) continue;
-                        ArrayList<File> arrayList = files;
-                        return arrayList;
-                    }
-                    break block9;
-                }
-                while (entries.hasMoreElements()) {
-                    ZipEntry entry = entries.nextElement();
-                    String entryName = entry.getName().replace("\\", "/");
-                    if (entryName.contains("../")) continue;
-                    if (!entryName.contains(keyword) || ZipUtils.unzipChildFile(destDir, files, zip, entry, entryName))
-                        continue;
-                    ArrayList<File> arrayList = files;
-                    return arrayList;
-                }
-            } finally {
-                zip.close();
-            }
-        }
-        return files;
-    }
-
     private static boolean unzipChildFile(File destDir, List<File> files, ZipFile zip, ZipEntry entry, String name) throws IOException {
         File file = new File(destDir, name);
         files.add(file);
@@ -203,7 +130,7 @@ public final class ZipUtils {
         if (zipFile == null) {
             return null;
         }
-        ArrayList<String> paths = new ArrayList<String>();
+        ArrayList<String> paths = new ArrayList<>();
         ZipFile zip = new ZipFile(zipFile);
         Enumeration<? extends ZipEntry> entries = zip.entries();
         while (entries.hasMoreElements()) {
