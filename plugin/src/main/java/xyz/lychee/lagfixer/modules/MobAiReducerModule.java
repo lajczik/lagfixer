@@ -84,15 +84,17 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
     }
 
     public boolean isEnabled(Entity ent) {
-        if ((!this.ignore_models && HookManager.getInstance().getModel().hasModel(ent)) || this.list.contains(ent.getType()) != this.list_mode)
+        if ((!this.ignore_models && HookManager.getInstance().hasModel(ent)) || this.list.contains(ent.getType()) != this.list_mode)
             return false;
 
-        if (ent instanceof Villager) return villagers;
-        if (ent instanceof Tameable) return tameable;
-        if (ent instanceof Flying) return birds;
-        if (ent instanceof Animals) return animals;
-        if (ent instanceof Monster) return monsters;
-        return others;
+        return switch (ent) {
+            case Villager ignored -> villagers;
+            case Tameable ignored -> tameable;
+            case Flying ignored -> birds;
+            case Animals ignored -> animals;
+            case Monster ignored -> monsters;
+            default -> others;
+        };
     }
 
     @Override

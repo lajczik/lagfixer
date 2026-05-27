@@ -19,7 +19,6 @@ import xyz.lychee.lagfixer.objects.AbstractManager;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 public class CommandManager extends AbstractManager implements Listener, TabExecutor {
@@ -109,7 +108,7 @@ public class CommandManager extends AbstractManager implements Listener, TabExec
             return Bukkit.getOnlinePlayers().stream()
                     .map(HumanEntity::getName)
                     .filter(s -> s.startsWith(args[1]))
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return Collections.emptyList();

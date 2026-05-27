@@ -12,20 +12,17 @@ import xyz.lychee.lagfixer.hooks.PlaceholderAPIHook;
 import xyz.lychee.lagfixer.managers.ConfigManager;
 import xyz.lychee.lagfixer.managers.HookManager;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 public class MessageUtils {
     private static final Map<String, String> REPLACEMENTS;
 
     static {
-        Map<String, String> map = new HashMap<>();
-        map.put("{*}", "•");
-        map.put("{>>}", "»");
-        map.put("{<<}", "«");
-
-        REPLACEMENTS = Collections.unmodifiableMap(map);
+        REPLACEMENTS = Map.of(
+                "{*}", "•",
+                "{>>}", "»",
+                "{<<}", "«"
+        );
     }
 
     public static String fixColors(@Nullable CommandSender sender, String message) {
