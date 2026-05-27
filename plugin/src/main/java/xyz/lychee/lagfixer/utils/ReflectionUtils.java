@@ -49,6 +49,7 @@ public final class ReflectionUtils {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T createInstance(String name, AbstractModule module) {
         String version = SupportManager.getInstance().getNmsVersion();
         if (version == null) return null;
