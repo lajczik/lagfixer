@@ -51,15 +51,14 @@ public class ReflectionSupportNms implements ISupportNms {
     public double getTps() {
         if (getServerMethod == null || recentTpsField == null) return -1;
 
-        int index = 2;
         try {
             Object craftServer = Bukkit.getServer();
             Object minecraftServer = getServerMethod.invoke(craftServer);
             if (minecraftServer == null) return -1;
 
             double[] tps = (double[]) recentTpsField.get(minecraftServer);
-            if (index >= tps.length) index = 0;
-            return Math.min(20.0, tps[index]);
+            int index = Math.min(1, tps.length - 1);
+            return Math.clamp(tps[index], 0.0, 20.0);
         } catch (Exception e) {
             return -1;
         }
