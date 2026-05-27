@@ -1,6 +1,5 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow")
 }
 
 group = "xyz.lychee.lagfixer"
@@ -35,9 +34,9 @@ dependencies {
     compileOnly("io.github.arcaneplugins:levelledmobs-plugin:4.0.3.1")
 
     compileOnly("com.mojang:authlib:3.11.50")
-    compileOnly("org.apache.logging.log4j:log4j-core:2.25.3")
+    compileOnly("org.apache.logging.log4j:log4j-core:2.17.2")
     compileOnly("org.jetbrains:annotations:26.1.0")
-    compileOnly("com.github.oshi:oshi-core:6.10.0")
+    compileOnly("com.github.oshi:oshi-core:7.2.0")
     compileOnly("org.apache.commons:commons-lang3:3.20.0")
 
     implementation("net.kyori:adventure-platform-bukkit:4.4.1")
@@ -45,10 +44,6 @@ dependencies {
 }
 
 tasks {
-    shadowJar {
-        minimize()
-    }
-
     processResources {
         filteringCharset = "UTF-8"
         filesMatching("plugin.yml") {
