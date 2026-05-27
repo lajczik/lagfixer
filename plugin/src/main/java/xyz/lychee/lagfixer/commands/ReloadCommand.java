@@ -66,7 +66,7 @@ public class ReloadCommand extends CommandManager.Subcommand {
 
             MessageUtils.sendMessage(true, sender, """
                     &7Reloaded modules configurations in &f%s&7.
-
+                    
                      &7Working methods to apply all changes:
                       &8{*} &7Server restart (&frecommended&7)
                       &8{*} &7All plugins reload, command: &f/reload confirm

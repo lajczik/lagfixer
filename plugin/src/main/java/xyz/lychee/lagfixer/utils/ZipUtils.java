@@ -24,7 +24,7 @@ public final class ZipUtils {
             return false;
         }
 
-        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFilePath)))){
+        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(Paths.get(zipFilePath)))) {
             for (String srcFile : srcFilePaths) {
                 if (ZipUtils.zipFile(new File(srcFile), "", zos, comment)) continue;
                 return false;

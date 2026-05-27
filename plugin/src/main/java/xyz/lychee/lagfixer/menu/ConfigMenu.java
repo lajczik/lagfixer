@@ -102,7 +102,6 @@ public class ConfigMenu extends AbstractMenu {
 
             change.getModule().getMenu().updateAll();
             openModuleMenu(player, change.getModule());
-
         } catch (Exception ex) {
             MessageUtils.sendMessage(true, player, "&cError saving configuration!");
         }

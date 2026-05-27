@@ -10,9 +10,9 @@ import java.util.Optional;
 public interface OptimizedEntities {
 
     class OBoat extends Boat implements OptimizedEntities {
+        @SuppressWarnings("unchecked")
         OBoat(Boat b) {
             super((EntityType<Boat>) b.getType(), b.level(), () -> b.getPickResult().getItem());
-
         }
 
         @Override
@@ -32,6 +32,7 @@ public interface OptimizedEntities {
     }
 
     class OChestBoat extends ChestBoat implements OptimizedEntities {
+        @SuppressWarnings("unchecked")
         OChestBoat(ChestBoat cb) {
             super((EntityType<ChestBoat>) cb.getType(), cb.level(), () -> cb.getPickResult().getItem());
         }
@@ -55,7 +56,6 @@ public interface OptimizedEntities {
     class ORaft extends Raft implements OptimizedEntities {
         ORaft(Raft r) {
             super(EntityType.BAMBOO_RAFT, r.level(), () -> r.getPickResult().getItem());
-
         }
 
         @Override
@@ -77,7 +77,6 @@ public interface OptimizedEntities {
     class OChestRaft extends ChestRaft implements OptimizedEntities {
         OChestRaft(ChestRaft cr) {
             super(EntityType.BAMBOO_CHEST_RAFT, cr.level(), () -> cr.getPickResult().getItem());
-
         }
 
         @Override
