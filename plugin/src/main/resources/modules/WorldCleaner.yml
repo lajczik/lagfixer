@@ -5,40 +5,70 @@ WorldCleaner:
     - world_the_end
     - world_nether
   values:
-    interval: 600 # Interval (in seconds) between WorldCleaner runs.
+    # Interval (in seconds) between WorldCleaner runs.
+    interval: 600
+
     alerts:
       enabled: true
-      permission: "" # Leave empty to disable permission.
-      actionbar: false # Temporary message above the hotbar
+      # Leave empty to disable permission.
+      permission: ""
+      actionbar: false
       message: true
 
     # Command: /lagfixer clear items
     items:
       enabled: true
-      disable_item_despawn: false # If true, LagFixer will handle item despawning instead of Bukkit.
-      time_lived: 10000 # Minimum time (in ms) an item must exist before removal (-1 to disable).
-      blacklist: # Materials: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+      # If true, LagFixer will handle item despawning instead of Bukkit.
+      disable_item_despawn: false
+      # Minimum time (in ms) an item must exist before removal (-1 to disable).
+      time_lived: 10000
+      # Materials: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+      blacklist:
         - BEACON
-      abyss: # The abyss stores deleted items, which players can retrieve via /abyss.
+      # The abyss stores deleted items, which players can retrieve via /abyss.
+      abyss:
         enabled: false
-        alerts: true # Configurable in lang.yml.
-        permission: "" # Leave empty to disable permission.
-        item_despawn: true # If true, adds items to abyss when they despawn.
-        close: 60 # Clears abyss inventory and disables the command after this time.
-        blacklist: # Materials: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+        # Configurable in lang.yml.
+        alerts: true
+
+        open_sound:
+          enabled: true
+          # Sounds: https://www.digminecraft.com/lists/sound_list_pc.php
+          sound: "block.ender_chest.open"
+          pitch: 0.9
+          volume: 0.5
+
+        command:
+          # Leave empty to disable permission.
+          permission: ""
+          aliases: [ ]
+
+        # If true, adds items to abyss when they despawn.
+        item_despawn: true
+        # Clears abyss inventories and disables the command after this time.
+        close: 60
+        # Materials: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+        blacklist:
           - BEDROCK
           - BEACON
 
     # Command: /lagfixer clear creatures
     creatures:
       enabled: true
-      named: false        # If "true" removes named creatures
-      drop_items: false   # If "true" drops items when removing creatures
-      stacked: true       # If "true" removes stacked entities (WildStacker, RoseStacker and UltimateStacker hook)
-      levelled: true      # If "true" removes levelled mobs (LevelledMobs hook)
-      ignore_models: true # If "true" keeps entities from ModelEngine or MythicMobs
-      list_mode: true     # If "true" only listed entities will be removed; if false, all unlisted entities will be removed
-      list: # Allowed creatures: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+      # If "true" removes named creatures
+      named: false
+      # If "true" drops items when removing creatures
+      drop_items: false
+      # If "true" removes stacked entities (WildStacker, RoseStacker and UltimateStacker hook)
+      stacked: true
+      # If "true" removes levelled mobs (LevelledMobs hook)
+      levelled: true
+      # If "true" keeps entities from ModelEngine or MythicMobs
+      ignore_models: true
+      # If "true" only listed entities will be removed; if false, all unlisted entities will be removed
+      list_mode: true
+      # Allowed creatures: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+      list:
         - BAT
         - ZOMBIE
         - SKELETON
@@ -57,8 +87,10 @@ WorldCleaner:
     # Command: /lagfixer clear projectiles (e.g., arrows, snowballs)
     projectiles:
       enabled: true
-      list_mode: true # If "true" only listed entities will be removed; if false, all unlisted entities will be removed
-      list: # Projectiles: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+      # If "true" only listed entities will be removed; if false, all unlisted entities will be removed
+      list_mode: true
+      # Projectiles: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+      list:
         - EGG
         - SNOWBALL
         - ARROW
