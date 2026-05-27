@@ -16,10 +16,8 @@ import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-import xyz.lychee.lagfixer.utils.FastRandom;
 
 public class AbilityLimiterModule extends AbstractModule implements Listener {
-    private final FastRandom random = new FastRandom();
     private int trident_cooldown;
     private int elytra_cooldown;
     private int trident_durability;
@@ -76,7 +74,7 @@ public class AbilityLimiterModule extends AbstractModule implements Listener {
         if (meta.hasEnchant(Enchantment.DURABILITY)) {
             float lossChance = 100F / (is.getEnchantmentLevel(Enchantment.DURABILITY) + 1);
             for (int i = 0; i < defaultDuraLoss; i++) {
-                if (this.random.nextFloat() * 100F < lossChance) {
+                if (Math.random() * 100F < lossChance) {
                     duraLoss++;
                 }
             }
