@@ -148,7 +148,7 @@ public class ConsoleFilterModule extends AbstractModule {
         }
     }
 
-    public class CustomFilter extends AbstractFilter {
+    private class CustomFilter extends AbstractFilter {
         @Override
         public Filter.Result filter(LogEvent event) {
             if (!filtering || event.getLoggerName().equals("ErrorFilter") || event.getLoggerName().equals("LagFixer")) {

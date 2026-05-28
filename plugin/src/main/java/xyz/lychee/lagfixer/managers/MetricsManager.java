@@ -8,12 +8,12 @@ import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.objects.AbstractManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -176,15 +176,18 @@ public class MetricsManager
             this.startSubmitting();
         }
 
-        private byte[] compress(String str) throws IOException {
+        private byte[] compress(String str) {
             if (str == null) {
                 return null;
             }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            try (GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
                 gzip.write(str.getBytes(StandardCharsets.UTF_8));
+                return outputStream.toByteArray();
             }
-            return outputStream.toByteArray();
+            catch (IOException e) {
+                return null;
+            }
         }
 
         public void addCustomChart(CustomChart chart) {
@@ -228,30 +231,24 @@ public class MetricsManager
             baseJson.add("service", serviceJson);
             baseJson.addProperty("serverUUID", MetricsManager.this.uuid);
             baseJson.addProperty("metricsVersion", "3.0.2");
-            this.scheduler.execute(() -> {
-                try {
-                    this.sendData(baseJson);
-                } catch (Exception exception) {
-                    // empty catch block
-                }
-            });
+            this.sendData(baseJson);
         }
 
-        private void sendData(JsonObject data) throws Exception {
-            HttpsURLConnection connection = (HttpsURLConnection) URI.create("https://bStats.org/api/v2/data/bukkit").toURL().openConnection();
+        private void sendData(JsonObject data) {
             byte[] compressedData = this.compress(data.toString());
-            connection.setRequestMethod("POST");
-            connection.addRequestProperty("Accept", "application/json");
-            connection.addRequestProperty("Connection", "close");
-            connection.addRequestProperty("Content-Encoding", "gzip");
-            connection.addRequestProperty("Content-Length", Integer.toString(compressedData.length));
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("User-Agent", "Metrics-Service/1");
-            connection.setDoOutput(true);
-            try (DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())) {
-                outputStream.write(compressedData);
-            }
-            connection.getInputStream().close();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://bStats.org/api/v2/data/bukkit"))
+                    .header("Accept", "application/json")
+                    .header("Content-Encoding", "gzip")
+                    .header("Content-Length", Integer.toString(compressedData.length))
+                    .header("Content-Type", "application/json")
+                    .header("User-Agent", "Metrics-Service/1")
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(compressedData))
+                    .build();
+
+            SupportManager.getInstance().getClient()
+                    .sendAsync(request, HttpResponse.BodyHandlers.discarding());
         }
     }
 }

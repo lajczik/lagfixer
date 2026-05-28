@@ -12,9 +12,12 @@ import xyz.lychee.lagfixer.objects.*;
 import xyz.lychee.lagfixer.support.PaperSupport;
 import xyz.lychee.lagfixer.support.SpigotSupport;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 @Getter
@@ -29,6 +32,10 @@ public class SupportManager extends AbstractManager implements Listener {
     private ISupportNms nms = null;
     private ResourceMonitor resourceMonitor = new ResourceMonitor();
     private WorldsMonitor worldsMonitor = new WorldsMonitor();
+    private HttpClient client = HttpClient.newBuilder()
+            .executor(Executors.newSingleThreadExecutor())
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
 
     public SupportManager(LagFixer plugin) {
         super(plugin);
@@ -52,6 +59,7 @@ public class SupportManager extends AbstractManager implements Listener {
         this.versions.put("1.21.11", "v1_21_R7");
 
         this.versions.put("26.1", "v26_1");
+        this.versions.put("26.2", "v26_1");
     }
 
     @Override
