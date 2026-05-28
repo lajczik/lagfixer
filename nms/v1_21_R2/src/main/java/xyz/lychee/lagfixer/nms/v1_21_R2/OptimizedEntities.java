@@ -51,6 +51,7 @@ public interface OptimizedEntities {
     }
 
     class OBoat extends Boat implements OptimizedEntities {
+        @SuppressWarnings("unchecked")
         OBoat(Boat b) {
             super((EntityType<? extends Boat>) b.getType(), b.level(), () -> b.getPickResult().getItem());
         }
@@ -72,6 +73,7 @@ public interface OptimizedEntities {
     }
 
     class OChestBoat extends ChestBoat implements OptimizedEntities {
+        @SuppressWarnings("unchecked")
         OChestBoat(ChestBoat cb) {
             super((EntityType<? extends ChestBoat>) cb.getType(), cb.level(), () -> cb.getPickResult().getItem());
         }

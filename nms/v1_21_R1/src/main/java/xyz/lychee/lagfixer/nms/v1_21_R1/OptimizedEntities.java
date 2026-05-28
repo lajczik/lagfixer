@@ -31,7 +31,7 @@ public interface OptimizedEntities {
 
     class OChestBoat extends ChestBoat implements OptimizedEntities {
         OChestBoat(ChestBoat cb) {
-            super((EntityType<? extends ChestBoat>) cb.getType(), cb.level());
+            super(EntityType.CHEST_BOAT, cb.level());
         }
 
         @Override
