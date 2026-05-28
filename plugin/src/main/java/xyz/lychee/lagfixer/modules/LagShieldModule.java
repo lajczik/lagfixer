@@ -132,6 +132,7 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
     }
 
     private Integer getThreshold(TreeMap<Double, Integer> map, double tps) {
+        if (map.isEmpty()) return null;
         Map.Entry<Double, Integer> entry = map.ceilingEntry(tps);
         if (entry != null) return entry.getValue();
         entry = map.lastEntry();
