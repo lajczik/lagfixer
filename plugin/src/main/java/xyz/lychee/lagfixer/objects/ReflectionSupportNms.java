@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -121,5 +123,25 @@ public class ReflectionSupportNms implements ISupportNms {
         } catch (Exception e) {
             return -1;
         }
+    }
+
+    @Override
+    public boolean isSupportSimulation() {
+        return false;
+    }
+
+    @Override
+    public void setViewDistance(World world, int view) {
+
+    }
+
+    @Override
+    public void setSimulationDistance(World world, int simulation) {
+
+    }
+
+    @Override
+    public void setEntityAi(Entity ent, boolean bl) {
+
     }
 }

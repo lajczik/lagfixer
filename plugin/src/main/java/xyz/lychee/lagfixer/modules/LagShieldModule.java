@@ -25,7 +25,7 @@ import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-import xyz.lychee.lagfixer.utils.ReflectionUtils;
+import xyz.lychee.lagfixer.objects.ISupportNms;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -38,7 +38,6 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
     private final TreeMap<Double, Integer> dynamic_tick_speed_tps = new TreeMap<>();
     private int locks = 0;
     private BukkitTask task;
-    private LagShieldModule.NMS lagShield;
     private double entitySpawn_tps;
     private double tickHopper_tps;
     private double redstone_tps;
@@ -76,7 +75,9 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
 
     @Override
     public void run() {
-        double tps = SupportManager.getInstance().getResourceMonitor().getTps();
+        SupportManager support = SupportManager.getInstance();
+        ISupportNms nms = support.getNms();
+        double tps = support.getResourceMonitor().getTps();
         boolean oldMobAi = this.mobAi;
 
         this.entitySpawn = tps < this.entitySpawn_tps;
@@ -92,13 +93,13 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
         if (this.mobAi) {
             for (World w : this.getAllowedWorlds()) {
                 for (LivingEntity le : w.getLivingEntities()) {
-                    this.lagShield.setEntityAi(le, false);
+                    nms.setEntityAi(le, false);
                 }
             }
         } else if (oldMobAi) {
             for (World w : this.getAllowedWorlds()) {
                 for (LivingEntity le : w.getLivingEntities()) {
-                    this.lagShield.setEntityAi(le, true);
+                    nms.setEntityAi(le, true);
                 }
             }
         }
@@ -107,7 +108,7 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
             Integer viewDistance = this.getThreshold(this.dynamic_view_distance_tps, tps);
             if (viewDistance != null) {
                 for (World w : this.getAllowedWorlds()) {
-                    this.lagShield.setViewDistance(w, viewDistance);
+                    nms.setViewDistance(w, viewDistance);
                 }
             }
         }
@@ -116,7 +117,7 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
             Integer simulationDistance = this.getThreshold(this.dynamic_simulation_distance_tps, tps);
             if (simulationDistance != null) {
                 for (World w : this.getAllowedWorlds()) {
-                    this.lagShield.setSimulationDistance(w, simulationDistance);
+                    nms.setSimulationDistance(w, simulationDistance);
                 }
             }
         }
@@ -229,18 +230,17 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
 
     @Override
     public void load() throws Exception {
-        this.task = SupportManager.getInstance().getFork().runTimer(false, this, 1L, 1L, TimeUnit.MINUTES);
+        SupportManager support = SupportManager.getInstance();
+        this.task = support.getFork().runTimer(false, this, 1L, 1L, TimeUnit.MINUTES);
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
 
-        if (!this.lagShield.isSupportSimulation()) {
+        if (!support.getNms().isSupportSimulation()) {
             this.dynamic_simulation_distance = false;
         }
     }
 
     @Override
     public boolean loadConfig() {
-        this.lagShield = ReflectionUtils.createInstance("LagShield", this);
-
         this.entitySpawn_tps = this.getSection().getDouble("tps_threshold.entity_spawn");
         this.tickHopper_tps = this.getSection().getDouble("tps_threshold.tick_hopper");
         this.redstone_tps = this.getSection().getDouble("tps_threshold.redstone");
@@ -266,7 +266,7 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
             this.loadThreshold(this.dynamic_tick_speed_tps, "dynamic_tick_speed.tps_thresholds");
         }
 
-        return this.lagShield != null;
+        return true;
     }
 
     @Override

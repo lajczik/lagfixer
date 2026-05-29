@@ -20,14 +20,14 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
     private static final IdentityHashMap<Class<? extends Entity>, Function<Entity, Entity>> VEHICLES = new IdentityHashMap<>(7);
 
     static {
-        VEHICLES.put(Boat.class, e -> new OptimizedEntities.OBoat((Boat) e));
+        VEHICLES.put(Boat.class, e -> new VehicleWrapper.OBoat((Boat) e));
 
-        VEHICLES.put(MinecartChest.class, e -> new OptimizedEntities.OMinecartChest((MinecartChest) e));
-        VEHICLES.put(MinecartHopper.class, e -> new OptimizedEntities.OMinecartHopper((MinecartHopper) e));
-        VEHICLES.put(MinecartFurnace.class, e -> new OptimizedEntities.OMinecartFurnace((MinecartFurnace) e));
-        VEHICLES.put(MinecartSpawner.class, e -> new OptimizedEntities.OMinecartSpawner((MinecartSpawner) e));
-        VEHICLES.put(MinecartTNT.class, e -> new OptimizedEntities.OMinecartTNT((MinecartTNT) e));
-        VEHICLES.put(Minecart.class, e -> new OptimizedEntities.OMinecart((Minecart) e));
+        VEHICLES.put(MinecartChest.class, e -> new VehicleWrapper.OMinecartChest((MinecartChest) e));
+        VEHICLES.put(MinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper((MinecartHopper) e));
+        VEHICLES.put(MinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace((MinecartFurnace) e));
+        VEHICLES.put(MinecartSpawner.class, e -> new VehicleWrapper.OMinecartSpawner((MinecartSpawner) e));
+        VEHICLES.put(MinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT((MinecartTNT) e));
+        VEHICLES.put(Minecart.class, e -> new VehicleWrapper.OMinecart((Minecart) e));
     }
 
     public VehicleMotionReducer(VehicleMotionReducerModule module) {
@@ -57,7 +57,7 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
     }
 
     private boolean processEntity(Entity original) {
-        if (original instanceof OptimizedEntities) return false;
+        if (original instanceof VehicleWrapper) return false;
 
         Function<Entity, ? extends Entity> factory = VEHICLES.get(original.getClass());
         if (factory == null) return false;
@@ -66,19 +66,19 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
         this.copyLocation(original, newVehicle);
         original.level.addFreshEntity(newVehicle);
         this.copyItems(original, newVehicle);
-        original.removeVehicle();
+        original.remove(Entity.RemovalReason.DISCARDED);
         return true;
     }
 
     private void copyItems(Entity from, Entity to) {
-        if (from instanceof AbstractMinecartContainer && to instanceof AbstractMinecartContainer) {
-            for (int i = 0; i < ((AbstractMinecartContainer) from).getContainerSize(); i++) {
-                ItemStack is = ((AbstractMinecartContainer) from).getItem(i);
+        if (from instanceof AbstractMinecartContainer fromContainer && to instanceof AbstractMinecartContainer toContainer) {
+            for (int i = 0; i < fromContainer.getContainerSize(); i++) {
+                ItemStack is = fromContainer.getItem(i);
                 if (!is.isEmpty()) {
-                    ((AbstractMinecartContainer) to).setItem(i, is.copy());
+                    toContainer.setItem(i, is.copy());
                 }
             }
-            ((AbstractMinecartContainer) from).clearContent();
+            fromContainer.clearContent();
         }
     }
 

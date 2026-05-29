@@ -16,12 +16,12 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
     private static final IdentityHashMap<Class<? extends Entity>, Function<Entity, Entity>> VEHICLES = new IdentityHashMap<>(7);
 
     static {
-        VEHICLES.put(EntityBoat.class, e -> new OptimizedEntities.OBoat((EntityBoat) e));
-        VEHICLES.put(EntityMinecartChest.class, e -> new OptimizedEntities.OMinecartChest((EntityMinecartChest) e));
-        VEHICLES.put(EntityMinecartHopper.class, e -> new OptimizedEntities.OMinecartHopper((EntityMinecartHopper) e));
-        VEHICLES.put(EntityMinecartFurnace.class, e -> new OptimizedEntities.OMinecartFurnace((EntityMinecartFurnace) e));
-        VEHICLES.put(EntityMinecartTNT.class, e -> new OptimizedEntities.OMinecartTNT((EntityMinecartTNT) e));
-        VEHICLES.put(EntityMinecartRideable.class, e -> new OptimizedEntities.OMinecart((EntityMinecartRideable) e));
+        VEHICLES.put(EntityBoat.class, e -> new VehicleWrapper.OBoat((EntityBoat) e));
+        VEHICLES.put(EntityMinecartChest.class, e -> new VehicleWrapper.OMinecartChest((EntityMinecartChest) e));
+        VEHICLES.put(EntityMinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper((EntityMinecartHopper) e));
+        VEHICLES.put(EntityMinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace((EntityMinecartFurnace) e));
+        VEHICLES.put(EntityMinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT((EntityMinecartTNT) e));
+        VEHICLES.put(EntityMinecartRideable.class, e -> new VehicleWrapper.OMinecart((EntityMinecartRideable) e));
     }
 
     public VehicleMotionReducer(VehicleMotionReducerModule module) {
@@ -52,7 +52,7 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
 
     private boolean processEntity(Entity original) {
         Function<Entity, Entity> function;
-        if (original instanceof OptimizedEntities || (function = VEHICLES.get(original.getClass())) == null) {
+        if (original instanceof VehicleWrapper || (function = VEHICLES.get(original.getClass())) == null) {
             return false;
         }
 

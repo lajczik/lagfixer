@@ -2,11 +2,17 @@ package xyz.lychee.lagfixer.nms.v1_17_R1;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.PathfinderMob;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftCreature;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -55,5 +61,29 @@ public class SupportNms extends ReflectionSupportNms {
     @Override
     public double getTps() {
         return ((CraftServer) Bukkit.getServer()).getServer().recentTps[2];
+    }
+
+    @Override
+    public void setViewDistance(World world, int view) {
+        int clampedView = Math.clamp(view, 2, 32);
+
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        if (level.spigotConfig.viewDistance != clampedView) {
+            level.spigotConfig.viewDistance = clampedView;
+            level.getChunkSource().setViewDistance(clampedView);
+        }
+    }
+
+    @Override
+    public void setEntityAi(Entity ent, boolean bl) {
+        if (ent instanceof CraftCreature creature) {
+            PathfinderMob mob = creature.getHandle();
+            if (mob.isNoAi() != bl) return;
+
+            mob.setNoAi(!bl);
+            mob.setAggressive(!bl);
+            mob.setSilent(!bl);
+            mob.collides = !bl;
+        }
     }
 }
