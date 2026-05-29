@@ -235,16 +235,12 @@ public class MetricsManager
         }
 
         private void sendData(JsonObject data) {
-            byte[] compressedData = this.compress(data.toString());
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://bStats.org/api/v2/data/bukkit"))
                     .header("Accept", "application/json")
-                    .header("Content-Encoding", "gzip")
-                    .header("Content-Length", Integer.toString(compressedData.length))
                     .header("Content-Type", "application/json")
                     .header("User-Agent", "Metrics-Service/1")
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(compressedData))
+                    .POST(HttpRequest.BodyPublishers.ofString(data.toString()))
                     .build();
 
             SupportManager.getInstance().getClient()
