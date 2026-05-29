@@ -15,8 +15,6 @@ public interface ISupportNms {
 
     int getPlayerPing(Player player);
 
-    boolean isSupportSimulation();
-
     void setViewDistance(World world, int view);
 
     void setSimulationDistance(World world, int simulation);

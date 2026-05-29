@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -233,10 +232,6 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
         SupportManager support = SupportManager.getInstance();
         this.task = support.getFork().runTimer(false, this, 1L, 1L, TimeUnit.MINUTES);
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
-
-        if (!support.getNms().isSupportSimulation()) {
-            this.dynamic_simulation_distance = false;
-        }
     }
 
     @Override
@@ -275,23 +270,6 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
             this.task.cancel();
         }
         HandlerList.unregisterAll(this);
-    }
-
-    @Getter
-    public static abstract class NMS {
-        private final LagShieldModule module;
-
-        public NMS(LagShieldModule module) {
-            this.module = module;
-        }
-
-        public abstract boolean isSupportSimulation();
-
-        public abstract void setViewDistance(World world, int view);
-
-        public abstract void setSimulationDistance(World world, int simulation);
-
-        public abstract void setEntityAi(Entity entity, boolean status);
     }
 }
 

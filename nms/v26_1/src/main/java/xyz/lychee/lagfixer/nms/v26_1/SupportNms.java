@@ -73,11 +73,6 @@ public class SupportNms extends ReflectionSupportNms {
     }
 
     @Override
-    public boolean isSupportSimulation() {
-        return true;
-    }
-
-    @Override
     public void setViewDistance(World world, int view) {
         int clampedView = Math.clamp(view, 2, 32);
 

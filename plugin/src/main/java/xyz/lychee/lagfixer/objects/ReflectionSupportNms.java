@@ -126,22 +126,11 @@ public class ReflectionSupportNms implements ISupportNms {
     }
 
     @Override
-    public boolean isSupportSimulation() {
-        return false;
-    }
+    public void setViewDistance(World world, int view) {}
 
     @Override
-    public void setViewDistance(World world, int view) {
-
-    }
+    public void setSimulationDistance(World world, int simulation) {}
 
     @Override
-    public void setSimulationDistance(World world, int simulation) {
-
-    }
-
-    @Override
-    public void setEntityAi(Entity ent, boolean bl) {
-
-    }
+    public void setEntityAi(Entity ent, boolean bl) {}
 }
