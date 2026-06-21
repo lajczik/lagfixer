@@ -4,6 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.managers.CommandManager;
+<<<<<<< HEAD
+=======
+import xyz.lychee.lagfixer.managers.SupportManager;
+import xyz.lychee.lagfixer.objects.ISupportNms;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 public class PingCommand extends CommandManager.Subcommand {
@@ -19,6 +24,10 @@ public class PingCommand extends CommandManager.Subcommand {
 
     @Override
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {
+<<<<<<< HEAD
+=======
+        ISupportNms nms = SupportManager.getInstance().getNms();
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         if (args.length > 0) {
             Player player = Bukkit.getPlayer(args[0]);
             if (player == null) {

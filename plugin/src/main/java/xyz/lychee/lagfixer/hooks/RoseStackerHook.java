@@ -36,7 +36,6 @@ public class RoseStackerHook extends AbstractHook implements HookManager.Stacker
         }
     }
 
-
     @Override
     public boolean isStacked(LivingEntity entity) {
         return RoseStackerAPI.getInstance().isEntityStacked(entity);

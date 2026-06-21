@@ -24,11 +24,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class RedstoneLimiterModule extends AbstractModule implements Listener {
+<<<<<<< HEAD
     private final HashMap<String, Long> cooldown = new HashMap<>();
     private final HashMap<Chunk, TickCounter> redstone_map = new HashMap<>();
     private final HashMap<Chunk, TickCounter> piston_map = new HashMap<>();
     private ScheduledTask task;
     private int ticks_redsone;
+=======
+    private final Map<String, Long> cooldown = new ConcurrentHashMap<>();
+    private final Map<Chunk, TickCounter> redstone_map = new ConcurrentHashMap<>();
+    private final Map<Chunk, TickCounter> piston_map = new ConcurrentHashMap<>();
+    private final EnumSet<Material> push_blacklist = EnumSet.noneOf(Material.class);
+    private BukkitTask task;
+    private int ticks_redstone;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     private int ticks_piston;
     private int click_cooldown;
     private boolean break_redstone;
@@ -53,7 +62,7 @@ public class RedstoneLimiterModule extends AbstractModule implements Listener {
         }
         TickCounter counter = this.redstone_map.computeIfAbsent(e.getBlock().getChunk(), TickCounter::new);
         counter.addTick(e.getBlock(), 1);
-        if (counter.ticks > this.ticks_redsone) {
+        if (counter.ticks > this.ticks_redstone) {
             e.setNewCurrent(e.getOldCurrent());
         }
     }
@@ -111,8 +120,13 @@ public class RedstoneLimiterModule extends AbstractModule implements Listener {
 
     @Override
     public void load() {
+<<<<<<< HEAD
         this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.getPlugin(), t -> {
             this.redstone_map.values().forEach(counter -> counter.complete(this.ticks_redsone, this.break_redstone));
+=======
+        this.task = SupportManager.getInstance().getFork().runTimer(true, () -> {
+            this.redstone_map.values().forEach(counter -> counter.complete(this.ticks_redstone, this.break_redstone));
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             this.piston_map.values().forEach(counter -> counter.complete(this.ticks_piston, this.break_piston));
         }, 1L, 2L, TimeUnit.SECONDS);
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
@@ -121,7 +135,7 @@ public class RedstoneLimiterModule extends AbstractModule implements Listener {
     @Override
     public boolean loadConfig() {
         this.alerts = this.getSection().getBoolean("alerts");
-        this.ticks_redsone = this.getSection().getInt("ticks_limit.redstone");
+        this.ticks_redstone = this.getSection().getInt("ticks_limit.redstone");
         this.ticks_piston = this.getSection().getInt("ticks_limit.piston");
         this.click_cooldown = this.getSection().getInt("click_cooldown");
         this.break_redstone = this.getSection().getBoolean("break_block.redstone");

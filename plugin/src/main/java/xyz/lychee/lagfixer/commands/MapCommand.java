@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.*;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.Language;
@@ -106,7 +107,11 @@ public class MapCommand extends CommandManager.Subcommand {
         private int bufferIndex;
         private int dataCount;
         private volatile boolean shouldRender = true;
+<<<<<<< HEAD
         private ScheduledTask task;
+=======
+        private BukkitTask task;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
         public MapHandler(LagFixer plugin) throws AWTError {
             this.plugin = plugin;
@@ -145,10 +150,18 @@ public class MapCommand extends CommandManager.Subcommand {
         public void load() {
             int interval = this.plugin.getConfig().getInt("main.monitor.map.interval");
 
+<<<<<<< HEAD
             this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.plugin, t -> {
                 SupportManager support = SupportManager.getInstance();
                 ResourceMonitor monitor = support.getResourceMonitor();
                 int pixelY = msptToPixelY(monitor.getMspt());
+=======
+            this.task = SupportManager.getInstance().getFork().runTimer(true, () -> {
+                SupportManager support = SupportManager.getInstance();
+                ResourceMonitor monitor = support.getResourceMonitor();
+                boolean supportMspt = support.getFork().isSupportMspt();
+                int pixelY = supportMspt ? msptToPixelY(monitor.getMspt()) : tpsToPixelY(monitor.getTps());
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
                 if (this.dataCount < MAX_DATA_POINTS) {
                     this.valuesBuffer[this.dataCount++] = pixelY;
@@ -214,6 +227,15 @@ public class MapCommand extends CommandManager.Subcommand {
             return (int) Math.round(3 + (1.0 - scale) * 118.0);
         }
 
+<<<<<<< HEAD
+=======
+        private int tpsToPixelY(double tps) {
+            double clamped = Math.clamp(tps, 15.0, 20.0);
+            double scale = (clamped - 15.0) / 5.0;
+            return (int) Math.round(3 + scale * 118.0);
+        }
+
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         private void renderText(String text) {
             MinecraftFont font = MinecraftFont.Font;
             int x = 10, y = 10;

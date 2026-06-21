@@ -33,8 +33,13 @@ public class BenchmarkCommand extends CommandManager.Subcommand {
             return MessageUtils.sendMessage(true, sender, "&7Benchmark is running, wait for results in console!");
         }
 
+<<<<<<< HEAD
         ResourceMonitor resourceMonitor = SupportManager.getInstance().getResourceMonitor();
         if (resourceMonitor.getMspt() > 10.0) {
+=======
+        ResourceMonitor monitor = SupportManager.getInstance().getResourceMonitor();
+        if (monitor.getMspt() > 10.0) {
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             return MessageUtils.sendMessage(true, sender, "&7Server MSPT is too &chigh&7, the result may be incorrect!");
         }
 
@@ -62,7 +67,7 @@ public class BenchmarkCommand extends CommandManager.Subcommand {
                 String result = b.getResult().toString();
                 ErrorsManager.getInstance().sendBenchmark(b);
 
-                MessageUtils.sendMessage(true, sender, "&7Benchmark done in &f" + t.stop().getExecutingTime() + "&7ms, results:&f" + result);
+                MessageUtils.sendMessage(true, sender, "&7Benchmark done in &f" + t.stop() + "&7, results:&f" + result);
                 this.getCommandManager().getPlugin().getLogger().info(result);
             } catch (Exception e) {
                 MessageUtils.sendMessage(true, sender, "&cBenchmark error: " + e.getMessage());

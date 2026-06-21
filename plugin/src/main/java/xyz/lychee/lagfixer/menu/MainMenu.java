@@ -19,7 +19,6 @@ import xyz.lychee.lagfixer.utils.MessageUtils;
 import java.util.Collections;
 
 public class MainMenu extends AbstractMenu {
-
     private final ItemBuilder i1 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWMyZmYyNDRkZmM5ZGQzYTJjZWY2MzExMmU3NTAyZGM2MzY3YjBkMDIxMzI5NTAzNDdiMmI0NzlhNzIzNjZkZCJ9fX0=", "&f&lConfiguration:");
     private final ItemBuilder i2 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWNjNzg5ZjIzMDc5NGY5MGUzM2M0ZjlhZDAwNjk0YmMyYTJmZjVlOGI5YjM3NWRjMzUzMjQwMWIyODFmM2U1OCJ9fX0=", "&f&lServer informations:");
     private final ItemBuilder i3 = this.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTI4OWQ1YjE3ODYyNmVhMjNkMGIwYzNkMmRmNWMwODVlODM3NTA1NmJmNjg1YjVlZDViYjQ3N2ZlODQ3MmQ5NCJ9fX0=", "&f&lWorlds informations:");
@@ -74,6 +73,10 @@ public class MainMenu extends AbstractMenu {
                 " &8{*} &7Items: &e" + worldsMonitor.getItems(),
                 " &8{*} &7Projectiles: &e" + worldsMonitor.getProjectiles(),
                 " &8{*} &7Vehicles: &e" + worldsMonitor.getVehicles(),
+<<<<<<< HEAD
+=======
+                " &8{*} &7Tile entities: &e" + worldsMonitor.getTiles(),
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                 " &8{*} &7Players: &e" + Bukkit.getOnlinePlayers().size() + "&8/&e" + Bukkit.getMaxPlayers(),
                 "",
                 "&eClick to open cleaner menu!"

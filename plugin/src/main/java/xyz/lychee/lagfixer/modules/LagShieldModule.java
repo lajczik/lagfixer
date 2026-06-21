@@ -2,8 +2,15 @@ package xyz.lychee.lagfixer.modules;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
+<<<<<<< HEAD
 import org.bukkit.*;
 import org.bukkit.entity.*;
+=======
+import org.bukkit.GameRule;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -22,6 +29,10 @@ import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
+<<<<<<< HEAD
+=======
+import xyz.lychee.lagfixer.objects.ISupportNms;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
 import java.util.List;
 import java.util.Map;
@@ -35,8 +46,12 @@ public class LagShieldModule extends AbstractModule implements Listener {
     private final TreeMap<Double, Integer> dynamic_simulation_distance_tps = new TreeMap<>();
     private final TreeMap<Double, Integer> dynamic_tick_speed_tps = new TreeMap<>();
     private int locks = 0;
+<<<<<<< HEAD
     private ScheduledTask task;
 
+=======
+    private BukkitTask task;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     private double entitySpawn_tps;
     private double tickHopper_tps;
     private double redstone_tps;
@@ -72,7 +87,70 @@ public class LagShieldModule extends AbstractModule implements Listener {
         );
     }
 
+<<<<<<< HEAD
+=======
+    @Override
+    public void run() {
+        SupportManager support = SupportManager.getInstance();
+        ISupportNms nms = support.getNms();
+        double tps = support.getResourceMonitor().getTps();
+        boolean oldMobAi = this.mobAi;
+
+        this.entitySpawn = tps < this.entitySpawn_tps;
+        this.tickHopper = tps < this.tickHopper_tps;
+        this.redstone = tps < this.redstone_tps;
+        this.projectiles = tps < this.projectiles_tps;
+        this.leavesDecay = tps < this.leavesDecay_tps;
+        this.mobAi = tps < this.mobAi_tps;
+        this.liquidFlow = tps < this.liquidFlow_tps;
+        this.explosions = tps < this.explosions_tps;
+        this.fireworks = tps < this.fireworks_tps;
+
+        if (this.mobAi) {
+            for (World w : this.getAllowedWorlds()) {
+                for (LivingEntity le : w.getLivingEntities()) {
+                    nms.setEntityAi(le, false);
+                }
+            }
+        } else if (oldMobAi) {
+            for (World w : this.getAllowedWorlds()) {
+                for (LivingEntity le : w.getLivingEntities()) {
+                    nms.setEntityAi(le, true);
+                }
+            }
+        }
+
+        if (this.dynamic_view_distance) {
+            Integer viewDistance = this.getThreshold(this.dynamic_view_distance_tps, tps);
+            if (viewDistance != null) {
+                for (World w : this.getAllowedWorlds()) {
+                    nms.setViewDistance(w, viewDistance);
+                }
+            }
+        }
+
+        if (this.dynamic_simulation_distance) {
+            Integer simulationDistance = this.getThreshold(this.dynamic_simulation_distance_tps, tps);
+            if (simulationDistance != null) {
+                for (World w : this.getAllowedWorlds()) {
+                    nms.setSimulationDistance(w, simulationDistance);
+                }
+            }
+        }
+
+        if (this.dynamic_tick_speed) {
+            Integer tickSpeed = this.getThreshold(this.dynamic_tick_speed_tps, tps);
+            if (tickSpeed != null) {
+                for (World w : this.getAllowedWorlds()) {
+                    w.setGameRule(GameRule.RANDOM_TICK_SPEED, tickSpeed);
+                }
+            }
+        }
+    }
+
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     private Integer getThreshold(TreeMap<Double, Integer> map, double tps) {
+        if (map.isEmpty()) return null;
         Map.Entry<Double, Integer> entry = map.ceilingEntry(tps);
         if (entry != null) return entry.getValue();
         entry = map.lastEntry();
@@ -169,6 +247,7 @@ public class LagShieldModule extends AbstractModule implements Listener {
 
     @Override
     public void load() throws Exception {
+<<<<<<< HEAD
         this.task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this.getPlugin(), t -> {
             double tps = SupportManager.getInstance().getResourceMonitor().getTps();
             boolean oldMobAi = this.mobAi;
@@ -242,6 +321,11 @@ public class LagShieldModule extends AbstractModule implements Listener {
                 }
             }, executor);
         });
+=======
+        SupportManager support = SupportManager.getInstance();
+        this.task = support.getFork().runTimer(false, this, 1L, 1L, TimeUnit.MINUTES);
+        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     }
 
     @Override
@@ -281,4 +365,9 @@ public class LagShieldModule extends AbstractModule implements Listener {
         }
         HandlerList.unregisterAll(this);
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90

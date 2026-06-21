@@ -10,7 +10,15 @@ import java.util.Optional;
 public interface VehicleWrapper {
     class OBoat extends Boat implements VehicleWrapper {
         OBoat(Boat b) {
+<<<<<<< HEAD
+<<<<<<<< HEAD:nms/v1_21_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R1/VehicleWrapper.java
             super(EntityType.BOAT, b.level());
+========
+            super(EntityType.BOAT, b.level);
+>>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_17_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_17_R1/VehicleWrapper.java
+=======
+            super(EntityType.BOAT, b.level());
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
 
         @Override
@@ -29,6 +37,10 @@ public interface VehicleWrapper {
         }
     }
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:nms/v1_21_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R1/VehicleWrapper.java
+=======
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     class OChestBoat extends ChestBoat implements VehicleWrapper {
         OChestBoat(ChestBoat cb) {
             super(EntityType.CHEST_BOAT, cb.level());
@@ -53,6 +65,14 @@ public interface VehicleWrapper {
     class OMinecart extends Minecart implements VehicleWrapper {
         OMinecart(Minecart m) {
             super(EntityType.MINECART, m.level());
+<<<<<<< HEAD
+========
+    class OMinecart extends Minecart implements VehicleWrapper {
+        OMinecart(Minecart m) {
+            super(EntityType.MINECART, m.level);
+>>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_17_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_17_R1/VehicleWrapper.java
+=======
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
 
         @Override
@@ -73,7 +93,15 @@ public interface VehicleWrapper {
 
     class OMinecartChest extends MinecartChest implements VehicleWrapper {
         OMinecartChest(MinecartChest mc) {
+<<<<<<< HEAD
+<<<<<<<< HEAD:nms/v1_21_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R1/VehicleWrapper.java
             super(EntityType.CHEST_MINECART, mc.level());
+========
+            super(EntityType.CHEST_MINECART, mc.level);
+>>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_17_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_17_R1/VehicleWrapper.java
+=======
+            super(EntityType.CHEST_MINECART, mc.level());
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
 
         @Override
@@ -94,7 +122,15 @@ public interface VehicleWrapper {
 
     class OMinecartHopper extends MinecartHopper implements VehicleWrapper {
         OMinecartHopper(MinecartHopper mh) {
+<<<<<<< HEAD
+<<<<<<<< HEAD:nms/v1_21_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R1/VehicleWrapper.java
             super(EntityType.HOPPER_MINECART, mh.level());
+========
+            super(EntityType.HOPPER_MINECART, mh.level);
+>>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_17_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_17_R1/VehicleWrapper.java
+=======
+            super(EntityType.HOPPER_MINECART, mh.level());
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
 
         @Override
@@ -115,7 +151,15 @@ public interface VehicleWrapper {
 
     class OMinecartFurnace extends MinecartFurnace implements VehicleWrapper {
         OMinecartFurnace(MinecartFurnace mf) {
+<<<<<<< HEAD
+<<<<<<<< HEAD:nms/v1_21_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R1/VehicleWrapper.java
             super(EntityType.FURNACE_MINECART, mf.level());
+========
+            super(EntityType.FURNACE_MINECART, mf.level);
+>>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_17_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_17_R1/VehicleWrapper.java
+=======
+            super(EntityType.FURNACE_MINECART, mf.level());
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
 
         @Override
@@ -136,12 +180,25 @@ public interface VehicleWrapper {
 
     class OMinecartSpawner extends MinecartSpawner implements VehicleWrapper {
         OMinecartSpawner(MinecartSpawner other) {
+<<<<<<< HEAD
+<<<<<<<< HEAD:nms/v1_21_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R1/VehicleWrapper.java
             super(EntityType.SPAWNER_MINECART, other.level());
+========
+            super(EntityType.SPAWNER_MINECART, other.level);
+>>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_17_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_17_R1/VehicleWrapper.java
 
             Optional.ofNullable(other.getSpawner().nextSpawnData)
                     .flatMap(sd -> EntityType.by(sd.entityToSpawn()))
                     .ifPresent(type ->
                             this.getSpawner().setEntityId(type, other.level(), other.getRandom(), this.blockPosition())
+=======
+            super(EntityType.SPAWNER_MINECART, other.level());
+
+            Optional.ofNullable(other.getSpawner().nextSpawnData)
+                    .flatMap(sd -> EntityType.by(sd.getEntityToSpawn()))
+                    .ifPresent(type ->
+                            this.getSpawner().setEntityId(type, other.level(), other.random, this.blockPosition())
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                     );
         }
 
@@ -163,7 +220,15 @@ public interface VehicleWrapper {
 
     class OMinecartTNT extends MinecartTNT implements VehicleWrapper {
         OMinecartTNT(MinecartTNT mt) {
+<<<<<<< HEAD
+<<<<<<<< HEAD:nms/v1_21_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R1/VehicleWrapper.java
             super(EntityType.TNT_MINECART, mt.level());
+========
+            super(EntityType.TNT_MINECART, mt.level);
+>>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_17_R1/src/main/java/xyz/lychee/lagfixer/nms/v1_17_R1/VehicleWrapper.java
+=======
+            super(EntityType.TNT_MINECART, mt.level());
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
 
         @Override

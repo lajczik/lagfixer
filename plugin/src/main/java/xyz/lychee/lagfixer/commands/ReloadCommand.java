@@ -64,12 +64,15 @@ public class ReloadCommand extends CommandManager.Subcommand {
                 }
             });
 
-            MessageUtils.sendMessage(true, sender, "&7Reloaded modules configurations in &f" + t.stop().getExecutingTime() + "&7ms." +
-                    "\n " +
-                    "\n &7Working methods to apply all changes:" +
-                    "\n  &8{*} &7Server restart (&frecommended&7)" +
-                    "\n  &8{*} &7All plugins reload, command: &f/reload confirm" +
-                    "\n  &8{*} &7Plugman reload, command: &f/plugman reload LagFixer");
+            MessageUtils.sendMessage(true, sender, """
+                    &7Reloaded modules configurations in &f%s&7.
+                    
+                     &7Working methods to apply all changes:
+                      &8{*} &7Server restart (&frecommended&7)
+                      &8{*} &7All plugins reload, command: &f/reload confirm
+                      &8{*} &7Plugman reload, command: &f/plugman reload LagFixer
+                    """.formatted(t.stop())
+            );
             this.reload = false;
         });
         thread.setName("LagFixer Reload");

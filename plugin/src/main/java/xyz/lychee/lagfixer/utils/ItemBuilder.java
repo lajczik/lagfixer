@@ -145,4 +145,9 @@ public class ItemBuilder {
         this.glow = glow;
         return this;
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90

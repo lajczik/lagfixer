@@ -15,7 +15,10 @@ import xyz.lychee.lagfixer.managers.ErrorsManager;
 import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractHook;
+<<<<<<< HEAD
 import xyz.lychee.lagfixer.objects.ISupportNms;
+=======
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import xyz.lychee.lagfixer.objects.ResourceMonitor;
 
 import java.util.concurrent.TimeUnit;
@@ -33,7 +36,11 @@ public class SparkHook extends AbstractHook {
         SupportManager support = SupportManager.getInstance();
         support.getResourceMonitor().stop();
 
+<<<<<<< HEAD
         SparkMonitor monitor = new SparkMonitor(this.getPlugin());
+=======
+        SparkMonitor monitor = new SparkMonitor();
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         monitor.start();
         support.setResourceMonitor(monitor);
 
@@ -69,8 +76,18 @@ public class SparkHook extends AbstractHook {
         }
 
         @Override
+<<<<<<< HEAD
         public ISupportNms.TickReport tickReport() {
             DoubleStatistic<StatisticWindow.TicksPerSecond> tps = this.spark.tps();
+=======
+        public double tps() {
+            DoubleStatistic<StatisticWindow.TicksPerSecond> tps = this.spark.tps();
+            return tps == null ? 20.0 : tps.poll(StatisticWindow.TicksPerSecond.SECONDS_10);
+        }
+
+        @Override
+        public double mspt() {
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             GenericStatistic<DoubleAverageInfo, StatisticWindow.MillisPerTick> mspt = this.spark.mspt();
 
             return new ISupportNms.TickReport(

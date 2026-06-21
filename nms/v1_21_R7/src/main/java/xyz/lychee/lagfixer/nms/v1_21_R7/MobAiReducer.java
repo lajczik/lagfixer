@@ -35,6 +35,8 @@ import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.Item;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftCreature;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -92,9 +94,9 @@ public class MobAiReducer extends MobAiReducerModule.NMS {
 
     @Override
     public void optimize(org.bukkit.entity.Entity ent, boolean init) {
-        if (!(ent instanceof CraftCreature)) return;
+        if (!(ent instanceof CraftCreature creature)) return;
 
-        PathfinderMob handle = ((CraftCreature) ent).getHandle();
+        PathfinderMob handle = creature.getHandle();
         if (optimizedMobs.containsKey(handle)) return;
 
         MobAiReducerModule module = this.getModule();
@@ -127,12 +129,22 @@ public class MobAiReducer extends MobAiReducerModule.NMS {
 
                 if (isAnimal && module.isBreedEnabled() && goalClass == BreedGoal.class) {
                     toRemove.add(pgw);
+<<<<<<< HEAD:nms/v1_21_R7/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R7/MobAiReducer.java
+=======
+                    pgw.stop();
+
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_21_R7/src/main/java/xyz.lychee.lagfixer.nms.v1_21_R7/MobAiReducer.java
                     toAdd.add(new WrappedGoal(pgw.getPriority(), new OptimizedBreedGoal(this.getModule(), (Animal) handle, this.breedTargeting)));
                     continue;
                 }
 
                 if (module.isTemptEnabled() && goalClass == TemptGoal.class && temptTargeting != null) {
                     toRemove.add(pgw);
+<<<<<<< HEAD:nms/v1_21_R7/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R7/MobAiReducer.java
+=======
+                    pgw.stop();
+
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_21_R7/src/main/java/xyz.lychee.lagfixer.nms.v1_21_R7/MobAiReducer.java
                     toAdd.add(new WrappedGoal(pgw.getPriority(), new OptimizedTemptGoal(this.getModule(), handle, temptTargeting)));
                     continue;
                 }
@@ -140,6 +152,7 @@ public class MobAiReducer extends MobAiReducerModule.NMS {
                 String simpleName = goalClass.getSimpleName();
                 if (aiList.stream().anyMatch(simpleName::contains) == aiListMode) {
                     toRemove.add(pgw);
+                    pgw.stop();
                 }
             }
 
@@ -154,4 +167,32 @@ public class MobAiReducer extends MobAiReducerModule.NMS {
             this.optimizedMobs.keySet().removeIf(ent -> !ent.isAlive() || !ent.valid);
         }
     }
+<<<<<<< HEAD:nms/v1_21_R7/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R7/MobAiReducer.java
+=======
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onLoad(EntitiesLoadEvent e) {
+        if (!this.getModule().canContinue(e.getWorld())) return;
+
+        if (this.getModule().isAsync()) {
+            Chunk chunk = e.getChunk();
+            SupportManager.getInstance().getFork()
+                    .runNow(
+                            true,
+                            new Location(chunk.getWorld(), chunk.getX() << 4, 64, chunk.getZ() << 4),
+                            () -> this.optimizeEntities(e.getEntities())
+                    );
+        } else {
+            this.optimizeEntities(e.getEntities());
+        }
+    }
+
+    public void optimizeEntities(List<org.bukkit.entity.Entity> list) {
+        for (org.bukkit.entity.Entity entity : list) {
+            if (this.getModule().isEnabled(entity)) {
+                this.optimize(entity, false);
+            }
+        }
+    }
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_21_R7/src/main/java/xyz.lychee.lagfixer.nms.v1_21_R7/MobAiReducer.java
 }

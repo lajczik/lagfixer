@@ -181,7 +181,11 @@ public class MetricsManager
                 return null;
             }
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+<<<<<<< HEAD
                  GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
+=======
+                    GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                 gzip.write(str.getBytes(StandardCharsets.UTF_8));
                 return outputStream.toByteArray();
             }

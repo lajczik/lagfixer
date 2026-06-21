@@ -17,9 +17,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
+<<<<<<< HEAD
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+=======
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
 public class AbilityLimiterModule extends AbstractModule implements Listener {
     private int trident_cooldown;

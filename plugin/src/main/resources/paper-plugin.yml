@@ -16,4 +16,11 @@ softdepend: [
   MythicMobs,
   StackMob
 ]
+<<<<<<< HEAD:plugin/src/main/resources/paper-plugin.yml
 folia-supported: true
+=======
+folia-supported: false
+
+libraries:
+  - com.github.oshi:oshi-core:7.2.0
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:plugin/src/main/resources/plugin.yml

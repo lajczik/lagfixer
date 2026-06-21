@@ -19,7 +19,11 @@ public class MonitorCommand extends CommandManager.Subcommand {
 
     @Override
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {
+<<<<<<< HEAD
         ResourceMonitor resourceMonitor = SupportManager.getInstance().getResourceMonitor();
+=======
+        ResourceMonitor monitor = SupportManager.getInstance().getResourceMonitor();
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         return MessageUtils.sendMessage(true, sender,
                 "&7Command result: " +
                         "\n &8{*} &fTps: &e" + resourceMonitor.getTps() +

@@ -3,6 +3,10 @@ package xyz.lychee.lagfixer.modules;
 import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
+<<<<<<< HEAD
+=======
+import net.kyori.adventure.audience.Audience;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -29,9 +33,14 @@ import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
+<<<<<<< HEAD
 import xyz.lychee.lagfixer.objects.RegionsEntityReport;
 import xyz.lychee.lagfixer.objects.WorldsMonitor;
 import xyz.lychee.lagfixer.utils.ItemBuilder;
+=======
+import xyz.lychee.lagfixer.objects.WorldsMonitor;
+import xyz.lychee.lagfixer.utils.MessageUtils;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import xyz.lychee.lagfixer.utils.ReflectionUtils;
 
 import java.io.IOException;
@@ -79,6 +88,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
     private Sound items_abyss_open_sound;
     private boolean items_abyss_itemdespawn;
     private String items_abyss_permission;
+    private List<String> items_abyss_aliases = Collections.emptyList();
     private int items_abyss_close;
 
     private boolean projectiles_enabled;
@@ -140,6 +150,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         }
     }
 
+<<<<<<< HEAD
     @Override
     public void load() throws IOException {
         this.command = new Command(Collections.emptyList());
@@ -147,10 +158,44 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
 
         this.second = this.interval + 1;
         this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.getPlugin(), t1 -> {
+=======
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+        Component text;
+        if (!this.items_abyss_enabled) {
+            text = Language.getMainValue("disabled_module", true, Placeholder.unparsed("module", this.getName()));
+        } else if (this.items_abyss_permission != null && !this.items_abyss_permission.isEmpty() && !sender.hasPermission(this.items_abyss_permission)) {
+            text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", this.items_abyss_permission));
+        } else if (!this.items_abyss_opened) {
+            text = this.getLanguage().getComponent("items.abyss.closed", true);
+        } else if (sender instanceof Player player) {
+            if (this.inventories.isEmpty()) {
+                text = this.getLanguage().getComponent("items.abyss.empty", true);
+            } else {
+                player.openInventory(this.inventories.getFirst());
+                text = this.getLanguage().getComponent("items.abyss.opened", true);
+            }
+        } else {
+            text = Language.getMainValue("player_only", true);
+        }
+
+        if (text != null) {
+            this.getPlugin().getAudiences().sender(sender).sendMessage(text);
+        }
+        return false;
+    }
+
+    @Override
+    public void load() throws IOException {
+        SupportManager support = SupportManager.getInstance();
+        support.getFork().registerCommand(this.getPlugin(), "abyss", this.items_abyss_aliases, this);
+
+        this.task = SupportManager.getInstance().getFork().runTimer(false, () -> {
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             if (--this.second <= 0) {
                 List<CompletableFuture<Void>> futures = new ArrayList<>();
                 RegionsEntityReport report = new RegionsEntityReport();
                 for (World world : this.getAllowedWorlds()) {
+<<<<<<< HEAD
                     this.purgeAll(world, futures, report);
                 }
 
@@ -202,6 +247,84 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                 if (this.items_abyss_enabled) {
                     Bukkit.getAsyncScheduler().runDelayed(this.getPlugin(), t2 -> {
                         this.opened = false;
+=======
+                    for (Entity ent : world.getEntities()) {
+                        if (ent instanceof LivingEntity livingEntity) {
+                            if (this.creatures_enabled && this.clearCreature(livingEntity)) {
+                                if (this.creatures_dropitems) {
+                                    livingEntity.damage(Double.MAX_VALUE);
+                                }
+                                ent.remove();
+                                creatures++;
+                            }
+                        } else if (ent instanceof Item item) {
+                            if (this.items_enabled && this.clearItem(item)) {
+                                if (this.items_abyss_enabled && !this.items_abyss_blacklist.contains(item.getItemStack().getType())) {
+                                    if (stacker != null) {
+                                        stacker.addItemsToList(item, this.items);
+                                    } else {
+                                        this.items.add(item.getItemStack().clone());
+                                    }
+                                }
+                                ent.remove();
+                                items++;
+                            }
+                        } else if (ent instanceof Projectile projectile) {
+                            if (this.projectiles_enabled && this.clearProjectile(projectile)) {
+                                ent.remove();
+                                projectiles++;
+                            }
+                        }
+                    }
+                }
+
+                if (this.alerts_enabled && this.messages.containsKey(this.second)) {
+                    this.sendAlert(
+                            Language.createComponent(this.messages.get(this.second), true,
+                                    Placeholder.unparsed("remaining", Integer.toString(this.second)),
+                                    Placeholder.unparsed("items", Integer.toString(items)),
+                                    Placeholder.unparsed("creatures", Integer.toString(creatures)),
+                                    Placeholder.unparsed("projectiles", Integer.toString(projectiles))
+                            )
+                    );
+                }
+
+                if (this.items_abyss_enabled && !this.items.isEmpty()) {
+                    String guiName = this.getLanguage().getString("items.abyss.gui.name", true);
+                    Collection<ItemStack> toStore = new ArrayList<>(this.items);
+                    this.items.clear();
+                    int page = 0;
+                    while (!toStore.isEmpty()) {
+                        Inventory inv = Bukkit.createInventory(null, 54,
+                                MessageUtils.fixColors(null, guiName.replace("<page>", Integer.toString(++page)))
+                        );
+
+                        for (int i = 45; i < 52; i++) {
+                            inv.setItem(i, this.items_abyss_filler);
+                        }
+                        inv.setItem(52, this.items_abyss_previous);
+                        inv.setItem(53, this.items_abyss_next);
+
+                        toStore = inv.addItem(toStore.toArray(new ItemStack[0])).values();
+
+                        this.inventories.add(inv);
+                    }
+
+                    if (this.inventories.isEmpty()) {
+                        return;
+                    }
+
+                    this.items_abyss_opened = true;
+                    if (this.items_abyss_alerts) {
+                        this.sendAlert(this.getLanguage().getComponent("items.abyss.open", true));
+                        if (this.items_abyss_open_sound != null) {
+                            this.alerts_audience.playSound(this.items_abyss_open_sound);
+                        }
+                    }
+
+                    support.getFork().runLater(false, () -> {
+                        this.items_abyss_opened = false;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
                         Set<HumanEntity> viewers = new HashSet<>();
                         this.inventories.forEach(inv -> {
@@ -213,14 +336,19 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                         Bukkit.getGlobalRegionScheduler().execute(this.getPlugin(), () -> viewers.forEach(HumanEntity::closeInventory));
 
                         if (this.items_abyss_alerts) {
+<<<<<<< HEAD
                             Component close = this.getLanguage().getComponent("items.abyss.close", true);
                             this.sendAlert(close);
+=======
+                            this.sendAlert(this.getLanguage().getComponent("items.abyss.close", true));
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                         }
                     }, this.items_abyss_close, TimeUnit.SECONDS);
                 }
 
                 this.second = this.interval + 1;
             } else if (this.alerts_enabled && this.messages.containsKey(this.second)) {
+<<<<<<< HEAD
                 WorldsMonitor worldsMonitor = SupportManager.getInstance().getWorldsMonitor();
 
                 Component text = Language.createComponent(this.messages.get(this.second), true,
@@ -231,11 +359,23 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                 );
 
                 this.sendAlert(text);
+=======
+                WorldsMonitor worldsMonitor = support.getWorldsMonitor();
+                this.sendAlert(
+                        Language.createComponent(this.messages.get(this.second), true,
+                                Placeholder.unparsed("remaining", Integer.toString(this.second)),
+                                Placeholder.unparsed("items", Long.toString(worldsMonitor.getItems())),
+                                Placeholder.unparsed("creatures", Long.toString(worldsMonitor.getCreatures())),
+                                Placeholder.unparsed("projectiles", Long.toString(worldsMonitor.getProjectiles()))
+                        )
+                );
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             }
         }, 1L, 1L, TimeUnit.SECONDS);
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
     }
 
+<<<<<<< HEAD
     public void sendAlert(Component component) {
         Bukkit.getOnlinePlayers().stream()
                 .filter(p -> this.alerts_permission == null || p.hasPermission(this.alerts_permission))
@@ -247,6 +387,11 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                         p.sendActionBar(component);
                     }
                 });
+=======
+    public void sendAlert(Component text) {
+        if (this.alerts_message) this.alerts_audience.sendMessage(text);
+        if (this.alerts_actionbar) this.alerts_audience.sendActionBar(text);
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     }
 
     public boolean clearCreature(LivingEntity ent) {
@@ -255,11 +400,8 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         }
 
         HookManager hm = HookManager.getInstance();
-        if (this.creatures_ignore_models) {
-            HookManager.ModelContainer model = hm.getModel();
-            if (model != null && model.hasModel(ent)) {
-                return false;
-            }
+        if (this.creatures_ignore_models && hm.hasModel(ent)) {
+            return false;
         }
 
         LevelledMobsHook lvlHook = hm.getHook(LevelledMobsHook.class);
@@ -300,7 +442,13 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         this.alerts_actionbar = this.getSection().getBoolean("alerts.actionbar");
 
         String permission = this.getSection().getString("alerts.permission");
+<<<<<<< HEAD
         this.alerts_permission = permission == null || permission.isBlank() ? null : permission;
+=======
+        boolean permissionDisabled = permission == null || permission.isEmpty();
+        this.alerts_audience = this.getPlugin().getAudiences()
+                .filter(s -> s instanceof Player && (permissionDisabled || s.hasPermission(permission)));
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
         this.creatures_enabled = this.getSection().getBoolean("creatures.enabled");
         if (this.creatures_enabled) {
@@ -329,7 +477,11 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                     double pitch = this.getSection().getDouble("items.abyss.open_sound.pitch");
                     String sound = this.getSection().getString("items.abyss.open_sound.sound");
 
+<<<<<<< HEAD
                     if (sound != null && !sound.isEmpty()) {
+=======
+                    if (Key.parseable(sound)) {
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                         try {
                             this.items_abyss_open_sound = Sound.sound(
                                     Key.key(Key.MINECRAFT_NAMESPACE, sound.toLowerCase()),
@@ -340,9 +492,18 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                         } catch (Exception e) {
                             this.items_abyss_open_sound = null;
                         }
+<<<<<<< HEAD
                     }
                 }
                 this.items_abyss_permission = this.getSection().getString("items.abyss.permission");
+=======
+                    } else {
+                        this.items_abyss_open_sound = null;
+                    }
+                }
+                this.items_abyss_permission = this.getSection().getString("items.abyss.command.permission");
+                this.items_abyss_aliases = this.getSection().getStringList("items.abyss.command.aliases");
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                 this.items_abyss_itemdespawn = this.getSection().getBoolean("items.abyss.item_despawn");
                 this.items_abyss_close = this.getSection().getInt("items.abyss.close");
                 ReflectionUtils.convertEnums(Material.class, this.items_abyss_blacklist, this.getSection().getStringList("items.abyss.blacklist"));
@@ -354,24 +515,20 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
 
         this.messages.clear();
         for (String str : Language.getYaml().getStringList("messages." + this.getName() + ".countingdown")) {
-            try {
-                int equalSignIndex = str.indexOf('=');
-                if (equalSignIndex != -1) {
-                    String index = str.substring(0, equalSignIndex);
-                    String message = str.substring(equalSignIndex + 1);
+            int equalSignIndex = str.indexOf('=');
+            if (equalSignIndex == -1) {
+                this.getPlugin().getLogger().warning("Skipping malformed countingdown message (no \"=\" found): " + str);
+                continue;
+            }
 
-                    try {
-                        int parsedIndex = Integer.parseInt(index);
-                        this.messages.put(parsedIndex, message);
-                    } catch (NumberFormatException e) {
-                        this.getPlugin().getLogger().warning("Invalid index format in countingdown message: " + index + " for message \"" + message + "\"");
-                    }
-                } else {
-                    this.getPlugin().getLogger().warning("Skipping malformed countingdown message (no \"=\" found): " + str);
-                }
-            } catch (Exception ex) {
-                this.getPlugin().getLogger().info("Error processing countingdown message: " + str);
-                this.getPlugin().printError(ex);
+            String index = str.substring(0, equalSignIndex);
+            String message = str.substring(equalSignIndex + 1);
+
+            try {
+                int parsedIndex = Integer.parseInt(index);
+                this.messages.put(parsedIndex, message);
+            } catch (NumberFormatException e) {
+                this.getPlugin().getLogger().warning("Invalid index format in countingdown message: " + index + " for message \"" + message + "\"");
             }
         }
 
@@ -390,6 +547,13 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         if (this.task != null && !this.task.isCancelled()) {
             this.task.cancel();
         }
+<<<<<<< HEAD
+=======
+
+        SupportManager.getInstance().getFork().unregisterCommand("abyss");
+    }
+}
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
         if (this.command != null) {
             this.command.unregister(Bukkit.getCommandMap());

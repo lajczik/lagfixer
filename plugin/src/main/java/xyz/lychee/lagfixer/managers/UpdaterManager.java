@@ -5,7 +5,12 @@ import com.google.gson.reflect.TypeToken;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import lombok.Setter;
+<<<<<<< HEAD
 import org.bukkit.Bukkit;
+=======
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -15,11 +20,15 @@ import xyz.lychee.lagfixer.objects.AbstractManager;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URI;
+<<<<<<< HEAD
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+=======
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -46,12 +55,27 @@ public class UpdaterManager extends AbstractManager implements Listener {
     @EventHandler
     public void onClick(PlayerJoinEvent e) {
         if (e.getPlayer().isOp() && this.compared < 0 && this.updater) {
+<<<<<<< HEAD
             Bukkit.getAsyncScheduler().runDelayed(this.getPlugin(), t -> {
                 MessageUtils.sendMessage(true, e.getPlayer(),
                         "\nPlugin needs update, latest version: &f" + this.latestVersion +
                                 "\n &8- &ehttps://modrinth.com/plugin/lagfixer/version/" + this.latestVersion + "-folia" +
                                 "\n"
                 );
+=======
+            SupportManager.getInstance().getFork().runLater(true, () -> {
+                Component text = MessageUtils.colors(e.getPlayer(), """
+                                
+                                Plugin needs update, latest version: &f%s
+                                 &8- &ehttps://modrinth.com/plugin/lagfixer/version/%s
+                                """.formatted(this.latestVersion, this.currentVersion)
+                        )
+                        .clickEvent(ClickEvent.openUrl("https://modrinth.com/plugin/lagfixer/version/"+this.latestVersion));
+
+                this.getPlugin().getAudiences()
+                        .player(e.getPlayer())
+                        .sendMessage(text);
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             }, 3, TimeUnit.SECONDS);
         }
     }
@@ -61,6 +85,7 @@ public class UpdaterManager extends AbstractManager implements Listener {
         //this.updater = this.getPlugin().getConfig().getBoolean("main.updater");
         this.currentVersion = this.getPlugin().getDescription().getVersion().split(" ")[0].trim();
 
+<<<<<<< HEAD
         this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.getPlugin(), t -> {
             try {
                 URL url = URI.create("https://api.modrinth.com/v2/project/lagfixer/version").toURL();
@@ -68,19 +93,45 @@ public class UpdaterManager extends AbstractManager implements Listener {
                 Type listType = new TypeToken<ArrayList<ModrinthVersion>>() {}.getType();
                 List<ModrinthVersion> versions = gson.fromJson(reader, listType);
                 versions.removeIf(version -> !version.getVersion_number().contains("-folia"));
+=======
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.spigotmc.org/legacy/update.php"))
+                .GET()
+                .build();
 
-                if (!versions.isEmpty()) {
-                    versions.sort((v1, v2) -> this.comparator.compare(v2.getVersion_number(), v1.getVersion_number()));
+        this.task = SupportManager.getInstance().getFork().runTimer(true, () -> {
+            this.currentVersion = this.getPlugin().getDescription().getVersion().split(" ")[0].trim();
 
+            SupportManager.getInstance().getClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenAccept(response -> {
+                        Type listType = new TypeToken<ArrayList<ModrinthVersion>>() {}.getType();
+                        List<ModrinthVersion> versions = gson.fromJson(response.body(), listType);
+                        versions.removeIf(version -> version.getVersion_number().matches(".*[^0-9.].*"));
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
+
+                        if (!versions.isEmpty()) {
+                            versions.sort((v1, v2) -> this.comparator.compare(v2.getVersion_number(), v1.getVersion_number()));
+
+<<<<<<< HEAD
                     ModrinthVersion latest = versions.get(0);
                     this.latestVersion = this.comparator.formatVersionNumber(latest.getVersion_number());
                 } else {
                     this.latestVersion = this.currentVersion;
                 }
+=======
+                            ModrinthVersion latest = versions.getFirst();
+                            this.latestVersion = latest.getVersion_number();
+                            this.behind = this.calculateBuildsBehind(versions);
+                        } else {
+                            this.latestVersion = this.getPlugin().getDescription().getVersion();
+                            this.behind = 0;
+                        }
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
-                this.difference = this.comparator.difference(this.currentVersion, this.latestVersion);
-                this.compared = this.comparator.compare(this.currentVersion, this.latestVersion);
+                        this.difference = this.comparator.difference(this.currentVersion, this.latestVersion);
+                        this.compared = this.comparator.compare(this.currentVersion, this.latestVersion);
 
+<<<<<<< HEAD
                 this.updater = this.compared < 0;
             } catch (IOException ex) {
                 this.getPlugin().printError(ex);
@@ -89,10 +140,20 @@ public class UpdaterManager extends AbstractManager implements Listener {
             if (this.updater && this.compared < 0) {
                 this.getPlugin().getLogger().info(
                         String.format("""
+=======
+                        if ((this.difference >= 0 && this.difference < 2) || this.behind > 5) {
+                            this.updater = true;
+                        }
+
+                        if (this.updater && this.compared < 0) {
+                            this.getPlugin().getLogger().info(
+                                    String.format("""
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                                         
                                         &8∘₊✧────────────────────────────────✧₊∘
                                         &c&lLagFixer needs an update!
                                         &fVersion: &e&n%s&r -> &e&n%s&r
+<<<<<<< HEAD
                                         &ahttps://modrinth.com/plugin/lagfixer/version/%s-folia
                                         
                                         &6⚠ &7Updating this plugin is crucial! &6⚠
@@ -101,6 +162,18 @@ public class UpdaterManager extends AbstractManager implements Listener {
                         )
                 );
             }
+=======
+                                        &ahttps://modrinth.com/plugin/lagfixer/version/%s
+                                        
+                                        &6⚠ &7Updating this plugin is crucial! &6⚠
+                                        &8∘₊✧────────────────────────────────✧₊∘
+                                        """,
+                                            this.currentVersion, this.latestVersion, this.latestVersion
+                                    )
+                            );
+                        }
+                    });
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }, 1L, 30L, TimeUnit.MINUTES);
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
     }

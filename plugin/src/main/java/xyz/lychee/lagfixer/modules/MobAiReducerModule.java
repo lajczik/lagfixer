@@ -82,6 +82,7 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
                 || !this.canContinue(e.getEntity().getWorld())
         ) return;
 
+<<<<<<< HEAD
         this.mobAiReducer.optimize(e.getEntity(), false);
     }
 
@@ -93,11 +94,17 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
                     this.mobAiReducer.optimize(entity, false);
                 }
             }
+=======
+        if (this.async) {
+            SupportManager.getInstance().getFork().runNow(true, e.getLocation(), () -> this.mobAiReducer.optimize(e.getEntity(), false));
+        } else {
+            this.mobAiReducer.optimize(e.getEntity(), false);
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
     }
 
     public boolean isEnabled(Entity ent) {
-        if ((!this.ignore_models && HookManager.getInstance().getModel().hasModel(ent)) || this.list.contains(ent.getType()) != this.list_mode)
+        if ((!this.ignore_models && HookManager.getInstance().hasModel(ent)) || this.list.contains(ent.getType()) != this.list_mode)
             return false;
 
         return switch (ent) {

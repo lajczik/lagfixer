@@ -16,7 +16,6 @@ import xyz.lychee.lagfixer.objects.AbstractManager;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 public class CommandManager extends AbstractManager {
@@ -53,6 +52,68 @@ public class CommandManager extends AbstractManager {
         }
     }
 
+<<<<<<< HEAD
+=======
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (!sender.hasPermission(this.permission)) {
+            Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", this.permission));
+            if (text == null) {
+                return false;
+            }
+            this.getPlugin().getAudiences().sender(sender).sendMessage(text);
+            return false;
+        }
+
+        if (args.length > 0) {
+            Subcommand cmd = this.subcommandsWithAliases.get(args[0].toLowerCase());
+            if (cmd != null) {
+                String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
+                cmd.execute(sender, subArgs);
+                return false;
+            }
+        }
+
+        StringBuilder help = new StringBuilder("Subcommands list:\n");
+        for (Subcommand subCommand : this.subcommands.values()) {
+            help.append("&8{*} &f/lagfixer &e")
+                    .append(subCommand.getName())
+                    .append(" &8- &7")
+                    .append(subCommand.getDescription())
+                    .append("\n");
+        }
+        return MessageUtils.sendMessage(true, sender, help.toString());
+    }
+
+    @Nullable
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length == 1) {
+            List<String> completions = new ArrayList<>(this.subcommandsWithAliases.keySet());
+            if (!args[0].isEmpty()) {
+                completions.removeIf(str -> !str.startsWith(args[0]));
+            }
+            Collections.sort(completions);
+            return completions;
+        } else if (args.length >= 2) {
+            String subCommandName = args[0].toLowerCase();
+            Subcommand subCommand = this.subcommandsWithAliases.get(subCommandName);
+
+            if (subCommand != null) {
+                String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
+                List<String> tabComplete = subCommand.tabComplete(commandSender, subArgs);
+                if (tabComplete != null && !tabComplete.isEmpty()) {
+                    return tabComplete;
+                }
+            }
+            return Bukkit.getOnlinePlayers().stream()
+                    .map(HumanEntity::getName)
+                    .filter(s -> s.startsWith(args[1]))
+                    .toList();
+        }
+
+        return Collections.emptyList();
+    }
+
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     @Override
     public void load() {
         for (Subcommand subcommand : this.subcommands.values()) {

@@ -6,8 +6,16 @@ import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftBoat;
 import org.bukkit.craftbukkit.entity.CraftMinecart;
+<<<<<<< HEAD
 import org.bukkit.craftbukkit.entity.CraftMinecartChest;
 import org.bukkit.entity.Vehicle;
+=======
+import org.bukkit.entity.Entity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.EntitiesLoadEvent;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import xyz.lychee.lagfixer.modules.VehicleMotionReducerModule;
 
 import java.util.IdentityHashMap;
@@ -35,7 +43,11 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
     }
 
     @Override
+<<<<<<< HEAD
     public boolean optimizeVehicle(org.bukkit.entity.Entity vehicle) {
+=======
+    public boolean optimizeVehicle(Entity vehicle) {
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         if (vehicle instanceof CraftBoat boat) {
             if (!this.getModule().isBoat()) return false;
 
@@ -64,7 +76,11 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
         return true;
     }
 
+<<<<<<< HEAD
     private void copyItems(Entity from, Entity to) {
+=======
+    private void copyItems(VehicleEntity from, VehicleEntity to) {
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         if (from instanceof ContainerEntity fromContainer && to instanceof ContainerEntity toContainer) {
             for (int i = 0; i < fromContainer.getContainerSize(); i++) {
                 ItemStack is = fromContainer.getItem(i);

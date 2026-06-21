@@ -17,6 +17,10 @@ public class LagFixer extends JavaPlugin {
     private static @Getter LagFixer instance;
     private final ArrayList<AbstractManager> managers = new ArrayList<>();
     private final ColoredLogger logger = new ColoredLogger();
+<<<<<<< HEAD
+=======
+    private BukkitAudiences audiences;
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
     @Override
     public void onEnable() {
@@ -48,12 +52,23 @@ public class LagFixer extends JavaPlugin {
             }
             it.remove();
         }
+<<<<<<< HEAD
 
         SupportManager support = SupportManager.getInstance();
         support.getResourceMonitor().stop();
         support.getWorldsMonitor().stop();
     }
 
+=======
+
+        SupportManager support = SupportManager.getInstance();
+        support.getResourceMonitor().stop();
+        support.getWorldsMonitor().stop();
+        Bukkit.getScheduler().cancelTasks(this);
+        HandlerList.unregisterAll(this);
+    }
+
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     public void loadManager(AbstractManager manager) {
         if (!manager.isEnabled()) {
             return;

@@ -146,6 +146,7 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
 
                                 int creatures = 0, items = 0, vehicles = 0, projectiles = 0;
 
+<<<<<<< HEAD
                                 for (Entity entity : entities) {
                                     if (this.whitelist.contains(entity.getType())
                                             || (!this.overflow_named && entity.customName() != null)
@@ -176,6 +177,42 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
                             }
                         }, executor);
                     });
+=======
+                        for (Entity entity : entities) {
+                            if (this.whitelist.contains(entity.getType())
+                                    || (!this.overflow_named && entity.getCustomName() != null)
+                                    || (!this.ignore_models && HookManager.getInstance().hasModel(entity))) {
+                                continue;
+                            }
+
+                            boolean removed = false;
+
+                            switch (entity) {
+                                case Mob ignored -> {
+                                    if (creatures < limit_creatures) creatures++;
+                                    else if (checkCreatures) removed = true;
+                                }
+                                case Item ignored -> {
+                                    if (items < limit_items) items++;
+                                    else if (checkItems) removed = true;
+                                }
+                                case Vehicle ignored -> {
+                                    if (vehicles < limit_vehicles) vehicles++;
+                                    else if (checkVehicles) removed = true;
+                                }
+                                case Projectile ignored -> {
+                                    if (projectiles < limit_projectiles) projectiles++;
+                                    else if (checkProjectiles) removed = true;
+                                }
+                                default -> {}
+                            }
+
+                            if (removed) {
+                                entity.remove();
+                            }
+                        }
+                    }
+>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                 });
             }, this.overflow_interval, this.overflow_interval, TimeUnit.SECONDS);
         }

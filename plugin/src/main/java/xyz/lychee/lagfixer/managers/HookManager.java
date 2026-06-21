@@ -60,6 +60,11 @@ public class HookManager
         return null;
     }
 
+    public boolean hasModel(Entity entity) {
+        ModelContainer model = this.getModel();
+        return model != null && model.hasModel(entity);
+    }
+
     public boolean noneStackers() {
         return this.stackerHooks.isEmpty();
     }
@@ -96,7 +101,7 @@ public class HookManager
                 TimingUtil t = TimingUtil.startNew();
                 hook.load();
                 this.addLoaded(hook);
-                this.getPlugin().getLogger().info(" &8• &rSuccessfully loaded hook " + hook.getName() + " in " + t.stop().getExecutingTime() + "ms!");
+                this.getPlugin().getLogger().info(" &8• &rSuccessfully loaded hook " + hook.getName() + " in " + t.stop() + "!");
             } catch (Exception ex) {
                 this.getPlugin().getLogger().info(" &8• &cError with enabling hook " + hook.getName() + ", reason: " + ex.getMessage());
                 this.getPlugin().printError(ex);
@@ -113,7 +118,7 @@ public class HookManager
                 TimingUtil t = TimingUtil.startNew();
                 hook.disable();
                 this.removeLoaded(hook);
-                this.getPlugin().getLogger().info(" &8• &rSuccessfully disabled hook " + hook.getName() + " in " + t.stop().getExecutingTime() + "ms!");
+                this.getPlugin().getLogger().info(" &8• &rSuccessfully disabled hook " + hook.getName() + " in " + t.stop() + "!");
             } catch (Exception ex) {
                 this.getPlugin().getLogger().info(" &8• &cError with disabling hook " + hook.getName() + ", reason: " + ex.getMessage());
                 this.getPlugin().printError(ex);

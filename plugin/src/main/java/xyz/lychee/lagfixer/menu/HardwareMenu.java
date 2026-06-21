@@ -83,7 +83,7 @@ public class HardwareMenu extends AbstractMenu {
         this.hardwareData.setPhysicalCores(cpu.getPhysicalProcessorCount());
         this.hardwareData.setTotalMemory(memory.getTotal());
         this.hardwareData.setPageSize(memory.getPageSize());
-        this.hardwareData.setMemoryType(memory.getPhysicalMemory().isEmpty() ? "Unknown" : memory.getPhysicalMemory().get(0).getMemoryType());
+        this.hardwareData.setMemoryType(memory.getPhysicalMemory().isEmpty() ? "Unknown" : memory.getPhysicalMemory().getFirst().getMemoryType());
         this.hardwareData.setDiskCount(disks.size());
         this.hardwareData.setPartitionCount(disks.stream().mapToInt(d -> d.getPartitions().size()).sum());
         this.hardwareData.setNetworkInterfaceCount(tempHal.getNetworkIFs().size());
@@ -123,10 +123,9 @@ public class HardwareMenu extends AbstractMenu {
                     " &8{*} &7Sent: &f" + FormatUtil.formatBytes(bytesSent),
                     " &8{*} &7Received: &f" + FormatUtil.formatBytes(bytesRecv),
                     " &8{*} &7Throughput: &f" + calculateNetworkSpeed(bytesSent, bytesRecv),
-                    "&7Network data updated in &e" + timing.stop().getExecutingTime() + "&7ms"
+                    "&7Network data updated in &e" + timing.stop()
             );
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             this.i1.setLore(
                     " &8{*} &7An error occurred while",
                     "&7retrieving network information :("
@@ -141,10 +140,9 @@ public class HardwareMenu extends AbstractMenu {
                     " &8{*} &7Physical cores: &f" + this.hardwareData.getPhysicalCores(),
                     " &8{*} &7Microarchitecture: &f" + this.hardwareData.getCpuMicroarchitecture(),
                     " &8{*} &7Frequency: &f" + FormatUtil.formatHertz(this.hardwareData.getCpuVendorFreq()),
-                    "&7Cpu data updated in &e" + timing.stop().getExecutingTime() + "&7ms"
+                    "&7Cpu data updated in &e" + timing.stop()
             );
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             this.i2.setLore(
                     " &8{*} &7An error occurred while",
                     "&7retrieving processer information :("
@@ -167,10 +165,9 @@ public class HardwareMenu extends AbstractMenu {
                     " &8{*} &7Memory Type: &f" + this.hardwareData.getMemoryType(),
                     " &8{*} &7Swap Total: &f" + FormatUtil.formatBytesDecimal(swap.getSwapTotal()),
                     " &8{*} &7Swap Used: &f" + FormatUtil.formatBytesDecimal(swap.getSwapUsed()),
-                    "&7Memory data updated in &e" + timing.stop().getExecutingTime() + "&7ms"
+                    "&7Memory data updated in &e" + timing.stop()
             );
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             this.i3.setLore(
                     " &8{*} &7An error occurred while",
                     "&7retrieving memory information :("
@@ -214,10 +211,9 @@ public class HardwareMenu extends AbstractMenu {
                     " &8{*} &7Written Data: &f" + FormatUtil.formatBytes(totalWriteBytes) +
                             " (&f" + writeOps + " ops&7)",
                     " &8{*} &7Disk Queues: &f" + queueLength,
-                    "&7Storage data updated in &e" + timing.stop().getExecutingTime() + "&7ms"
+                    "&7Storage data updated in &e" + timing.stop()
             );
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             this.i4.setLore(
                     " &8{*} &7An error occurred while",
                     "&7retrieving storage information :("
