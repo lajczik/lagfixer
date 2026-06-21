@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.managers.CommandManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.modules.WorldCleanerModule;
-import xyz.lychee.lagfixer.objects.RegionsEntityRaport;
+import xyz.lychee.lagfixer.objects.RegionsEntityReport;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.util.ArrayList;
@@ -42,8 +42,8 @@ public class ClearCommand extends CommandManager.Subcommand {
         }
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-        RegionsEntityRaport raport = new RegionsEntityRaport();
-        LongAdder size = raport.getEntities();
+        RegionsEntityReport report = new RegionsEntityReport();
+        LongAdder size = report.getEntities();
 
         String type = args[0].toLowerCase();
         switch (type) {
@@ -64,7 +64,7 @@ public class ClearCommand extends CommandManager.Subcommand {
             }
             case "all" -> {
                 for (World w : module.getAllowedWorlds()) {
-                    module.purgeAll(w, futures, raport);
+                    module.purgeAll(w, futures, report);
                 }
             }
             default -> {

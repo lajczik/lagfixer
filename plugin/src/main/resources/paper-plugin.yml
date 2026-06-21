@@ -2,7 +2,9 @@ name: LagFixer
 version: ${project.version} (folia build)
 main: xyz.lychee.lagfixer.LagFixer
 author: lychee
-api-version: 1.20.1
+api-version: "1.20"
+bootstrapper: xyz.lychee.lagfixer.LagFixerBootstrap
+loader: xyz.lychee.lagfixer.LagFixerLoader
 softdepend: [
   PlaceholderAPI,
   spark,
@@ -15,8 +17,3 @@ softdepend: [
   StackMob
 ]
 folia-supported: true
-
-libraries:
-  - org.apache.commons:commons-lang3:3.17.0
-  - commons-io:commons-io:2.19.0
-  - com.github.oshi:oshi-core:6.8.0

@@ -1,8 +1,6 @@
 package xyz.lychee.lagfixer.menu;
 
 import lombok.Data;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,10 +11,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import xyz.lychee.lagfixer.LagFixer;
-import xyz.lychee.lagfixer.Language;
 import xyz.lychee.lagfixer.commands.MenuCommand;
+import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractMenu;
 import xyz.lychee.lagfixer.objects.AbstractModule;
 import xyz.lychee.lagfixer.utils.MessageUtils;
@@ -29,8 +26,8 @@ public class ConfigMenu extends AbstractMenu {
     private final AbstractModule module;
     private final File configFile;
 
-    public ConfigMenu(LagFixer plugin, ConfigurationSection defSection, int size, AbstractModule module) {
-        super(plugin, size, "&8[&e&l⚡&8] &fConfig! &8| &eLagFixer", -1, true);
+    public ConfigMenu(LagFixer plugin, int size, AbstractModule module) {
+        super(plugin, size, MessageUtils.fixColors(null, "&8[&e&l⚡&8] &fConfig! &8| &eLagFixer"), -1, true);
         this.module = module;
         this.configFile = new File(this.getPlugin().getDataFolder(), "modules/" + module.getName() + ".yml");
 
@@ -42,54 +39,37 @@ public class ConfigMenu extends AbstractMenu {
 
         this.itemClickEvent(size - 5, () -> this.module.isLoaded() ? getEnabled() : getDisabled(), null);
 
+        ConfigurationSection base = this.module.getSection();
+        ConfigurationSection defaults = base.getDefaultSection() != null ? base.getDefaultSection() : base;
+
         int slot = 0;
-        for (Map.Entry<String, Object> entry : defSection.getValues(true).entrySet()) {
+        for (Map.Entry<String, Object> entry : defaults.getValues(true).entrySet()) {
             if (entry.getValue() instanceof ConfigurationSection) continue;
 
             String key = entry.getKey();
-            Object currentValue = this.module.getSection().get(key);
-
-            ConfigChange change = new ConfigChange(this.module, key, currentValue);
             this.itemClickEvent(slot++, () -> {
-                LegacyComponentSerializer serializer = Language.getSerializer();
-                List<Component> lore = new ArrayList<>();
-                lore.add(serializer.deserialize("&7Current value:"));
+                Object val = base.get(key);
+                List<String> lore = new ArrayList<>(List.of("&7Current value:"));
 
-                if (currentValue instanceof Collection) {
-                    for (Object obj : (Collection<?>) currentValue) {
-                        lore.add(serializer.deserialize(" &8{*} &e" + obj));
-                    }
-                } else {
-                    lore.add(serializer.deserialize(" &8{*} &e" + currentValue));
-                }
+                (val instanceof Collection<?> c ? c : Collections.singletonList(val))
+                        .forEach(o -> lore.add(" &8{*} &e" + o));
 
-                lore.add(Component.empty());
-                lore.add(serializer.deserialize("&bRight click for default value!"));
-                lore.add(serializer.deserialize("&aLeft click to change value!"));
+                lore.addAll(List.of("", "&bRight click for default value!", "&aLeft click to change value!"));
 
-                ItemStack item = this.module.getBaseSkull().clone();
-
-                ItemMeta meta = item.getItemMeta();
-                if (meta != null) {
-                    meta.displayName(serializer.deserialize("&f&lKey: &e&l" + key));
-                    meta.lore(lore);
-                    item.setItemMeta(meta);
-                }
-
-                return item;
+                return this.module.getBaseSkull().copy()
+                        .setName("&f&lKey: &e&l" + key)
+                        .setLore(lore)
+                        .build();
             }, e -> {
                 HumanEntity human = e.getWhoClicked();
                 if (e.isRightClick()) {
-                    Object defaultValue = change.getModule().getSection().getDefaultSection().get(change.getKey());
-                    MessageUtils.sendMessage(true, human,
-                            "&fDefault value of &e" + change.getKey() + " &fis:\n &8{*} &e" + defaultValue);
+                    MessageUtils.sendMessage(true, human, "&fDefault value of &e" + key + " &fis:\n &8{*} &e" + defaults.get(key));
                 } else {
                     human.closeInventory();
-                    playerChanges.put(human.getUniqueId(), change);
+                    playerChanges.put(human.getUniqueId(), new ConfigChange(this.module, key, this.module.getSection().get(key)));
                     MessageUtils.sendMessage(true, human, "Enter new value (-cancel to cancel):");
-                    if (change.getValue() instanceof Collection) {
+                    if (base.get(key) instanceof Collection)
                         MessageUtils.sendMessage(false, human, "&fExisting values will be toggled.");
-                    }
                 }
             });
         }
@@ -123,7 +103,6 @@ public class ConfigMenu extends AbstractMenu {
 
             change.getModule().getMenu().updateAll();
             openModuleMenu(player, change.getModule());
-
         } catch (Exception ex) {
             MessageUtils.sendMessage(true, player, "&cError saving configuration!");
         }

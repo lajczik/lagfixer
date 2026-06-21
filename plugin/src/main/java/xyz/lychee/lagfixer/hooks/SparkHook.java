@@ -9,14 +9,19 @@ import me.lucko.spark.api.statistic.misc.DoubleAverageInfo;
 import me.lucko.spark.api.statistic.types.DoubleStatistic;
 import me.lucko.spark.api.statistic.types.GenericStatistic;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.ErrorsManager;
 import xyz.lychee.lagfixer.managers.HookManager;
+import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractHook;
+import xyz.lychee.lagfixer.objects.ISupportNms;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
+
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class SparkHook extends AbstractHook {
-    private static @Getter SparkMonitor spark;
     private ScheduledTask task;
 
     public SparkHook(LagFixer plugin, HookManager manager) {
@@ -25,13 +30,18 @@ public class SparkHook extends AbstractHook {
 
     @Override
     public void load() {
-        spark = new SparkMonitor();
-        this.task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(getPlugin(), task -> {
+        SupportManager support = SupportManager.getInstance();
+        support.getResourceMonitor().stop();
+
+        SparkMonitor monitor = new SparkMonitor(this.getPlugin());
+        monitor.start();
+        support.setResourceMonitor(monitor);
+
+        this.task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this.getPlugin(), t -> {
             if (ErrorsManager.getInstance().isEnabled() && Bukkit.getOnlinePlayers().size() > 20) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spark profiler open");
             }
-        }, 72000L, 72000L);
-
+        }, 20 * 60 * 60, 20 * 60 * 60);
     }
 
     @Override
@@ -41,32 +51,32 @@ public class SparkHook extends AbstractHook {
         }
     }
 
-    public static class SparkMonitor {
+    static class SparkMonitor extends ResourceMonitor {
         private final Spark spark = SparkProvider.get();
 
-        public double getTps() {
-            DoubleStatistic<StatisticWindow.TicksPerSecond> tps = this.spark.tps();
-            if (tps == null) {
-                return 0.0d;
-            }
-            return tps.poll(StatisticWindow.TicksPerSecond.SECONDS_10);
+        public SparkMonitor(LagFixer plugin) {
+            super(plugin);
         }
 
-        public double getMspt() {
-            GenericStatistic<DoubleAverageInfo, StatisticWindow.MillisPerTick> mspt = this.spark.mspt();
-            if (mspt == null) {
-                return 0.0d;
-            }
-            return mspt.poll(StatisticWindow.MillisPerTick.SECONDS_10).median();
-        }
-
+        @Override
         public double cpuProcess() {
-            return this.spark.cpuProcess().poll(StatisticWindow.CpuUsage.SECONDS_10);
+            return this.spark.cpuProcess().poll(StatisticWindow.CpuUsage.SECONDS_10) * 100.0;
         }
 
+        @Override
         public double cpuSystem() {
-            return this.spark.cpuSystem().poll(StatisticWindow.CpuUsage.SECONDS_10);
+            return this.spark.cpuSystem().poll(StatisticWindow.CpuUsage.SECONDS_10) * 100.0;
+        }
+
+        @Override
+        public ISupportNms.TickReport tickReport() {
+            DoubleStatistic<StatisticWindow.TicksPerSecond> tps = this.spark.tps();
+            GenericStatistic<DoubleAverageInfo, StatisticWindow.MillisPerTick> mspt = this.spark.mspt();
+
+            return new ISupportNms.TickReport(
+                    mspt == null ? 0.0 : mspt.poll(StatisticWindow.MillisPerTick.SECONDS_10).median(),
+                    tps == null ? 20.0 : tps.poll(StatisticWindow.TicksPerSecond.SECONDS_10)
+            );
         }
     }
 }
-

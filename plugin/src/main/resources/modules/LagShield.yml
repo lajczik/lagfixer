@@ -41,7 +41,7 @@ LagShield:
         - "20.1:5"  # At 20 TPS -> simulation-distance 5
         - "18.0:4"  # At 18 TPS -> simulation-distance 4
         - "15.0:3"  # At 15 TPS -> simulation-distance 3
-        - "10.0:2"  # At 10 TPS -> simulation-distance 2
+        - "10.0:1"  # At 10 TPS -> simulation-distance 1
 
     # Dynamic random tick speed adjustment.
     # Adjusts the "randomTickSpeed" gamerule dynamically based on current TPS.

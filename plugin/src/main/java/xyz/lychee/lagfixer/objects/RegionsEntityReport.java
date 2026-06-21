@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.concurrent.atomic.LongAdder;
 
 @Data
-public class RegionsEntityRaport {
+public class RegionsEntityReport {
     private LongAdder chunks = new LongAdder();
     private LongAdder players = new LongAdder();
     private LongAdder entities = new LongAdder();
@@ -14,4 +14,3 @@ public class RegionsEntityRaport {
     private LongAdder projectiles = new LongAdder();
     private LongAdder vehicles = new LongAdder();
 }
-

@@ -1,6 +1,5 @@
 package xyz.lychee.lagfixer.modules;
 
-import com.google.common.collect.ImmutableSet;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -179,7 +178,7 @@ public class RedstoneLimiterModule extends AbstractModule implements Listener {
 
         public void complete(int limit, boolean breakBlocks) {
             if (this.ticks > limit) {
-                ImmutableSet<Block> blockSet = ImmutableSet.copyOf(this.blocks);
+                Set<Block> blockSet = new HashSet<>(this.blocks);
                 this.blocks.clear();
                 Location loc = this.getLocation(blockSet);
                 if (alerts) {

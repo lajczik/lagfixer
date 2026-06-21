@@ -6,18 +6,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.objects.AbstractManager;
+import xyz.lychee.lagfixer.objects.AbstractModule;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -52,8 +50,21 @@ public class MetricsManager
             this.uuid = cfg.getString("serverUuid");
         }
         this.metricsBase = new MetricsBase(19292, Runnable::run);
-
-        this.addCustomChart(new SingleLineChart("entities", () -> SupportManager.getInstance().getRegionsReport().getEntities().intValue()));
+        this.addCustomChart(new SingleLineChart("entities", () -> SupportManager.getInstance().getWorldsMonitor().getEntities()));
+        this.addCustomChart(new SingleLineChart("creatures", () -> SupportManager.getInstance().getWorldsMonitor().getCreatures()));
+        this.addCustomChart(new SingleLineChart("items", () -> SupportManager.getInstance().getWorldsMonitor().getItems()));
+        this.addCustomChart(new SingleLineChart("projectiles", () -> SupportManager.getInstance().getWorldsMonitor().getProjectiles()));
+        this.addCustomChart(new SingleLineChart("vehicles", () -> SupportManager.getInstance().getWorldsMonitor().getVehicles()));
+        this.addCustomChart(new AdvancedPie("modules", () -> {
+            Map<String, Integer> values = new HashMap<>();
+            Set<AbstractModule> modules = new HashSet<>(ModuleManager.getInstance().getModules().values());
+            for (AbstractModule module : modules) {
+                if (module.isLoaded()) {
+                    values.put(module.getName(), 1);
+                }
+            }
+            return values;
+        }));
     }
 
     @Override
@@ -117,6 +128,39 @@ public class MetricsManager
         }
     }
 
+    public static class AdvancedPie extends CustomChart {
+
+        private final Callable<Map<String, Integer>> callable;
+
+        public AdvancedPie(String chartId, Callable<Map<String, Integer>> callable) {
+            super(chartId);
+            this.callable = callable;
+        }
+
+        @Override
+        protected JsonObject getChartData() throws Exception {
+            JsonObject data = new JsonObject();
+            JsonObject values = new JsonObject();
+            Map<String, Integer> map = callable.call();
+            if (map == null || map.isEmpty()) {
+                return null;
+            }
+            boolean allSkipped = true;
+            for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                if (entry.getValue() == 0) {
+                    continue;
+                }
+                allSkipped = false;
+                values.addProperty(entry.getKey(), entry.getValue());
+            }
+            if (allSkipped) {
+                return null;
+            }
+            data.add("values", values);
+            return data;
+        }
+    }
+
     public class MetricsBase {
         private final ScheduledExecutorService scheduler;
         private final int serviceId;
@@ -132,15 +176,18 @@ public class MetricsManager
             this.startSubmitting();
         }
 
-        private byte[] compress(String str) throws IOException {
+        private byte[] compress(String str) {
             if (str == null) {
                 return null;
             }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            try (GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                 GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
                 gzip.write(str.getBytes(StandardCharsets.UTF_8));
+                return outputStream.toByteArray();
             }
-            return outputStream.toByteArray();
+            catch (IOException e) {
+                return null;
+            }
         }
 
         public void addCustomChart(CustomChart chart) {
@@ -184,31 +231,20 @@ public class MetricsManager
             baseJson.add("service", serviceJson);
             baseJson.addProperty("serverUUID", MetricsManager.this.uuid);
             baseJson.addProperty("metricsVersion", "3.0.2");
-            this.scheduler.execute(() -> {
-                try {
-                    this.sendData(baseJson);
-                } catch (Exception exception) {
-                    // empty catch block
-                }
-            });
+            this.sendData(baseJson);
         }
 
-        private void sendData(JsonObject data) throws Exception {
-            HttpsURLConnection connection = (HttpsURLConnection) URI.create("https://bStats.org/api/v2/data/bukkit").toURL().openConnection();
-            byte[] compressedData = this.compress(data.toString());
-            connection.setRequestMethod("POST");
-            connection.addRequestProperty("Accept", "application/json");
-            connection.addRequestProperty("Connection", "close");
-            connection.addRequestProperty("Content-Encoding", "gzip");
-            connection.addRequestProperty("Content-Length", String.valueOf(compressedData.length));
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("User-Agent", "Metrics-Service/1");
-            connection.setDoOutput(true);
-            try (DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())) {
-                outputStream.write(compressedData);
-            }
-            connection.getInputStream().close();
+        private void sendData(JsonObject data) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://bStats.org/api/v2/data/bukkit"))
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .header("User-Agent", "Metrics-Service/1")
+                    .POST(HttpRequest.BodyPublishers.ofString(data.toString()))
+                    .build();
+
+            SupportManager.getInstance().getClient()
+                    .sendAsync(request, HttpResponse.BodyHandlers.discarding());
         }
     }
 }
-

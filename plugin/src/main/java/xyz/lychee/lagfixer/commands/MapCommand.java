@@ -14,7 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.Language;
 import xyz.lychee.lagfixer.managers.CommandManager;
-import xyz.lychee.lagfixer.managers.MonitorManager;
+import xyz.lychee.lagfixer.managers.SupportManager;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.awt.*;
@@ -32,7 +33,8 @@ public class MapCommand extends CommandManager.Subcommand {
 
     @Override
     public void load() {
-        boolean enabled = this.getCommandManager().getPlugin().getConfig().getBoolean("main.map.enabled", true);
+        FileConfiguration config = this.getCommandManager().getPlugin().getConfig();
+        boolean enabled = config.getBoolean("main.monitor.map.enabled");
         if (enabled) {
             try {
                 this.mapHandler = new MapHandler(this.getCommandManager().getPlugin());
@@ -57,9 +59,9 @@ public class MapCommand extends CommandManager.Subcommand {
             MessageUtils.sendMessage(true, sender,
                     """
                             &7The map is currently unavailable.
-                            &7You need to add the &e&n-Djava.awt.headless=true&7 flag when starting the application to resolve the issue.
-                            &7This will enable headless mode and avoid the X11 display connection problem.
-                            &7Please restart the server with this flag and check if the issue persists.
+                            You need to add the &e&n-Djava.awt.headless=true&7 flag when starting the application to resolve the issue.
+                            This will enable headless mode and avoid the X11 display connection problem.
+                            Please restart the server with this flag and check if the issue persists.
                             """
             );
             return false;
@@ -112,14 +114,13 @@ public class MapCommand extends CommandManager.Subcommand {
 
             FileConfiguration config = plugin.getConfig();
             MapView tempMap = null;
-            if (config.isSet("main.map.id")) {
-                int mapId = config.getInt("map.id");
-                tempMap = Bukkit.getServer().getMap(mapId);
+            if (config.isSet("main.monitor.map.id")) {
+                tempMap = Bukkit.getServer().getMap(config.getInt("main.monitor.map.id"));
             }
 
             if (tempMap == null) {
-                this.mapView = Bukkit.createMap(Bukkit.getWorlds().get(0));
-                config.set("main.map.id", this.mapView.getId());
+                this.mapView = Bukkit.createMap(Bukkit.getWorlds().getFirst());
+                config.set("main.monitor.map.id", this.mapView.getId());
                 plugin.saveConfig();
             } else {
                 this.mapView = tempMap;
@@ -134,7 +135,7 @@ public class MapCommand extends CommandManager.Subcommand {
 
             MapMeta meta = (MapMeta) this.mapItem.getItemMeta();
             meta.setMapView(this.mapView);
-            meta.setDisplayName("§e⚡ §fServer monitor! §e⚡");
+            meta.setDisplayName(MessageUtils.fixColors(null, "&e⚡ &fServer monitor! &e⚡"));
             this.mapItem.setItemMeta(meta);
 
             this.mapView.getRenderers().clear();
@@ -142,10 +143,11 @@ public class MapCommand extends CommandManager.Subcommand {
         }
 
         public void load() {
-            int interval = this.plugin.getConfig().getInt("main.map.interval");
+            int interval = this.plugin.getConfig().getInt("main.monitor.map.interval");
 
-            task = Bukkit.getAsyncScheduler().runAtFixedRate(this.plugin, task -> {
-                MonitorManager monitor = MonitorManager.getInstance();
+            this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.plugin, t -> {
+                SupportManager support = SupportManager.getInstance();
+                ResourceMonitor monitor = support.getResourceMonitor();
                 int pixelY = msptToPixelY(monitor.getMspt());
 
                 if (this.dataCount < MAX_DATA_POINTS) {
@@ -208,14 +210,8 @@ public class MapCommand extends CommandManager.Subcommand {
         private int msptToPixelY(double mspt) {
             double clamped = Math.min(mspt, 200.0);
             double scale = (clamped - 10.0) / 125.0;
-            scale = Math.max(0.0, Math.min(1.0, scale));
+            scale = Math.clamp(scale, 0.0, 1.0);
             return (int) Math.round(3 + (1.0 - scale) * 118.0);
-        }
-
-        private int tpsToPixelY(double tps) {
-            double clamped = Math.max(15.0, Math.min(20.0, tps));
-            double scale = (clamped - 15.0) / 5.0;
-            return (int) Math.round(3 + scale * 118.0);
         }
 
         private void renderText(String text) {
@@ -241,7 +237,9 @@ public class MapCommand extends CommandManager.Subcommand {
         }
 
         public void unload() {
-            if (this.task != null) this.task.cancel();
+            if (this.task != null && !this.task.isCancelled()) {
+                this.task.cancel();
+            }
             this.g2d.dispose();
         }
 

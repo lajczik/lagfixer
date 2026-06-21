@@ -6,14 +6,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import xyz.lychee.lagfixer.LagFixer;
-import xyz.lychee.lagfixer.objects.AbstractSupportNms;
+import xyz.lychee.lagfixer.objects.ISupportNms;
 
 import java.util.concurrent.atomic.LongAdder;
 
-public class SupportNms extends AbstractSupportNms {
-    public SupportNms(LagFixer plugin) {
-        super(plugin);
-    }
+public class SupportNms implements ISupportNms {
 
     @Override
     public TickReport getTickReport() {

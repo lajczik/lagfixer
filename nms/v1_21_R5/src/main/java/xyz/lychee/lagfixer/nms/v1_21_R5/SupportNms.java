@@ -2,31 +2,15 @@ package xyz.lychee.lagfixer.nms.v1_21_R5;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import io.papermc.paper.threadedregions.TickData;
-import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
-import net.minecraft.server.level.ChunkHolder;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.entity.*;
 import xyz.lychee.lagfixer.LagFixer;
-import xyz.lychee.lagfixer.objects.AbstractSupportNms;
-import xyz.lychee.lagfixer.objects.RegionsEntityRaport;
+import xyz.lychee.lagfixer.objects.ISupportNms;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 
-public class SupportNms extends AbstractSupportNms {
-    public SupportNms(LagFixer plugin) {
-        super(plugin);
-    }
+public class SupportNms implements ISupportNms {
 
     @Override
     public TickReport getTickReport() {

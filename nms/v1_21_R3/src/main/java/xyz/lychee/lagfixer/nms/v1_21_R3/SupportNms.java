@@ -1,35 +1,14 @@
 package xyz.lychee.lagfixer.nms.v1_21_R3;
 
-import ca.spottedleaf.moonrise.common.util.CoordinateUtils;
-import ca.spottedleaf.moonrise.patches.chunk_system.level.entity.ChunkEntitySlices;
 import io.papermc.paper.threadedregions.TickData;
-import io.papermc.paper.threadedregions.TickRegions;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.vehicle.VehicleEntity;
-import net.minecraft.world.level.ChunkPos;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import xyz.lychee.lagfixer.LagFixer;
-import xyz.lychee.lagfixer.objects.AbstractSupportNms;
-import xyz.lychee.lagfixer.objects.RegionsEntityRaport;
+import xyz.lychee.lagfixer.objects.ISupportNms;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.LongAdder;
-
-public class SupportNms extends AbstractSupportNms {
-    public SupportNms(LagFixer plugin) {
-        super(plugin);
-    }
+public class SupportNms implements ISupportNms {
 
     @Override
     public TickReport getTickReport() {

@@ -11,49 +11,29 @@ import xyz.lychee.lagfixer.utils.TimingUtil;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.IntStream;
 
 @Getter
 public class LagFixer extends JavaPlugin {
     private static @Getter LagFixer instance;
     private final ArrayList<AbstractManager> managers = new ArrayList<>();
-    private final Logger logger = new ColoredLogger();
+    private final ColoredLogger logger = new ColoredLogger();
 
+    @Override
     public void onEnable() {
         instance = this;
-
-        try {
-            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-        } catch (ClassNotFoundException e) {
-            IntStream.range(0, 10).forEach(i -> {
-                this.getLogger().info(
-                        """
-                                
-                                This version of the plugin is intended only for folia servers, the correct version of the plugin can be found at:
-                                 - https://modrinth.com/plugin/lagfixer/versions?l=bukkit
-                                """
-                );
-            });
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        this.sendHeader();
-
         this.managers.clear();
+        this.logger.sendHeader(this.getDescription().getVersion());
         this.loadManager(new ErrorsManager(this));
-        this.loadManager(new SupportManager(this));
         this.loadManager(new ConfigManager(this));
+        this.loadManager(new SupportManager(this));
         this.loadManager(new HookManager(this));
-        this.loadManager(new MonitorManager(this));
         this.loadManager(new MetricsManager(this));
         this.loadManager(new UpdaterManager(this));
         this.loadManager(new ModuleManager(this));
         this.loadManager(new CommandManager(this));
-        this.getLogger().info("&fRemember to leave a rating!&r &e&l★ ★ ★ ★ ★");
     }
 
+    @Override
     public void onDisable() {
         Iterator<AbstractManager> it = this.managers.iterator();
         while (it.hasNext()) {
@@ -62,16 +42,16 @@ public class LagFixer extends JavaPlugin {
                 this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fDisabling manager...");
                 TimingUtil t = TimingUtil.startNew();
                 manager.disable();
-                this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fDisabled manager in &e" + t.stop().getExecutingTime() + "ms&f!");
+                this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fDisabled manager in &e" + t.stop() + "&f!");
             } catch (Exception ex) {
                 this.printError(ex);
             }
             it.remove();
         }
 
-        Bukkit.getAsyncScheduler().cancelTasks(this);
-        Bukkit.getGlobalRegionScheduler().cancelTasks(this);
-        HandlerList.unregisterAll(this);
+        SupportManager support = SupportManager.getInstance();
+        support.getResourceMonitor().stop();
+        support.getWorldsMonitor().stop();
     }
 
     public void loadManager(AbstractManager manager) {
@@ -83,31 +63,10 @@ public class LagFixer extends JavaPlugin {
             this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fEnabling manager...");
             TimingUtil t = TimingUtil.startNew();
             manager.load();
-            this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fEnabled manager in &e" + t.stop().getExecutingTime() + "ms&f!");
+            this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fEnabled manager in &e" + t.stop() + "&f!");
         } catch (Exception ex) {
             this.printError(ex);
         }
-    }
-
-    public void sendHeader() {
-        this.getLogger().info("""
-                &fRemember to leave a rating!&r &e&l★ ★ ★ ★ ★
-                
-                
-                
-                
-                &fLagFixer - Best Performance Solution!&r
-                &8                                                               \s
-                &8  &e██&6╗&8      &e█████&6╗&8  &e██████&6╗&8   &e███████&6╗&e██&6╗&e██&6╗&8  &e██&6╗&e███████&6╗&e██████&6╗&8  \s
-                &8  &e██&6║&8     &e██&6╔══&e██&6╗&e██&6╔════╝&8   &e██&6╔════╝&e██&6║╚&e██&6╗&e██&6╔╝&e██&6╔════╝&e██&6╔══&e██&6╗&8 \s
-                &8  &e██&6║&8     &e███████&6║&e██&6║&8  &e██&6╗&8   &e█████&6╗&8  &e██&6║&8 &6╚&e███&6╔╝&8 &e█████&6╗&8  &e██████&6╔╝&8 \s
-                &8  &e██&6║&8     &e██&6╔══&e██&6║&e██&6║&8  &6╚&e██&6╗&8  &e██&6╔══╝&8  &e██&6║&8 &e██&6╔&e██&6╗&8 &e██&6╔══╝&8  &e██&6╔══&e██&6╗&8 \s
-                &8  &e███████&6╗&e██&6║&8  &e██&6║╚&e██████&6╔╝&8  &e██&6║&8     &e██&6║&e██&6╔╝╚&e██&6╗&e███████&6╗&e██&6║&8  &e██&6║&8 \s
-                &8                                                                 \s
-                
-                
-                
-                """);
     }
 
     public void printError(Throwable ex) {

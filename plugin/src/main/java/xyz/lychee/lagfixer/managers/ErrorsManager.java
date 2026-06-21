@@ -1,6 +1,5 @@
 package xyz.lychee.lagfixer.managers;
 
-import com.google.common.collect.Iterators;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,14 +15,12 @@ import org.bukkit.Bukkit;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.commands.BenchmarkCommand;
 import xyz.lychee.lagfixer.objects.AbstractManager;
-import xyz.lychee.lagfixer.objects.RegionsEntityRaport;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
+import xyz.lychee.lagfixer.objects.WorldsMonitor;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -39,7 +36,7 @@ public class ErrorsManager extends AbstractManager {
     private final UUID uuid = UUID.randomUUID();
     private final HashMap<ThrowableKey, Error> errors = new HashMap<>();
     private final Pattern pattern = Pattern.compile("https://spark\\.lucko\\.me/.{10}");
-    private final AbstractFilter filter;
+    private final AbstractFilter filter = new CustomFilter();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private final ConcurrentLinkedQueue<SendTask> sendQueue = new ConcurrentLinkedQueue<>();
@@ -48,31 +45,22 @@ public class ErrorsManager extends AbstractManager {
     public ErrorsManager(LagFixer plugin) {
         super(plugin);
         instance = this;
-        this.filter = new AbstractFilter() {
-            public Filter.Result filter(LogEvent event) {
-                if (event.getLoggerName().equals(getPlugin().getLogger().getName())) {
-                    return Filter.Result.NEUTRAL;
-                }
-
-                if (event.getThrown() != null) {
-                    return checkError(event.getThrown()) ? Filter.Result.NEUTRAL : Filter.Result.DENY;
-                }
-
-                Matcher matcher = pattern.matcher(event.getMessage().getFormattedMessage());
-                if (matcher.find()) {
-                    sendProfiler(matcher.group());
-                    getPlugin().getLogger()
-                            .info("&7Spark profiler has been sent to our support to improve LagFixer optimizations and investigate what loads the server the most.");
-                }
-                return Filter.Result.NEUTRAL;
-            }
-        };
     }
 
     @Override
     public void load() {
         Logger logger = (Logger) LogManager.getRootLogger();
-        if (!Iterators.contains(logger.getFilters(), this.filter)) {
+
+        Iterator<Filter> it = logger.getFilters();
+        boolean initialized = false;
+        while (it.hasNext()) {
+            Filter filter = it.next();
+            if (filter instanceof CustomFilter) {
+                initialized = true;
+            }
+        }
+
+        if (!initialized) {
             logger.addFilter(this.filter);
         }
 
@@ -163,24 +151,28 @@ public class ErrorsManager extends AbstractManager {
 
     private JsonObject createJson() {
         UpdaterManager updater = UpdaterManager.getInstance();
-        MonitorManager monitor = MonitorManager.getInstance();
-        RegionsEntityRaport raport = SupportManager.getInstance().getRegionsReport();
-        JsonObject jo = new JsonObject();
+        SupportManager support = SupportManager.getInstance();
+        ResourceMonitor resourceMonitor = support.getResourceMonitor();
+        WorldsMonitor worldsMonitor = support.getWorldsMonitor();
 
+        JsonObject jo = new JsonObject();
         jo.addProperty("bukkit", Bukkit.getName() + " " + Bukkit.getServer().getBukkitVersion());
         jo.addProperty("version", this.getPlugin().getDescription().getVersion());
         jo.addProperty("uuid", this.uuid.toString());
-        jo.addProperty("entities", raport.getEntities().toString());
-        jo.addProperty("chunks", raport.getChunks().toString());
-        jo.addProperty("players", raport.getPlayers().toString());
+        jo.addProperty("entities", worldsMonitor.getEntities());
+        jo.addProperty("creatures", worldsMonitor.getCreatures());
+        jo.addProperty("items", worldsMonitor.getItems());
+        jo.addProperty("projectiles", worldsMonitor.getProjectiles());
+        jo.addProperty("vehicles", worldsMonitor.getVehicles());
+        jo.addProperty("players", Bukkit.getOnlinePlayers().size());
         jo.addProperty("maxplayers", Bukkit.getMaxPlayers());
-        jo.addProperty("cpuprocess", monitor.getCpuProcess());
-        jo.addProperty("cpusystem", monitor.getCpuSystem());
-        jo.addProperty("ramused", monitor.getRamUsed());
-        jo.addProperty("ramtotal", monitor.getRamTotal());
-        jo.addProperty("ramfree", monitor.getRamFree());
-        jo.addProperty("tps", monitor.getTps());
-        jo.addProperty("mspt", monitor.getMspt());
+        jo.addProperty("cpuprocess", resourceMonitor.getCpuProcess());
+        jo.addProperty("cpusystem", resourceMonitor.getCpuSystem());
+        jo.addProperty("ramused", resourceMonitor.getRamUsed());
+        jo.addProperty("ramtotal", resourceMonitor.getRamTotal());
+        jo.addProperty("ramfree", resourceMonitor.getRamFree());
+        jo.addProperty("tps", resourceMonitor.getTps());
+        jo.addProperty("mspt", resourceMonitor.getMspt());
         jo.addProperty("current_version", updater.getCurrentVersion());
         jo.addProperty("latest_version", updater.getLatestVersion());
         jo.addProperty("difference_version", updater.getDifference());
@@ -189,28 +181,16 @@ public class ErrorsManager extends AbstractManager {
     }
 
     private void connect(String params, JsonObject jsonObject) {
-        try {
-            HttpsURLConnection conn = (HttpsURLConnection) URI.create("https://api.sakuramc.pl" + params).toURL().openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setDoOutput(true);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.sakuramc.pl" + params))
+                .header("Content-Type", "application/json; charset=UTF-8")
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString()))
+                .build();
 
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(this.gson.toJson(jsonObject).getBytes(StandardCharsets.UTF_8));
-                os.flush();
-            }
-
-            int code = conn.getResponseCode();
-            InputStream is = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
-            byte[] data = new byte[4096];
-            while (is.read(data, 0, data.length) != -1) {}
-            is.close();
-            conn.disconnect();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        SupportManager.getInstance().getClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofByteArray());
     }
 
     private List<String> filterStackTrace(Throwable ex) {
@@ -244,9 +224,9 @@ public class ErrorsManager extends AbstractManager {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof ThrowableKey that)) return false;
-            return type.equals(that.type) &&
-                    Objects.equals(message, that.message) &&
-                    Objects.equals(causeKey, that.causeKey);
+            return Objects.equals(type, that.type)
+                    && Objects.equals(message, that.message)
+                    && Objects.equals(causeKey, that.causeKey);
         }
 
         @Override
@@ -338,6 +318,27 @@ public class ErrorsManager extends AbstractManager {
         public void handle(JsonArray arr) {
             arr.add(gson.toJsonTree(this, Error.class));
             this.reported = true;
+        }
+    }
+
+    private class CustomFilter extends AbstractFilter {
+        @Override
+        public Filter.Result filter(LogEvent event) {
+            if (event.getLoggerName().equals(getPlugin().getLogger().getName())) {
+                return Filter.Result.NEUTRAL;
+            }
+
+            if (event.getThrown() != null) {
+                return checkError(event.getThrown()) ? Filter.Result.NEUTRAL : Filter.Result.DENY;
+            }
+
+            Matcher matcher = pattern.matcher(event.getMessage().getFormattedMessage());
+            if (matcher.find()) {
+                sendProfiler(matcher.group());
+                getPlugin().getLogger()
+                        .info("&7Spark profiler has been sent to our support to improve LagFixer optimizations and investigate what loads the server the most.");
+            }
+            return Filter.Result.NEUTRAL;
         }
     }
 }

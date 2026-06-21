@@ -19,7 +19,6 @@ import xyz.lychee.lagfixer.utils.ReflectionUtils;
 public class VehicleMotionReducerModule extends AbstractModule implements Listener {
     private NMS vehicleMotionReducer;
     private boolean forceLoad;
-    private boolean minecart_remove_chest;
     private boolean minecart;
     private boolean boat;
 
@@ -37,8 +36,7 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onEntityPlace(EntityPlaceEvent event) {
         Entity entity = event.getEntity();
-        if (this.canContinue(entity.getWorld()) && entity instanceof Vehicle) {
-            Vehicle vehicle = (Vehicle) entity;
+        if (this.canContinue(entity.getWorld()) && entity instanceof Vehicle vehicle) {
             boolean cancel = this.vehicleMotionReducer.optimizeVehicle(vehicle);
 
             if (cancel) {
@@ -66,7 +64,7 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
 
         for (Entity ent : e.getEntities()) {
             if (this.isEnabled(ent)) {
-                this.vehicleMotionReducer.optimizeVehicle((Vehicle) ent);
+                this.vehicleMotionReducer.optimizeVehicle(ent);
             }
         }
     }
@@ -86,7 +84,6 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
         this.forceLoad = this.getSection().getBoolean("force_load");
         this.minecart = this.getSection().getBoolean("minecart.enabled");
         this.boat = this.getSection().getBoolean("boat.enabled");
-        this.minecart_remove_chest = this.getSection().getBoolean("minecart.remove_chest");
         return this.vehicleMotionReducer != null;
     }
 
@@ -103,7 +100,7 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
             this.module = module;
         }
 
-        public abstract boolean optimizeVehicle(Vehicle vehicle);
+        public abstract boolean optimizeVehicle(Entity vehicle);
     }
 }
 

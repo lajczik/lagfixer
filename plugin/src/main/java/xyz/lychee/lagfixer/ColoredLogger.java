@@ -23,19 +23,50 @@ public class ColoredLogger extends Logger {
     }
 
     private static String convertStringMessage(String message) {
-        if (message != null && !message.isEmpty()) {
-            String messageCopy = String.copyValueOf(message.toCharArray()) + AnsiColor.RESET.getAnsiColor();
-            Matcher matcher = Pattern.compile(String.format("(%c[0-9a-fk-or])(?!.*\u0001)", '&')).matcher(message);
-            while (matcher.find()) {
-                String result = matcher.group(1);
-                AnsiColor color = AnsiColor.getColorByCode(result.charAt(1));
-                if (color == null) continue;
-
-                messageCopy = messageCopy.replace(result, color.getAnsiColor());
-            }
-            return messageCopy;
+        if (message == null || message.isEmpty()) {
+            return message;
         }
-        return message;
+
+        StringBuilder result = new StringBuilder();
+        Pattern pattern = Pattern.compile("&([0-9a-fk-or])(?!.*\u0001)");
+        Matcher matcher = pattern.matcher(message);
+
+        int lastEnd = 0;
+        while (matcher.find()) {
+            result.append(message, lastEnd, matcher.start());
+            char codeChar = matcher.group(1).charAt(0);
+            AnsiColor color = AnsiColor.getColorByCode(codeChar);
+            if (color != null) {
+                result.append(color.getAnsiColor());
+            } else {
+                result.append(matcher.group(0));
+            }
+            lastEnd = matcher.end();
+        }
+
+        result.append(message.substring(lastEnd));
+        result.append(AnsiColor.RESET.getAnsiColor());
+
+        return result.toString();
+    }
+
+    public void sendHeader(String version) {
+        this.info("""
+                
+                
+                &fLagFixer &e%s &7- &fBest Performance Solution!&r
+                &8░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                &8░&e██&6╗&8░░░░░░&e█████&6╗&8░░&e██████&6╗&8░░░&e███████&6╗&e██&6╗&e██&6╗&8░░&e██&6╗&e███████&6╗&e██████&6╗&8░░
+                &8░&e██&6║&8░░░░░&e██&6╔══&e██&6╗&e██&6╔════╝&8░░░&e██&6╔════╝&e██&6║╚&e██&6╗&e██&6╔╝&e██&6╔════╝&e██&6╔══&e██&6╗&8░
+                &8░&e██&6║&8░░░░░&e███████&6║&e██&6║&8░░&e███&6╗&8░░&e█████&6╗&8░░&e██&6║&8░&6╚&e███&6╔╝&8░&e█████&6╗&8░░&e██████&6╔╝&8░
+                &8░&e██&6║&8░░░░░&e██&6╔══&e██&6║&e██&6║&8░░░&e██&6║&8░░&e██&6╔══╝&8░░&e██&6║&8░&e██&6╔&e██&6╗&8░&e██&6╔══╝&8░░&e██&6╔══&e██&6╗&8░
+                &8░&e███████&6╗&e██&6║&8░░&e██&6║╚&e██████&6╔╝&8░░&e██&6║&8░░░░░&e██&6║&e██&6╔╝&8░&e██&6╗&e███████&6╗&e██&6║&8░░&e██&6║&8░
+                &8░&6╚══════╝╚═╝&8░░&6╚═╝&8░&6╚═════╝&8░░░&6╚═╝&8░░░░░&6╚═╝╚═╝&8░░&6╚═╝╚══════╝╚═╝&8░░&6╚═╝&8░
+                &8░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                &fRemember to leave a rating!&r &e★ ★ ★ ★ ★
+                
+                """.formatted(version)
+        );
     }
 
     @Override

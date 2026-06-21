@@ -17,7 +17,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-import xyz.lychee.lagfixer.utils.FastRandom;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -71,18 +70,12 @@ public class AbilityLimiterModule extends AbstractModule implements Listener {
 
                 int duration;
                 ItemMeta meta = firework.getItemMeta();
-                if (meta instanceof FireworkMeta) {
-                    switch (((FireworkMeta) meta).getPower()) {
-                        case 2:
-                            duration = 5;
-                            break;
-                        case 3:
-                            duration = 9;
-                            break;
-                        default:
-                            duration = 3;
-                            break;
-                    }
+                if (meta instanceof FireworkMeta fireworkMeta) {
+                    duration = switch (fireworkMeta.getPower()) {
+                        case 2 -> 5;
+                        case 3 -> 9;
+                        default -> 3;
+                    };
                 } else duration = 3;
 
                 AtomicInteger ai = new AtomicInteger();
@@ -110,10 +103,9 @@ public class AbilityLimiterModule extends AbstractModule implements Listener {
 
         int duraLoss = defaultDuraLoss;
         if (meta.hasEnchant(Enchantment.DURABILITY)) {
-            FastRandom random = new FastRandom();
             float lossChance = 100F / (is.getEnchantmentLevel(Enchantment.DURABILITY) + 1);
             for (int i = 0; i < defaultDuraLoss; i++) {
-                if (random.nextFloat() * 100F < lossChance) {
+                if (Math.random() * 100F < lossChance) {
                     duraLoss++;
                 }
             }

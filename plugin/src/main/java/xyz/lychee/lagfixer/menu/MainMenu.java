@@ -8,11 +8,11 @@ import org.bukkit.inventory.ItemStack;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.commands.MenuCommand;
 import xyz.lychee.lagfixer.managers.ModuleManager;
-import xyz.lychee.lagfixer.managers.MonitorManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractMenu;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-import xyz.lychee.lagfixer.objects.RegionsEntityRaport;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
+import xyz.lychee.lagfixer.objects.WorldsMonitor;
 import xyz.lychee.lagfixer.utils.ItemBuilder;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
@@ -55,26 +55,26 @@ public class MainMenu extends AbstractMenu {
                 "&eClick to modify configuration!"
         );
 
-        MonitorManager monitor = MonitorManager.getInstance();
+        ResourceMonitor resourceMonitor = support.getResourceMonitor();
         i2.setLore(
-                " &8{*} &7Tps: &e" + monitor.getTps(),
-                " &8{*} &7Mspt: &e" + monitor.getMspt(),
-                " &8{*} &7Memory: &e" + monitor.getRamUsed() + "&8/&e" + monitor.getRamTotal() + "&8/&e" + monitor.getRamMax() + " MB",
-                " &8{*} &7Cpu process: &e" + monitor.getCpuProcess() + "&f%",
-                " &8{*} &7Cpu system: &e" + monitor.getCpuSystem() + "&f%",
+                " &8{*} &7Tps: &e" + resourceMonitor.getTps(),
+                " &8{*} &7Mspt: &e" + resourceMonitor.getMspt(),
+                " &8{*} &7Memory: &e" + resourceMonitor.getRamUsed() + "&8/&e" + resourceMonitor.getRamTotal() + "&8/&e" + resourceMonitor.getRamMax() + " MB",
+                " &8{*} &7Cpu process: &e" + resourceMonitor.getCpuProcess() + "&f%",
+                " &8{*} &7Cpu system: &e" + resourceMonitor.getCpuSystem() + "&f%",
                 "",
                 "&eClick to open hardware menu!"
         );
 
-        RegionsEntityRaport raport = support.getRegionsReport();
+        WorldsMonitor worldsMonitor = support.getWorldsMonitor();
         i3.setLore(
-                " &8{*} &7Chunks: &e" + raport.getChunks().toString(),
-                " &8{*} &7Entities: &e" + raport.getEntities().toString(),
-                " &8{*} &7Creatures: &e" + raport.getCreatures().toString(),
-                " &8{*} &7Items: &e" + raport.getItems().toString(),
-                " &8{*} &7Projectiles: &e" + raport.getProjectiles().toString(),
-                " &8{*} &7Vehicles: &e" + raport.getVehicles().toString(),
-                " &8{*} &7Players: &e" + raport.getPlayers().toString() + "&8/&e" + Bukkit.getMaxPlayers(),
+                " &8{*} &7Chunks: &e" + worldsMonitor.getChunks(),
+                " &8{*} &7Entities: &e" + worldsMonitor.getEntities(),
+                " &8{*} &7Creatures: &e" + worldsMonitor.getCreatures(),
+                " &8{*} &7Items: &e" + worldsMonitor.getItems(),
+                " &8{*} &7Projectiles: &e" + worldsMonitor.getProjectiles(),
+                " &8{*} &7Vehicles: &e" + worldsMonitor.getVehicles(),
+                " &8{*} &7Players: &e" + Bukkit.getOnlinePlayers().size() + "&8/&e" + Bukkit.getMaxPlayers(),
                 "",
                 "&eClick to open cleaner menu!"
         );

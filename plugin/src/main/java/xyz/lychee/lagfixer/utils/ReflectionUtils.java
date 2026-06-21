@@ -1,6 +1,5 @@
 package xyz.lychee.lagfixer.utils;
 
-import org.bukkit.Bukkit;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
@@ -50,24 +49,17 @@ public final class ReflectionUtils {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T createInstance(String name, AbstractModule module) {
-        String version = ReflectionUtils.getVersion(name);
+        String version = SupportManager.getInstance().getNmsVersion();
+        if (version == null) return null;
+
         try {
             Class<?> clazz = Class.forName("xyz.lychee.lagfixer.nms." + version + "." + name);
             return (T) clazz.getConstructor(module.getClass()).newInstance(module);
-        } catch (Throwable ex) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException |
+                 InvocationTargetException ex) {
             return null;
-        }
-    }
-
-    public static String getVersion(String clazz) {
-        String versionPackage = Bukkit.getServer().getClass().getPackage().getName();
-        String nmsVersion = versionPackage.substring(versionPackage.lastIndexOf(46) + 1);
-        try {
-            Class.forName("xyz.lychee.lagfixer.nms." + nmsVersion + "." + clazz);
-            return nmsVersion;
-        } catch (ClassNotFoundException ex) {
-            return SupportManager.getInstance().getVersions().get(Bukkit.getServer().getBukkitVersion().split("-")[0]);
         }
     }
 
@@ -83,4 +75,3 @@ public final class ReflectionUtils {
         }
     }
 }
-

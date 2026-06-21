@@ -20,10 +20,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.ModuleManager;
-import xyz.lychee.lagfixer.managers.MonitorManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-import xyz.lychee.lagfixer.utils.ReflectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -172,7 +170,7 @@ public class LagShieldModule extends AbstractModule implements Listener {
     @Override
     public void load() throws Exception {
         this.task = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this.getPlugin(), t -> {
-            double tps = MonitorManager.getInstance().getTps();
+            double tps = SupportManager.getInstance().getResourceMonitor().getTps();
             boolean oldMobAi = this.mobAi;
 
             this.entitySpawn = tps < this.entitySpawn_tps;
@@ -198,7 +196,7 @@ public class LagShieldModule extends AbstractModule implements Listener {
             if (this.dynamic_view_distance) {
                 Integer viewDistance = this.getThreshold(this.dynamic_view_distance_tps, tps);
                 if (viewDistance != null) {
-                    viewDistance = Math.max(Math.min(viewDistance, 32), 2);
+                    viewDistance = Math.clamp(viewDistance, 2, 32);
                     for (World w : this.getAllowedWorlds()) {
                         w.setViewDistance(viewDistance);
                     }
@@ -208,7 +206,7 @@ public class LagShieldModule extends AbstractModule implements Listener {
             if (this.dynamic_simulation_distance) {
                 Integer simulationDistance = this.getThreshold(this.dynamic_simulation_distance_tps, tps);
                 if (simulationDistance != null) {
-                    simulationDistance = Math.max(Math.min(simulationDistance, 32), 2);
+                    simulationDistance = Math.clamp(simulationDistance, 2, 32);
                     for (World w : this.getAllowedWorlds()) {
                         w.setSimulationDistance(simulationDistance);
                     }

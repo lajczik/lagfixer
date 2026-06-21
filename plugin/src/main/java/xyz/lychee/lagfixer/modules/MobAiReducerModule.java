@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
@@ -84,16 +85,29 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         this.mobAiReducer.optimize(e.getEntity(), false);
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onLoad(EntitiesLoadEvent e) {
+        if (this.canContinue(e.getWorld())) {
+            for (Entity entity : e.getEntities()) {
+                if (this.isEnabled(entity)) {
+                    this.mobAiReducer.optimize(entity, false);
+                }
+            }
+        }
+    }
+
     public boolean isEnabled(Entity ent) {
         if ((!this.ignore_models && HookManager.getInstance().getModel().hasModel(ent)) || this.list.contains(ent.getType()) != this.list_mode)
             return false;
 
-        if (ent instanceof Villager) return villagers;
-        if (ent instanceof Tameable) return tameable;
-        if (ent instanceof Flying) return birds;
-        if (ent instanceof Animals) return animals;
-        if (ent instanceof Monster) return monsters;
-        return others;
+        return switch (ent) {
+            case Villager ignored -> villagers;
+            case Tameable ignored -> tameable;
+            case Flying ignored -> birds;
+            case Animals ignored -> animals;
+            case Monster ignored -> monsters;
+            default -> others;
+        };
     }
 
     @Override

@@ -6,7 +6,8 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.managers.CommandManager;
 import xyz.lychee.lagfixer.managers.ErrorsManager;
-import xyz.lychee.lagfixer.managers.MonitorManager;
+import xyz.lychee.lagfixer.managers.SupportManager;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 import xyz.lychee.lagfixer.utils.TimingUtil;
 
@@ -32,12 +33,12 @@ public class BenchmarkCommand extends CommandManager.Subcommand {
             return MessageUtils.sendMessage(true, sender, "&7Benchmark is running, wait for results in console!");
         }
 
-        MonitorManager monitor = MonitorManager.getInstance();
-        if (monitor.getMspt() > 10.0) {
+        ResourceMonitor resourceMonitor = SupportManager.getInstance().getResourceMonitor();
+        if (resourceMonitor.getMspt() > 10.0) {
             return MessageUtils.sendMessage(true, sender, "&7Server MSPT is too &chigh&7, the result may be incorrect!");
         }
 
-        long availableRam = monitor.getRamFree() + (monitor.getRamMax() - monitor.getRamTotal());
+        long availableRam = resourceMonitor.getRamFree() + (resourceMonitor.getRamMax() - resourceMonitor.getRamTotal());
         if (availableRam < 2048) {
             return MessageUtils.sendMessage(true, sender, "&7Server available RAM is too low, you need &c" + availableRam + "&8/&c2048MB");
         }

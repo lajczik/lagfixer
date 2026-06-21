@@ -1,27 +1,21 @@
 package xyz.lychee.lagfixer.managers;
 
-import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.entity.*;
 import xyz.lychee.lagfixer.LagFixer;
-import xyz.lychee.lagfixer.objects.AbstractManager;
-import xyz.lychee.lagfixer.objects.AbstractSupportNms;
-import xyz.lychee.lagfixer.objects.RegionsEntityRaport;
-import xyz.lychee.lagfixer.utils.ReflectionUtils;
+import xyz.lychee.lagfixer.objects.*;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.Executors;
 
 @Getter
 @Setter
@@ -29,14 +23,22 @@ public class SupportManager extends AbstractManager {
     private static @Getter SupportManager instance;
 
     private final Map<String, String> versions = new HashMap<>();
-    private final RegionsEntityRaport regionsReport = new RegionsEntityRaport();
-    private AbstractSupportNms nms = null;
-    private ScheduledTask task = null;
+    private String nmsVersion = null;
+    private ISupportNms nms = null;
+    private ResourceMonitor resourceMonitor;
+    private WorldsMonitor worldsMonitor;
+    private HttpClient client = HttpClient.newBuilder()
+            .executor(Executors.newSingleThreadExecutor())
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
 
     public SupportManager(LagFixer plugin) {
         super(plugin);
 
         instance = this;
+
+        this.resourceMonitor = new ResourceMonitor(plugin);
+        this.worldsMonitor = new WorldsMonitor(plugin);
 
         this.versions.put("1.20.5", "v1_20_R4");
         this.versions.put("1.20.6", "v1_20_R4");
@@ -52,89 +54,57 @@ public class SupportManager extends AbstractManager {
         this.versions.put("1.21.9", "v1_21_R6");
         this.versions.put("1.21.10", "v1_21_R6");
         this.versions.put("1.21.11", "v1_21_R7");
+
+        this.versions.put("26.1", "v26_1");
+        this.versions.put("26.2", "v26_1");
+        this.versions.put("26.3", "v26_1");
+        this.versions.put("26.4", "v26_1");
+        this.versions.put("26.5", "v26_1");
+        this.versions.put("27.1", "v26_1");
+        this.versions.put("27.2", "v26_1");
+        this.versions.put("27.3", "v26_1");
     }
 
     @Override
     public void load() {
-        try {
-            String version = ReflectionUtils.getVersion("SupportNms");
-            Class<?> clazz = Class.forName("xyz.lychee.lagfixer.nms." + version + ".SupportNms");
-            this.nms = (AbstractSupportNms) clazz.getConstructor(LagFixer.class).newInstance(this.getPlugin());
-            this.getPlugin().getLogger().info(" &8• &rLoaded nms support ~ " + this.nms.getClass().getCanonicalName());
-        } catch (Throwable ex) {
-            this.getPlugin().getLogger().info("   &cOptimal support folia not found!");
-            this.getPlugin().getLogger().info("   &7Supported versions: &e1.20.1 - 1.21.11");
-            Bukkit.getPluginManager().disablePlugin(this.getPlugin());
-            return;
+        Server server = Bukkit.getServer();
+        String version = server.getBukkitVersion().split("-")[0];
+
+        if (!version.startsWith("1.")) {
+            String[] parts = version.split("\\.");
+            if (parts.length >= 2) {
+                version = parts[0] + "." + parts[1];
+            }
         }
 
-        this.task = Bukkit.getAsyncScheduler()
-                .runAtFixedRate(
-                        this.getPlugin(),
-                        t -> {
-                            LongAdder chunksAdder = new LongAdder();
-                            LongAdder entitiesAdder = new LongAdder();
-                            LongAdder playersAdder = new LongAdder();
-                            LongAdder creaturesAdder = new LongAdder();
-                            LongAdder itemsAdder = new LongAdder();
-                            LongAdder vehiclesAdder = new LongAdder();
-                            LongAdder projectilesAdder = new LongAdder();
+        if (this.versions.containsKey(version)) {
+            this.nmsVersion = this.versions.get(version);
+        } else {
+            String[] parts = server.getClass().getPackage().getName().split("\\.");
+            String lastPart = parts[parts.length - 1];
+            if (lastPart.matches("v\\d+_\\d+_R\\d+")) {
+                this.nmsVersion = lastPart;
+            } else {
+                this.getPlugin().getLogger().info("   &cPlugin is outdated, update from:");
+                this.getPlugin().getLogger().info("   &chttps://modrinth.com/plugin/lagfixer");
+                this.nms = new DeprecatedSupportNms();
+            }
+        }
 
-                            List<CompletableFuture<Void>> futures = new ArrayList<>();
+        if (this.nms == null) {
+            try {
+                Class<?> clazz = Class.forName("xyz.lychee.lagfixer.nms." + this.nmsVersion + ".SupportNms");
+                this.nms = (ISupportNms) clazz.getConstructor().newInstance();
+                this.getPlugin().getLogger().info(" &8• &rLoaded nms support ~ " + this.nms.getClass().getCanonicalName());
+            } catch (Throwable ex) {
+                this.getPlugin().getLogger().info("   &cOptimal support for "+this.nmsVersion+" not found!");
+                this.getPlugin().getLogger().info("   &7Supported versions: &e1.20 - 26.2");
+                this.nms = new DeprecatedSupportNms();
+            }
+        }
 
-                            for (World world : Bukkit.getWorlds()) {
-                                if (world.getPlayers().isEmpty()) continue;
-
-                                playersAdder.add(world.getPlayerCount());
-
-                                RegionScheduler scheduler = Bukkit.getServer().getRegionScheduler();
-
-                                Map<RegionPos, List<Chunk>> regions = SupportManager.createRegionMap(world);
-                                regions.forEach((regionPos, chunks) -> {
-                                    chunksAdder.add(chunks.size());
-
-                                    Executor executor = task -> scheduler.execute(this.getPlugin(), world, regionPos.getX() << 3, regionPos.getZ() << 3, task);
-                                    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                                        for (Chunk chunk : chunks) {
-                                            for (Entity ent : chunk.getEntities()) {
-                                                if (ent instanceof Mob) {
-                                                    creaturesAdder.increment();
-                                                } else if (ent instanceof Item) {
-                                                    itemsAdder.increment();
-                                                } else if (ent instanceof Projectile) {
-                                                    projectilesAdder.increment();
-                                                } else if (ent instanceof Vehicle) {
-                                                    vehiclesAdder.increment();
-                                                }
-                                                entitiesAdder.increment();
-                                            }
-                                        }
-                                    }, executor);
-
-                                    futures.add(future);
-                                });
-                            }
-
-                            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                                    .orTimeout(5, TimeUnit.SECONDS)
-                                    .thenAccept(v -> {
-                                        this.regionsReport.setChunks(chunksAdder);
-                                        this.regionsReport.setEntities(entitiesAdder);
-                                        this.regionsReport.setPlayers(playersAdder);
-                                        this.regionsReport.setCreatures(creaturesAdder);
-                                        this.regionsReport.setItems(itemsAdder);
-                                        this.regionsReport.setProjectiles(projectilesAdder);
-                                        this.regionsReport.setVehicles(vehiclesAdder);
-                                    })
-                                    .exceptionally(ex -> {
-                                        this.getPlugin().printError(ex);
-                                        return null;
-                                    });
-                        },
-                        30,
-                        30,
-                        TimeUnit.SECONDS
-                );
+        this.resourceMonitor.start();
+        this.worldsMonitor.start();
     }
 
     public static Map<RegionPos, List<Chunk>> createRegionMap(World world) {
@@ -151,11 +121,7 @@ public class SupportManager extends AbstractManager {
     }
 
     @Override
-    public void disable() {
-        if (this.task != null) {
-            this.task.cancel();
-        }
-    }
+    public void disable() {}
 
     @Override
     public boolean isEnabled() {

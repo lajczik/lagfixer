@@ -74,8 +74,7 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         if (event.getSource().getType() == InventoryType.HOPPER) {
             InventoryHolder holder = event.getSource().getHolder();
-            if (holder instanceof Hopper) {
-                Hopper hopper = (Hopper) holder;
+            if (holder instanceof Hopper hopper) {
                 if (shouldBlockTransfer(hopper, event)) {
                     event.setCancelled(true);
                     return;

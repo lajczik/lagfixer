@@ -71,7 +71,7 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
         e.setCancelled(this.handleEvent(e.getSpawnLocation(), e.getReason(), e.getType(), this.creatures, ent -> ent instanceof Mob));
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    /*@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPreSpawnerSpawn(PreSpawnerSpawnEvent e) {
         e.setCancelled(this.handleEvent(e.getSpawnLocation(), e.getReason(), e.getType(), this.creatures, ent -> ent instanceof Mob));
     }
@@ -79,7 +79,7 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onSpawnerSpawn(SpawnerSpawnEvent e) {
         e.setCancelled(this.handleEvent(e.getLocation(), CreatureSpawnEvent.SpawnReason.SPAWNER, e.getEntityType(), this.creatures, ent -> ent instanceof Mob));
-    }
+    }*/
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent e) {

@@ -32,7 +32,7 @@ public class ReloadCommand extends CommandManager.Subcommand {
             TimingUtil t = TimingUtil.startNew();
 
             LagFixer plugin = this.getCommandManager().getPlugin();
-            plugin.sendHeader();
+            plugin.getLogger().sendHeader(plugin.getDescription().getVersion());
 
             plugin.reloadConfig();
             try {

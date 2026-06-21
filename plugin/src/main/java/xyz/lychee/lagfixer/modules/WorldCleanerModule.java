@@ -3,6 +3,8 @@ package xyz.lychee.lagfixer.modules;
 import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -27,7 +29,8 @@ import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-import xyz.lychee.lagfixer.objects.RegionsEntityRaport;
+import xyz.lychee.lagfixer.objects.RegionsEntityReport;
+import xyz.lychee.lagfixer.objects.WorldsMonitor;
 import xyz.lychee.lagfixer.utils.ItemBuilder;
 import xyz.lychee.lagfixer.utils.ReflectionUtils;
 
@@ -73,6 +76,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
     private int items_timelived;
     private boolean items_abyss_enabled;
     private boolean items_abyss_alerts;
+    private Sound items_abyss_open_sound;
     private boolean items_abyss_itemdespawn;
     private String items_abyss_permission;
     private int items_abyss_close;
@@ -145,9 +149,9 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.getPlugin(), t1 -> {
             if (--this.second <= 0) {
                 List<CompletableFuture<Void>> futures = new ArrayList<>();
-                RegionsEntityRaport raport = new RegionsEntityRaport();
+                RegionsEntityReport report = new RegionsEntityReport();
                 for (World world : this.getAllowedWorlds()) {
-                    this.purgeAll(world, futures, raport);
+                    this.purgeAll(world, futures, report);
                 }
 
                 String message = this.alerts_enabled ? this.messages.get(this.second) : null;
@@ -157,9 +161,9 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                             if (message != null) {
                                 Component text = Language.createComponent(message, true,
                                         Placeholder.unparsed("remaining", Integer.toString(this.second)),
-                                        Placeholder.unparsed("items", raport.getItems().toString()),
-                                        Placeholder.unparsed("creatures", raport.getCreatures().toString()),
-                                        Placeholder.unparsed("projectiles", raport.getProjectiles().toString())
+                                        Placeholder.unparsed("items", report.getItems().toString()),
+                                        Placeholder.unparsed("creatures", report.getCreatures().toString()),
+                                        Placeholder.unparsed("projectiles", report.getProjectiles().toString())
                                 );
 
                                 this.sendAlert(text);
@@ -217,13 +221,13 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
 
                 this.second = this.interval + 1;
             } else if (this.alerts_enabled && this.messages.containsKey(this.second)) {
-                RegionsEntityRaport regionsReport = SupportManager.getInstance().getRegionsReport();
+                WorldsMonitor worldsMonitor = SupportManager.getInstance().getWorldsMonitor();
 
                 Component text = Language.createComponent(this.messages.get(this.second), true,
                         Placeholder.unparsed("remaining", Integer.toString(this.second)),
-                        Placeholder.unparsed("items", regionsReport.getItems().toString()),
-                        Placeholder.unparsed("creatures", regionsReport.getCreatures().toString()),
-                        Placeholder.unparsed("projectiles", regionsReport.getProjectiles().toString())
+                        Placeholder.unparsed("items", Long.toString(worldsMonitor.getItems())),
+                        Placeholder.unparsed("creatures", Long.toString(worldsMonitor.getCreatures())),
+                        Placeholder.unparsed("projectiles", Long.toString(worldsMonitor.getProjectiles()))
                 );
 
                 this.sendAlert(text);
@@ -318,6 +322,26 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
             this.items_abyss_enabled = this.getSection().getBoolean("items.abyss.enabled");
             if (this.items_abyss_enabled) {
                 this.items_abyss_alerts = this.getSection().getBoolean("items.abyss.alerts");
+
+                boolean open_sound = this.getSection().getBoolean("items.abyss.open_sound.enabled");
+                if (open_sound) {
+                    double volume = this.getSection().getDouble("items.abyss.open_sound.volume");
+                    double pitch = this.getSection().getDouble("items.abyss.open_sound.pitch");
+                    String sound = this.getSection().getString("items.abyss.open_sound.sound");
+
+                    if (sound != null && !sound.isEmpty()) {
+                        try {
+                            this.items_abyss_open_sound = Sound.sound(
+                                    Key.key(Key.MINECRAFT_NAMESPACE, sound.toLowerCase()),
+                                    Sound.Source.MASTER,
+                                    (float) Math.clamp(volume, 0.0, 1.0),
+                                    (float) Math.clamp(pitch, 0.0, 2.0)
+                            );
+                        } catch (Exception e) {
+                            this.items_abyss_open_sound = null;
+                        }
+                    }
+                }
                 this.items_abyss_permission = this.getSection().getString("items.abyss.permission");
                 this.items_abyss_itemdespawn = this.getSection().getBoolean("items.abyss.item_despawn");
                 this.items_abyss_close = this.getSection().getInt("items.abyss.close");
@@ -372,7 +396,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         }
     }
 
-    public void purgeAll(World world, List<CompletableFuture<Void>> into, RegionsEntityRaport raport) {
+    public void purgeAll(World world, List<CompletableFuture<Void>> into, RegionsEntityReport report) {
         HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
         RegionScheduler scheduler = Bukkit.getServer().getRegionScheduler();
 
@@ -382,13 +406,13 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 for (Chunk chunk : chunks) {
                     Entity[] entities = chunk.getEntities();
-                    raport.getEntities().add(entities.length);
+                    report.getEntities().add(entities.length);
                     for (Entity ent : entities) {
                         if (ent instanceof Mob creature) {
                             if (this.isCreatures_enabled() && this.clearCreature(creature)) {
                                 if (this.isCreatures_dropitems()) creature.damage(Double.MAX_VALUE);
                                 else creature.remove();
-                                raport.getCreatures().increment();
+                                report.getCreatures().increment();
                             }
                         } else if (ent instanceof Item item) {
                             if (this.isItems_enabled() && this.clearItem(item)) {
@@ -401,12 +425,12 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                                     }
                                 }
                                 item.remove();
-                                raport.getItems().increment();
+                                report.getItems().increment();
                             }
                         } else if (ent instanceof Projectile projectile) {
                             if (this.isProjectiles_enabled() && this.clearProjectile(projectile)) {
                                 projectile.remove();
-                                raport.getProjectiles().increment();
+                                report.getProjectiles().increment();
                             }
                         }
                     }
@@ -517,7 +541,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                 if (inventories.isEmpty()) {
                     text = getLanguage().getComponent("items.abyss.empty", true);
                 } else {
-                    ((Player) sender).openInventory(inventories.get(0));
+                    ((Player) sender).openInventory(inventories.getFirst());
                     text = getLanguage().getComponent("items.abyss.opened", true);
                 }
             } else {

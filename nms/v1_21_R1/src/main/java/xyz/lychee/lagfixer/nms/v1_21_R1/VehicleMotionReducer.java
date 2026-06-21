@@ -1,5 +1,6 @@
 package xyz.lychee.lagfixer.nms.v1_21_R1;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.*;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
@@ -16,15 +17,15 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
     private static final IdentityHashMap<Class<? extends VehicleEntity>, Function<VehicleEntity, VehicleEntity>> VEHICLES = new IdentityHashMap<>(10);
 
     static {
-        VEHICLES.put(Boat.class, e -> new OptimizedEntities.OBoat((Boat) e));
-        VEHICLES.put(ChestBoat.class, e -> new OptimizedEntities.OChestBoat((ChestBoat) e));
+        VEHICLES.put(Boat.class, e -> new VehicleWrapper.OBoat((Boat) e));
+        VEHICLES.put(ChestBoat.class, e -> new VehicleWrapper.OChestBoat((ChestBoat) e));
 
-        VEHICLES.put(MinecartChest.class, e -> new OptimizedEntities.OMinecartChest((MinecartChest) e));
-        VEHICLES.put(MinecartHopper.class, e -> new OptimizedEntities.OMinecartHopper((MinecartHopper) e));
-        VEHICLES.put(MinecartFurnace.class, e -> new OptimizedEntities.OMinecartFurnace((MinecartFurnace) e));
-        VEHICLES.put(MinecartSpawner.class, e -> new OptimizedEntities.OMinecartSpawner((MinecartSpawner) e));
-        VEHICLES.put(MinecartTNT.class, e -> new OptimizedEntities.OMinecartTNT((MinecartTNT) e));
-        VEHICLES.put(Minecart.class, e -> new OptimizedEntities.OMinecart((Minecart) e));
+        VEHICLES.put(MinecartChest.class, e -> new VehicleWrapper.OMinecartChest((MinecartChest) e));
+        VEHICLES.put(MinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper((MinecartHopper) e));
+        VEHICLES.put(MinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace((MinecartFurnace) e));
+        VEHICLES.put(MinecartSpawner.class, e -> new VehicleWrapper.OMinecartSpawner((MinecartSpawner) e));
+        VEHICLES.put(MinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT((MinecartTNT) e));
+        VEHICLES.put(Minecart.class, e -> new VehicleWrapper.OMinecart((Minecart) e));
     }
 
     public VehicleMotionReducer(VehicleMotionReducerModule module) {
@@ -32,28 +33,21 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
     }
 
     @Override
-    public boolean optimizeVehicle(Vehicle vehicle) {
-        if (vehicle instanceof CraftBoat) {
+    public boolean optimizeVehicle(org.bukkit.entity.Entity vehicle) {
+        if (vehicle instanceof CraftBoat boat) {
             if (!this.getModule().isBoat()) return false;
 
-            return this.processEntity(((CraftBoat) vehicle).getHandle());
-        } else if (vehicle instanceof CraftMinecart) {
+            return this.processEntity(boat.getHandle());
+        } else if (vehicle instanceof CraftMinecart minecart) {
             if (!this.getModule().isMinecart()) return false;
 
-            if (vehicle instanceof CraftMinecartChest && getModule().isMinecart_remove_chest()) {
-                AbstractMinecartContainer mc = ((CraftMinecartChest) vehicle).getHandle();
-                mc.clearContent();
-                mc.removeVehicle();
-                return true;
-            }
-
-            return this.processEntity(((CraftMinecart) vehicle).getHandle());
+            return this.processEntity(minecart.getHandle());
         }
         return false;
     }
 
     private boolean processEntity(VehicleEntity original) {
-        if (original instanceof OptimizedEntities) return false;
+        if (original instanceof VehicleWrapper) return false;
 
         Function<VehicleEntity, ? extends VehicleEntity> factory = VEHICLES.get(original.getClass());
         if (factory == null) return false;
@@ -61,21 +55,22 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
         VehicleEntity newVehicle = factory.apply(original);
         newVehicle.setSilent(true);
         copyLocation(original, newVehicle);
-        transferItems(original, newVehicle);
+        copyItems(original, newVehicle);
 
         original.removeVehicle();
         original.level().addFreshEntity(newVehicle);
         return true;
     }
 
-    private void transferItems(VehicleEntity from, VehicleEntity to) {
-        if (from instanceof ContainerEntity && to instanceof ContainerEntity) {
-            for (ItemStack stack : ((ContainerEntity) from).getItemStacks()) {
-                if (!stack.isEmpty()) {
-                    ((ContainerEntity) to).getItemStacks().add(stack);
+    private void copyItems(Entity from, Entity to) {
+        if (from instanceof ContainerEntity fromContainer && to instanceof ContainerEntity toContainer) {
+            for (int i = 0; i < fromContainer.getContainerSize(); i++) {
+                ItemStack is = fromContainer.getItem(i);
+                if (!is.isEmpty()) {
+                    toContainer.setItem(i, is.copyAndClear());
                 }
             }
-            ((ContainerEntity) from).clearItemStacks();
+            fromContainer.clearContent();
         }
     }
 

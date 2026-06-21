@@ -7,23 +7,20 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.Language;
+import xyz.lychee.lagfixer.managers.ConfigManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.menu.ConfigMenu;
 import xyz.lychee.lagfixer.utils.ItemBuilder;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -34,7 +31,7 @@ public abstract class AbstractModule {
     private final Impact impact;
     private final String name;
     private final String[] description;
-    private final ItemStack baseSkull;
+    private final ItemBuilder baseSkull;
     private final YamlConfiguration config;
     private final ConfigMenu menu;
     private ConfigurationSection section;
@@ -48,25 +45,25 @@ public abstract class AbstractModule {
         this.impact = impact;
         this.name = name;
         this.description = description;
-        this.baseSkull = ItemBuilder.createSkull(texture).build();
+        this.baseSkull = ItemBuilder.createSkull(texture);
         this.config = new YamlConfiguration();
         this.language = new Language(this);
 
         try {
             this.loadConfigSection();
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             this.plugin.printError(ex);
         }
 
-        ConfigurationSection defSection = this.section.getDefaultSection() == null ? this.section : this.section.getDefaultSection();
-
-        long valueCount = defSection.getValues(true).entrySet().stream()
-                .filter(e -> !(e.getValue() instanceof ConfigurationSection))
+        long valueCount = this.section.getValues(true)
+                .values()
+                .stream()
+                .filter(v -> !(v instanceof ConfigurationSection))
                 .count();
 
-        int size = (int) Math.max(9, Math.min(45, ((valueCount + 8) / 9) * 9)) + 9;
+        int size = Math.clamp(((valueCount + 8) / 9) * 9, 9, 45) + 9;
 
-        this.menu = new ConfigMenu(this.plugin, defSection, size, this);
+        this.menu = new ConfigMenu(this.plugin, size, this);
     }
 
     public boolean loadAllConfig() throws Exception {
@@ -75,81 +72,27 @@ public abstract class AbstractModule {
         return this.loadConfig();
     }
 
-    public void loadConfigSection() throws Exception {
-        this.loadConfigFile();
+    public void loadConfigSection() throws IOException, InvalidConfigurationException {
+        ConfigManager.loadConfig(this.plugin, this.config, "modules/" + this.name + ".yml");
 
         this.section = this.config.getConfigurationSection(this.name + ".values");
 
         this.worlds.clear();
-        this.worlds.addAll(this.config.getStringList(this.name + ".worlds"));
-        this.canContinue = this.worlds.isEmpty() ? -1 : this.worlds.contains("*") ? 1 : 0;
-    }
 
-    public void loadConfigFile() throws Exception {
-        String resourcePath = "modules/" + this.name + ".yml";
-
-        InputStream defStream = this.plugin.getResource(resourcePath);
-        if (defStream == null) {
-            this.plugin.getLogger().warning("Couldn't find config file " + this.name + ".yml in resources");
-            return;
-        }
-
-        YamlConfiguration defaultConfig;
-        try (InputStreamReader r = new InputStreamReader(defStream, StandardCharsets.UTF_8)) {
-            defaultConfig = YamlConfiguration.loadConfiguration(r);
-        }
-
-        File configFile = new File(this.plugin.getDataFolder(), resourcePath);
-
-        if (configFile.exists()) {
-            this.config.load(configFile);
-            this.config.setDefaults(defaultConfig);
-            this.config.options().copyDefaults(true);
-            this.config.save(configFile);
-            return;
-        }
-
-        File parent = configFile.getParentFile();
-        if (!parent.exists() && !parent.mkdirs()) {
-            this.plugin.getLogger().warning("Could not create directory: " + parent);
-        }
-
-        FileConfiguration mainCfg = this.plugin.getConfig();
-        String sectionPath = "modules." + this.name;
-        if (mainCfg.isConfigurationSection(sectionPath)) {
-            ConfigurationSection section = mainCfg.getConfigurationSection(sectionPath);
-            if (section != null) {
-                this.config.set(this.name, section);
-                this.config.setDefaults(defaultConfig);
-                this.config.options().copyDefaults(true);
-                this.config.save(configFile);
-
-                mainCfg.set(sectionPath, "Configuration has been moved to \"LagFixer/modules/" + this.name + ".yml\"");
-                return;
-            }
-        }
-
-        this.plugin.saveResource(resourcePath, false);
-        this.config.load(configFile);
-        this.config.setDefaults(defaultConfig);
-        this.config.options().copyDefaults(true);
-        this.config.save(configFile);
+        List<String> list = this.config.getStringList(this.name + ".worlds");
+        this.canContinue = list.isEmpty() ? -1 : list.contains("*") ? 1 : 0;
+        if (this.canContinue == 0) this.worlds.addAll(list);
     }
 
     public boolean canContinue(World w) {
         return this.canContinue == 0 ? this.worlds.contains(w.getName()) : this.canContinue == 1;
     }
 
-    public Stream<World> getAllowedWorldsStream() {
-        return Bukkit.getWorlds().stream().filter(this::canContinue);
-    }
-
     public Set<World> getAllowedWorlds() {
         HashSet<World> set = new HashSet<>();
         for (World world : Bukkit.getWorlds()) {
-            if (this.canContinue(world)) {
+            if (this.canContinue(world))
                 set.add(world);
-            }
         }
         return Collections.unmodifiableSet(set);
     }

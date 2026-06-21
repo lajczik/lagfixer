@@ -17,6 +17,7 @@ import xyz.lychee.lagfixer.utils.MessageUtils;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class UpdaterManager extends AbstractManager implements Listener {
 
         this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.getPlugin(), t -> {
             try {
-                URL url = new URL("https://api.modrinth.com/v2/project/lagfixer/version");
+                URL url = URI.create("https://api.modrinth.com/v2/project/lagfixer/version").toURL();
                 InputStreamReader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
                 Type listType = new TypeToken<ArrayList<ModrinthVersion>>() {}.getType();
                 List<ModrinthVersion> versions = gson.fromJson(reader, listType);

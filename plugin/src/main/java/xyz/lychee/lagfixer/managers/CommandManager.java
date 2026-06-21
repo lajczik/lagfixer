@@ -23,8 +23,7 @@ public class CommandManager extends AbstractManager {
     private static @Getter CommandManager instance;
     private final HashMap<String, Subcommand> subcommands = new HashMap<>();
     private final HashMap<String, Subcommand> subcommandsWithAliases = new HashMap<>();
-    private Command command;
-    private String permission;
+    private LagFixerCommand command;
 
     public CommandManager(LagFixer plugin) {
         super(plugin);
@@ -60,8 +59,7 @@ public class CommandManager extends AbstractManager {
             subcommand.load();
         }
 
-        this.permission = this.getPlugin().getConfig().getString("main.command.permission");
-        this.command = new Command(this.getPlugin().getConfig().getStringList("main.command.aliases"));
+        this.command = new LagFixerCommand(this.getPlugin().getConfig().getStringList("main.command_aliases"));
         Bukkit.getCommandMap().register(this.command.getName(), this.command);
     }
 
@@ -106,19 +104,33 @@ public class CommandManager extends AbstractManager {
         }
     }
 
-    public class Command extends BukkitCommand {
-        public Command(List<String> aliases) {
+    public class LagFixerCommand extends BukkitCommand {
+        public LagFixerCommand(List<String> aliases) {
             super("lagfixer", "Main lagfixer command", "/lagfixer <" + String.join("|", subcommands.keySet()) + ">", aliases);
         }
 
         @Override
         public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-            if (!sender.hasPermission(permission)) {
-                Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", permission));
-                if (text == null) {
-                    return false;
+            if (args.length > 0) {
+                Subcommand cmd = subcommandsWithAliases.get(args[0].toLowerCase());
+                if (cmd != null) {
+                    if (!sender.hasPermission("lagfixer.command."+cmd.getName())) {
+                        Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", "lagfixer.command."+cmd.getName()));
+                        if (text != null) {
+                            sender.sendMessage(text);
+                        }
+                        return false;
+                    }
+                    String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
+                    return cmd.execute(sender, subArgs);
                 }
-                sender.sendMessage(text);
+            }
+
+            if (!sender.hasPermission("lagfixer.command")) {
+                Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", "lagfixer.command"));
+                if (text != null) {
+                    sender.sendMessage(text);
+                }
                 return false;
             }
 

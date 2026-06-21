@@ -2,7 +2,8 @@ package xyz.lychee.lagfixer.commands;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.managers.CommandManager;
-import xyz.lychee.lagfixer.managers.MonitorManager;
+import xyz.lychee.lagfixer.managers.SupportManager;
+import xyz.lychee.lagfixer.objects.ResourceMonitor;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 public class MonitorCommand extends CommandManager.Subcommand {
@@ -18,13 +19,13 @@ public class MonitorCommand extends CommandManager.Subcommand {
 
     @Override
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {
-        MonitorManager monitor = MonitorManager.getInstance();
+        ResourceMonitor resourceMonitor = SupportManager.getInstance().getResourceMonitor();
         return MessageUtils.sendMessage(true, sender,
                 "&7Command result: " +
-                        "\n &8{*} &fTps: &e" + monitor.getTps() +
-                        "\n &8{*} &fMspt: &e" + monitor.getMspt() +
-                        "\n &8{*} &fMemory: &e" + monitor.getRamUsed() + "&8/&e" + monitor.getRamTotal() + "&8/&e" + monitor.getRamMax() + " MB" +
-                        "\n &8{*} &fCpu process: &e" + monitor.getCpuProcess() + "%" +
-                        "\n &8{*} &fCpu system: &e" + monitor.getCpuSystem() + "%");
+                        "\n &8{*} &fTps: &e" + resourceMonitor.getTps() +
+                        "\n &8{*} &fMspt: &e" + resourceMonitor.getMspt() +
+                        "\n &8{*} &fMemory: &e" + resourceMonitor.getRamUsed() + "&8/&e" + resourceMonitor.getRamTotal() + "&8/&e" + resourceMonitor.getRamMax() + " MB" +
+                        "\n &8{*} &fCpu process: &e" + resourceMonitor.getCpuProcess() + "%" +
+                        "\n &8{*} &fCpu system: &e" + resourceMonitor.getCpuSystem() + "%");
     }
 }

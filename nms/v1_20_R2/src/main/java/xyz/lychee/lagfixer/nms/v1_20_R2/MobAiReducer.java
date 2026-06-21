@@ -19,22 +19,17 @@ import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.animal.sniffer.Sniffer;
 import net.minecraft.world.entity.monster.Strider;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftCreature;
-import org.bukkit.craftbukkit.v1_20_R2.event.CraftEventFactory;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
-import org.bukkit.event.world.EntitiesLoadEvent;
 import xyz.lychee.lagfixer.modules.MobAiReducerModule;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
+public class MobAiReducer extends MobAiReducerModule.NMS {
     private final Map<PathfinderMob, Boolean> optimizedMobs = new MapMaker().weakKeys().concurrencyLevel(4).makeMap();
     private final Map<Class<? extends Entity>, TargetingConditions> temptTargeting = new HashMap<>();
     private final TargetingConditions breedTargeting = TargetingConditions.forNonCombat().ignoreLineOfSight();
@@ -117,12 +112,13 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
 
                 if (isAnimal && module.isBreedEnabled() && goalClass == BreedGoal.class) {
                     toRemove.add(pgw);
-                    toAdd.add(new WrappedGoal(pgw.getPriority(), new OptimizedBreedGoal((Animal) handle)));
+                    toAdd.add(new WrappedGoal(pgw.getPriority(), new OptimizedBreedGoal(this.getModule(), (Animal) handle, this.breedTargeting)));
                     continue;
                 }
+
                 if (module.isTemptEnabled() && goalClass == TemptGoal.class && temptTargeting != null) {
                     toRemove.add(pgw);
-                    toAdd.add(new WrappedGoal(pgw.getPriority(), new OptimizedTemptGoal(handle, temptTargeting)));
+                    toAdd.add(new WrappedGoal(pgw.getPriority(), new OptimizedTemptGoal(this.getModule(), handle, temptTargeting)));
                     continue;
                 }
 
@@ -141,102 +137,6 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
     public void purge() {
         synchronized (this.optimizedMobs) {
             this.optimizedMobs.keySet().removeIf(ent -> !ent.isAlive() || !ent.valid);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onLoad(EntitiesLoadEvent e) {
-        if (this.getModule().canContinue(e.getWorld())) {
-            this.optimizeEntities(e.getEntities());
-        }
-    }
-
-    public void optimizeEntities(List<org.bukkit.entity.Entity> list) {
-        for (org.bukkit.entity.Entity entity : list) {
-            if (this.getModule().isEnabled(entity)) {
-                this.optimize(entity, false);
-            }
-        }
-    }
-
-    public class OptimizedTemptGoal extends Goal {
-        private final PathfinderMob mob;
-        private final TargetingConditions targeting;
-        private int cooldown = 0;
-        private Player targetPlayer;
-
-        public OptimizedTemptGoal(PathfinderMob mob, TargetingConditions targeting) {
-            this.mob = mob;
-            this.targeting = targeting;
-            setFlags(EnumSet.of(Flag.MOVE));
-        }
-
-        public boolean canUse() {
-            if (this.cooldown > 0) {
-                this.cooldown--;
-                return false;
-            }
-            this.targetPlayer = this.mob.level().getNearestPlayer(this.targeting, this.mob);
-            if (this.targetPlayer == null) return false;
-
-            if (getModule().isTemptEvent()) {
-                EntityTargetLivingEntityEvent event = CraftEventFactory.callEntityTargetLivingEvent(this.mob, this.targetPlayer, EntityTargetEvent.TargetReason.TEMPT);
-                return !event.isCancelled();
-            }
-            return true;
-        }
-
-        public void tick() {
-            if (this.mob.distanceToSqr(this.targetPlayer) >= 6.25d || getModule().isTemptTeleport()) {
-                if (getModule().isTemptTeleport()) {
-                    this.mob.teleportTo(this.targetPlayer.getX(), this.targetPlayer.getY(), this.targetPlayer.getZ());
-                } else {
-                    this.mob.getNavigation().moveTo(this.targetPlayer, this.mob instanceof Animal ? getModule().getTemptSpeed() : 0.35d);
-                }
-            } else {
-                this.mob.getNavigation().stop();
-            }
-            this.cooldown = getModule().getTemptCooldown();
-        }
-    }
-
-    public class OptimizedBreedGoal extends Goal {
-        protected final Animal animal;
-        protected Animal partner;
-
-        public OptimizedBreedGoal(Animal entityanimal) {
-            this.animal = entityanimal;
-            setFlags(EnumSet.of(Flag.MOVE));
-        }
-
-        public boolean canUse() {
-            if (!this.animal.isInLove()) return false;
-
-            this.partner = getFreePartner();
-            if (this.partner == null || !this.partner.isAlive() || !this.partner.isInLove()) return false;
-
-            if (getModule().isBreedEvent()) {
-                EntityTargetLivingEntityEvent event = CraftEventFactory.callEntityTargetLivingEvent(this.animal, this.partner, EntityTargetEvent.TargetReason.CUSTOM);
-                return !event.isCancelled();
-            }
-            return true;
-        }
-
-        public void tick() {
-            if (getModule().isBreedTeleport()) {
-                this.animal.teleportTo(this.partner.getX(), this.partner.getY(), this.partner.getZ());
-            } else {
-                this.animal.getNavigation().moveTo(this.partner, getModule().getBreedSpeed());
-            }
-            this.animal.spawnChildFromBreeding(this.animal.level().getMinecraftWorld(), this.partner);
-        }
-
-        private Animal getFreePartner() {
-            List<? extends Animal> nearbyEntities = this.animal.level().getNearbyEntities(this.animal.getClass(), MobAiReducer.this.breedTargeting, this.animal, this.animal.getBoundingBox().inflate(8.0d));
-            return nearbyEntities.stream()
-                    .filter(this.animal::canMate)
-                    .min(Comparator.comparingDouble(other -> other.distanceToSqr(this.animal)))
-                    .orElse(null);
         }
     }
 }

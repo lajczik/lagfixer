@@ -2,31 +2,27 @@ package xyz.lychee.lagfixer.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
+import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.Language;
 import xyz.lychee.lagfixer.hooks.PlaceholderAPIHook;
 import xyz.lychee.lagfixer.managers.ConfigManager;
 import xyz.lychee.lagfixer.managers.HookManager;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
-public class MessageUtils extends JavaPlugin {
+public class MessageUtils {
     private static final Map<String, String> REPLACEMENTS;
 
     static {
-        Map<String, String> map = new HashMap<>();
-        map.put("{*}", "•");
-        map.put("{>>}", "»");
-        map.put("{<<}", "«");
-
-        REPLACEMENTS = Collections.unmodifiableMap(map);
+        REPLACEMENTS = Map.of(
+                "{*}", "•",
+                "{>>}", "»",
+                "{<<}", "«"
+        );
     }
 
     public static String fixColors(@Nullable CommandSender sender, String message) {
@@ -45,7 +41,7 @@ public class MessageUtils extends JavaPlugin {
 
     private static String applyReplacements(String text) {
         for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet()) {
-            text = StringUtils.replace(text, entry.getKey(), entry.getValue());
+            text = text.replace(entry.getKey(), entry.getValue());
         }
         return text;
     }
@@ -54,14 +50,19 @@ public class MessageUtils extends JavaPlugin {
         if (sender instanceof Player) {
             PlaceholderAPIHook papi = HookManager.getInstance().getHook(PlaceholderAPIHook.class);
             if (papi != null) {
-                text = papi.applyPlaceholders((Player) sender, text);
+                return papi.applyPlaceholders((Player) sender, text);
             }
         }
         return text;
     }
 
     public static boolean sendMessage(boolean prefix, CommandSender sender, String message) {
-        sender.sendMessage(MessageUtils.fixColors(sender, (prefix ? ConfigManager.getInstance().getLegacyPrefix() : "") + "&f" + applyReplacements(message)));
+        Component text = colors(sender, "&f" + message);
+
+        sender.sendMessage(prefix ?
+                Component.empty().append(ConfigManager.getInstance().getPrefix()).append(text) : text
+        );
+
         return false;
     }
 }

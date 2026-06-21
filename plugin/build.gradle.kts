@@ -28,19 +28,14 @@ dependencies {
     compileOnly("uk.antiperson.stackmob:StackMob:5.10.3")
     compileOnly(files("libs/LevelledMobs.jar"))
 
-    compileOnly("commons-io:commons-io:2.19.0")
-    compileOnly("com.github.oshi:oshi-core:6.8.0")
-    compileOnly("org.apache.commons:commons-lang3:3.17.0")
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    compileOnly("commons-io:commons-io:2.22.0")
+    compileOnly("com.github.oshi:oshi-core:7.3.1")
+    compileOnly("org.apache.commons:commons-lang3:3.20.0")
 }
 
 tasks {
     processResources {
-        filesMatching("**/plugin.yml") {
+        filesMatching("**/paper-plugin.yml") {
             expand(rootProject.project.properties)
         }
 
