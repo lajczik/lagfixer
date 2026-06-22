@@ -57,7 +57,8 @@ public abstract class AbstractMenu implements Listener {
         this.clicks.forEach((slot, event) -> {
             try {
                 this.inv.setItem(slot, event.getCallableItem().call());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         });
         this.update();
         this.updated = true;

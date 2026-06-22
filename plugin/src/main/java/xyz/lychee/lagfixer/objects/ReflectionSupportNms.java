@@ -33,19 +33,22 @@ public class ReflectionSupportNms implements ISupportNms {
             getServerMethod = craftServer.getClass().getMethod("getServer");
             Object minecraftServer = getServerMethod.invoke(craftServer);
             recentTpsField = minecraftServer.getClass().getField("recentTps");
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         ItemMeta tempMeta = Bukkit.getItemFactory().getItemMeta(Material.PLAYER_HEAD);
         if (tempMeta != null) {
             try {
                 setProfileMethod = tempMeta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
                 setProfileMethod.setAccessible(true);
-            } catch (NoSuchMethodException ignored) {}
+            } catch (NoSuchMethodException ignored) {
+            }
 
             try {
                 profileField = tempMeta.getClass().getDeclaredField("profile");
                 profileField.setAccessible(true);
-            } catch (NoSuchFieldException ignored) {}
+            } catch (NoSuchFieldException ignored) {
+            }
         }
     }
 
@@ -82,7 +85,8 @@ public class ReflectionSupportNms implements ISupportNms {
                     setProfileMethod.invoke(meta, profile);
                     is.setItemMeta(meta);
                     return is;
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
             }
 
             if (profileField != null) {
@@ -90,7 +94,8 @@ public class ReflectionSupportNms implements ISupportNms {
                     profileField.set(meta, profile);
                     is.setItemMeta(meta);
                     return is;
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
             }
 
             return is;
@@ -126,11 +131,14 @@ public class ReflectionSupportNms implements ISupportNms {
     }
 
     @Override
-    public void setViewDistance(World world, int view) {}
+    public void setViewDistance(World world, int view) {
+    }
 
     @Override
-    public void setSimulationDistance(World world, int simulation) {}
+    public void setSimulationDistance(World world, int simulation) {
+    }
 
     @Override
-    public void setEntityAi(Entity ent, boolean bl) {}
+    public void setEntityAi(Entity ent, boolean bl) {
+    }
 }

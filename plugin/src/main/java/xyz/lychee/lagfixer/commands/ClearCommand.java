@@ -21,10 +21,12 @@ public class ClearCommand extends CommandManager.Subcommand {
     }
 
     @Override
-    public void load() {}
+    public void load() {
+    }
 
     @Override
-    public void unload() {}
+    public void unload() {
+    }
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {

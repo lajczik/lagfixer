@@ -67,10 +67,12 @@ public class ModulesMenu extends AbstractMenu {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @Override
-    public void handleClick(InventoryClickEvent e, ItemStack item) {}
+    public void handleClick(InventoryClickEvent e, ItemStack item) {
+    }
 
     @Override
     public AbstractMenu previousMenu() {

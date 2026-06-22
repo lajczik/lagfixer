@@ -152,7 +152,8 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
                                     if (projectiles < limit_projectiles) projectiles++;
                                     else if (checkProjectiles) removed = true;
                                 }
-                                default -> {}
+                                default -> {
+                                }
                             }
 
                             if (removed) {

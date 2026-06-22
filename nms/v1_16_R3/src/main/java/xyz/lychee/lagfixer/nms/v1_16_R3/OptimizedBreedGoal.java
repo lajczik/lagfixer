@@ -12,9 +12,9 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class OptimizedBreedGoal extends PathfinderGoal {
+    protected final EntityAnimal animal;
     private final MobAiReducerModule module;
     private final PathfinderTargetCondition targeting;
-    protected final EntityAnimal animal;
     protected EntityAnimal partner;
 
     public OptimizedBreedGoal(MobAiReducerModule module, EntityAnimal entityanimal, PathfinderTargetCondition targeting) {

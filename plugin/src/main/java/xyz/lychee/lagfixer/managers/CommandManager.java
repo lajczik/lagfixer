@@ -57,8 +57,8 @@ public class CommandManager extends AbstractManager implements Listener, TabExec
         if (args.length > 0) {
             Subcommand cmd = this.subcommandsWithAliases.get(args[0].toLowerCase());
             if (cmd != null) {
-                if (!sender.hasPermission("lagfixer.command."+cmd.getName())) {
-                    Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", "lagfixer.command."+cmd.getName()));
+                if (!sender.hasPermission("lagfixer.command." + cmd.getName())) {
+                    Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", "lagfixer.command." + cmd.getName()));
                     if (text == null) {
                         return false;
                     }

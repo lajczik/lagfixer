@@ -37,7 +37,8 @@ public class MenuCommand extends CommandManager.Subcommand {
         try {
             this.hardwareMenu = new HardwareMenu(plugin, 27, MessageUtils.fixColors(null, "&8[&e&l⚡&8] &fHardware! &8| &eLagFixer"));
             this.hardwareMenu.load();
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override

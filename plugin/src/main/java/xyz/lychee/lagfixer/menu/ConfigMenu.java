@@ -75,7 +75,8 @@ public class ConfigMenu extends AbstractMenu {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+    }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {

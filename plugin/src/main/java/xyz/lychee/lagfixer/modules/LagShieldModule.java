@@ -223,7 +223,8 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
                         Double.parseDouble(split[0]),
                         Integer.parseInt(split[1])
                 );
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 

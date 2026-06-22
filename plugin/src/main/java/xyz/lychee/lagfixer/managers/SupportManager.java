@@ -115,7 +115,8 @@ public class SupportManager extends AbstractManager {
     }
 
     @Override
-    public void disable() {}
+    public void disable() {
+    }
 
     @Override
     public boolean isEnabled() {

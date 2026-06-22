@@ -54,11 +54,18 @@ public class ConsoleFilterModule extends AbstractModule {
         try (Stream<Path> files = Files.list(directory)) {
             files.filter(p -> p.toString().endsWith(".log.gz"))
                     .sorted(Comparator.comparingLong((Path p) -> {
-                        try {return Files.getLastModifiedTime(p).toMillis();} catch (IOException e) {return 0L;}
+                        try {
+                            return Files.getLastModifiedTime(p).toMillis();
+                        } catch (IOException e) {
+                            return 0L;
+                        }
                     }).reversed())
                     .skip(logsLimit)
                     .forEach(path -> {
-                        try {Files.deleteIfExists(path);} catch (IOException ignored) {}
+                        try {
+                            Files.deleteIfExists(path);
+                        } catch (IOException ignored) {
+                        }
                     });
         } catch (IOException e) {
             getPlugin().printError(e);

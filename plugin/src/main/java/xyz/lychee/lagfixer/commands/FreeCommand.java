@@ -21,7 +21,8 @@ public class FreeCommand extends CommandManager.Subcommand {
     }
 
     @Override
-    public void unload() {}
+    public void unload() {
+    }
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
@@ -38,7 +39,8 @@ public class FreeCommand extends CommandManager.Subcommand {
             try {
                 runtime.gc();
                 Thread.sleep(300);
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
 
             long after = runtime.totalMemory() - runtime.freeMemory();
 

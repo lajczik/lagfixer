@@ -63,7 +63,8 @@ public class HardwareMenu extends AbstractMenu {
             try (Reader reader = new FileReader(dataFile)) {
                 this.hardwareData = gson.fromJson(reader, HardwareData.class);
                 return;
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
         collectAndSaveHardwareData(dataFile);
     }
@@ -90,7 +91,8 @@ public class HardwareMenu extends AbstractMenu {
 
         try (Writer writer = new FileWriter(dataFile)) {
             gson.toJson(this.hardwareData, writer);
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     private void fillButtons() {
@@ -243,7 +245,8 @@ public class HardwareMenu extends AbstractMenu {
     }
 
     @Override
-    public void handleClick(InventoryClickEvent e, ItemStack item) {}
+    public void handleClick(InventoryClickEvent e, ItemStack item) {
+    }
 
     @Override
     public AbstractMenu previousMenu() {

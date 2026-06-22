@@ -63,7 +63,7 @@ public class SupportNms extends ReflectionSupportNms {
     public double getTps() {
         return ((CraftServer) Bukkit.getServer()).getServer().recentTps[2];
     }
-    
+
     @Override
     public void setViewDistance(World world, int view) {
         int clampedView = Math.clamp(view, 2, 32);

@@ -14,10 +14,12 @@ public class PingCommand extends CommandManager.Subcommand {
     }
 
     @Override
-    public void load() {}
+    public void load() {
+    }
 
     @Override
-    public void unload() {}
+    public void unload() {
+    }
 
     @Override
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {

@@ -55,7 +55,7 @@ public class UpdaterManager extends AbstractManager implements Listener {
                                 """.formatted(this.latestVersion, this.currentVersion)
                         )
                         .hoverEvent(HoverEvent.showText(MessageUtils.colors(e.getPlayer(), "Click to open url!")))
-                        .clickEvent(ClickEvent.openUrl("https://modrinth.com/plugin/lagfixer/version/"+this.latestVersion));
+                        .clickEvent(ClickEvent.openUrl("https://modrinth.com/plugin/lagfixer/version/" + this.latestVersion));
 
                 this.getPlugin().getAudiences()
                         .player(e.getPlayer())
@@ -78,7 +78,8 @@ public class UpdaterManager extends AbstractManager implements Listener {
 
             SupportManager.getInstance().getClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                     .thenAccept(response -> {
-                        Type listType = new TypeToken<ArrayList<ModrinthVersion>>() {}.getType();
+                        Type listType = new TypeToken<ArrayList<ModrinthVersion>>() {
+                        }.getType();
                         List<ModrinthVersion> versions = gson.fromJson(response.body(), listType);
                         versions.removeIf(version -> version.getVersion_number().matches(".*[^0-9.].*"));
 
@@ -103,15 +104,15 @@ public class UpdaterManager extends AbstractManager implements Listener {
                         if (this.updater && this.compared < 0) {
                             this.getPlugin().getLogger().info(
                                     String.format("""
-                                        
-                                        &8∘₊✧────────────────────────────────✧₊∘
-                                        &c&lLagFixer needs an update!
-                                        &fVersion: &e&n%s&r -> &e&n%s&r
-                                        &ahttps://modrinth.com/plugin/lagfixer/version/%s
-                                        
-                                        &6⚠ &7Updating this plugin is crucial! &6⚠
-                                        &8∘₊✧────────────────────────────────✧₊∘
-                                        """,
+                                                    
+                                                    &8∘₊✧────────────────────────────────✧₊∘
+                                                    &c&lLagFixer needs an update!
+                                                    &fVersion: &e&n%s&r -> &e&n%s&r
+                                                    &ahttps://modrinth.com/plugin/lagfixer/version/%s
+                                                    
+                                                    &6⚠ &7Updating this plugin is crucial! &6⚠
+                                                    &8∘₊✧────────────────────────────────✧₊∘
+                                                    """,
                                             this.currentVersion, this.latestVersion, this.latestVersion
                                     )
                             );
