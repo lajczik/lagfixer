@@ -2,7 +2,6 @@ package xyz.lychee.lagfixer.hooks;
 
 import com.ticxo.modelengine.api.ModelEngineAPI;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.Nullable;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.objects.AbstractHook;
@@ -12,8 +11,8 @@ public class ModelEngineHook extends AbstractHook implements HookManager.ModelCo
         super(plugin, "ModelEngine", manager);
     }
 
-    public boolean hasModel(@Nullable Entity entity) {
-        return entity != null && ModelEngineAPI.isModeledEntity(entity.getUniqueId());
+    public boolean hasModel(Entity entity) {
+        return ModelEngineAPI.isModeledEntity(entity.getUniqueId());
     }
 
     @Override

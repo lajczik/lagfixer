@@ -1,8 +1,7 @@
 package xyz.lychee.lagfixer;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.lychee.lagfixer.managers.*;
 import xyz.lychee.lagfixer.objects.AbstractManager;
@@ -17,14 +16,12 @@ public class LagFixer extends JavaPlugin {
     private static @Getter LagFixer instance;
     private final ArrayList<AbstractManager> managers = new ArrayList<>();
     private final ColoredLogger logger = new ColoredLogger();
-<<<<<<< HEAD
-=======
     private BukkitAudiences audiences;
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
     @Override
     public void onEnable() {
         instance = this;
+        this.audiences = BukkitAudiences.create(this);
         this.managers.clear();
         this.logger.sendHeader(this.getDescription().getVersion());
         this.loadManager(new ErrorsManager(this));
@@ -35,6 +32,8 @@ public class LagFixer extends JavaPlugin {
         this.loadManager(new UpdaterManager(this));
         this.loadManager(new ModuleManager(this));
         this.loadManager(new CommandManager(this));
+        this.getLogger().info("&fRemember to leave a rating!&r &e&l★ ★ ★ ★ ★");
+        this.getLogger().info("&c❤ &fSupport us &e&nhttps://ko-fi.com/lajczik");
     }
 
     @Override
@@ -52,23 +51,12 @@ public class LagFixer extends JavaPlugin {
             }
             it.remove();
         }
-<<<<<<< HEAD
 
         SupportManager support = SupportManager.getInstance();
         support.getResourceMonitor().stop();
         support.getWorldsMonitor().stop();
     }
 
-=======
-
-        SupportManager support = SupportManager.getInstance();
-        support.getResourceMonitor().stop();
-        support.getWorldsMonitor().stop();
-        Bukkit.getScheduler().cancelTasks(this);
-        HandlerList.unregisterAll(this);
-    }
-
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     public void loadManager(AbstractManager manager) {
         if (!manager.isEnabled()) {
             return;

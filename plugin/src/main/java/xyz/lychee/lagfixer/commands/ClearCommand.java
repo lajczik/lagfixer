@@ -1,25 +1,19 @@
 package xyz.lychee.lagfixer.commands;
 
 import org.apache.commons.lang3.stream.Streams;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Projectile;
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.managers.CommandManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.modules.WorldCleanerModule;
-import xyz.lychee.lagfixer.objects.RegionsEntityReport;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-<<<<<<< HEAD
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.LongAdder;
-=======
 import java.util.concurrent.atomic.AtomicInteger;
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
 public class ClearCommand extends CommandManager.Subcommand {
     public ClearCommand(CommandManager commandManager) {
@@ -45,49 +39,9 @@ public class ClearCommand extends CommandManager.Subcommand {
             return true;
         }
 
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
-        RegionsEntityReport report = new RegionsEntityReport();
-        LongAdder size = report.getEntities();
+        AtomicInteger ai = new AtomicInteger();
 
         String type = args[0].toLowerCase();
-<<<<<<< HEAD
-        switch (type) {
-            case "items" -> {
-                for (World w : module.getAllowedWorlds()) {
-                    module.purgeItems(w, futures, size);
-                }
-            }
-            case "creatures" -> {
-                for (World w : module.getAllowedWorlds()) {
-                    module.purgeCreatures(w, futures, size);
-                }
-            }
-            case "projectiles" -> {
-                for (World w : module.getAllowedWorlds()) {
-                    module.purgeProjectiles(w, futures, size);
-                }
-            }
-            case "all" -> {
-                for (World w : module.getAllowedWorlds()) {
-                    module.purgeAll(w, futures, report);
-                }
-            }
-            default -> {
-                return MessageUtils.sendMessage(true, sender, "&7Invalid clear type: &f" + type);
-            }
-        }
-        ;
-
-        MessageUtils.sendMessage(true, sender, "&7Asynchronous entity removal in progress...");
-
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .orTimeout(5, TimeUnit.SECONDS)
-                .whenComplete((v, t) ->
-                        MessageUtils.sendMessage(true, sender, "&7Successfully removed &e" + size + " &7entities!")
-                );
-
-        return true;
-=======
         return switch (type) {
             case "items" -> {
                 module.getAllowedWorlds()
@@ -127,17 +81,12 @@ public class ClearCommand extends CommandManager.Subcommand {
             }
             default -> MessageUtils.sendMessage(true, sender, "&7Invalid clear type: &f" + type);
         };
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     }
 
     @Override
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         if (args.length == 1) {
-<<<<<<< HEAD
-            return Streams.of("items", "creatures", "projectiles", "all").filter(str -> str.startsWith(args[0])).toList();
-=======
             return Streams.of("items", "creatures", "projectiles").filter(str -> str.startsWith(args[0])).toList();
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
         return Collections.emptyList();
     }

@@ -40,7 +40,6 @@ public class ConfigManager extends AbstractManager implements Listener {
                 return;
             }
 
-<<<<<<< HEAD
             boolean formatter = plugin.getConfig().getBoolean("main.config_formatter");
             if (formatter) {
                 YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(
@@ -64,27 +63,6 @@ public class ConfigManager extends AbstractManager implements Listener {
                 defConfig.save(file);
             }
 
-=======
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(
-                    new InputStreamReader(defConfigStream, StandardCharsets.UTF_8)
-            );
-
-            if (file.exists()) {
-                YamlConfiguration userConfig = YamlConfiguration.loadConfiguration(file);
-
-                for (String key : userConfig.getKeys(true)) {
-                    Object userValue = userConfig.get(key);
-                    if (userValue instanceof ConfigurationSection) continue;
-
-                    Object defaultValue = defConfig.get(key);
-                    if (defaultValue != null && userValue != null && !userValue.equals(defaultValue)) {
-                        defConfig.set(key, userValue);
-                    }
-                }
-            }
-
-            defConfig.save(file);
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             cfg.load(file);
         }
     }

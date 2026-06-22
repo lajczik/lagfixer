@@ -1,22 +1,17 @@
 package xyz.lychee.lagfixer.modules;
 
-import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
-<<<<<<< HEAD
-=======
 import net.kyori.adventure.audience.Audience;
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -25,6 +20,8 @@ import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.Language;
@@ -33,42 +30,31 @@ import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
-<<<<<<< HEAD
-import xyz.lychee.lagfixer.objects.RegionsEntityReport;
-import xyz.lychee.lagfixer.objects.WorldsMonitor;
-import xyz.lychee.lagfixer.utils.ItemBuilder;
-=======
 import xyz.lychee.lagfixer.objects.WorldsMonitor;
 import xyz.lychee.lagfixer.utils.MessageUtils;
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import xyz.lychee.lagfixer.utils.ReflectionUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.LongAdder;
 
 @Getter
-public class WorldCleanerModule extends AbstractModule implements Listener {
+public class WorldCleanerModule extends AbstractModule implements Listener, CommandExecutor {
     private final HashSet<ItemStack> items = new HashSet<>();
     private final HashMap<Integer, String> messages = new HashMap<>();
     private final EnumSet<EntityType> creatures_list = EnumSet.noneOf(EntityType.class);
     private final EnumSet<EntityType> projectiles_list = EnumSet.noneOf(EntityType.class);
     private final ArrayList<Inventory> inventories = new ArrayList<>();
     private final EnumSet<Material> items_abyss_blacklist = EnumSet.noneOf(Material.class);
-    private final ItemBuilder items_abyss_previous;
-    private final ItemBuilder items_abyss_next;
-    private final ItemBuilder items_abyss_filler;
+    private final ItemStack items_abyss_previous;
+    private final ItemStack items_abyss_next;
+    private final ItemStack items_abyss_filler;
     private final EnumSet<Material> items_blacklist = EnumSet.noneOf(Material.class);
-    private Command command;
-    private ScheduledTask task;
-    private boolean opened = false;
+    private BukkitTask task;
     private int second;
     private int interval;
     private boolean alerts_enabled;
-    private String alerts_permission;
+    private Audience alerts_audience;
     private boolean alerts_actionbar;
     private boolean alerts_message;
 
@@ -84,6 +70,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
     private boolean items_disableitemdespawn;
     private int items_timelived;
     private boolean items_abyss_enabled;
+    private volatile boolean items_abyss_opened = false;
     private boolean items_abyss_alerts;
     private Sound items_abyss_open_sound;
     private boolean items_abyss_itemdespawn;
@@ -104,9 +91,16 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTlkODA2Yjc1ZWM5NTAwNmM1ZWMzODY2YzU0OGM1NTcxYWYzZTc4OGM3ZDE2MjllZGU2NGJjMWI3NDg4NTljZCJ9fX0="
         );
 
-        this.items_abyss_previous = ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjg0ZjU5NzEzMWJiZTI1ZGMwNThhZjg4OGNiMjk4MzFmNzk1OTliYzY3Yzk1YzgwMjkyNWNlNGFmYmEzMzJmYyJ9fX0=");
-        this.items_abyss_next = ItemBuilder.createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTYzMzlmZjJlNTM0MmJhMThiZGM0OGE5OWNjYTY1ZDEyM2NlNzgxZDg3ODI3MmY5ZDk2NGVhZDNiOGFkMzcwIn19fQ==");
-        this.items_abyss_filler = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setName("&8#");
+        SupportManager support = SupportManager.getInstance();
+        this.items_abyss_previous = support.getNms().createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjg0ZjU5NzEzMWJiZTI1ZGMwNThhZjg4OGNiMjk4MzFmNzk1OTliYzY3Yzk1YzgwMjkyNWNlNGFmYmEzMzJmYyJ9fX0=");
+        this.items_abyss_next = support.getNms().createSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTYzMzlmZjJlNTM0MmJhMThiZGM0OGE5OWNjYTY1ZDEyM2NlNzgxZDg3ODI3MmY5ZDk2NGVhZDNiOGFkMzcwIn19fQ==");
+        this.items_abyss_filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+
+        ItemMeta metaFiller = this.items_abyss_filler.getItemMeta();
+        if (metaFiller != null) {
+            metaFiller.setDisplayName(MessageUtils.fixColors(null, "&8#"));
+            this.items_abyss_filler.setItemMeta(metaFiller);
+        }
     }
 
     @EventHandler
@@ -132,33 +126,24 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
             ItemStack is = e.getCurrentItem();
             if (is == null) return;
 
-            if (is.equals(this.items_abyss_next.getItem())) {
+            if (is.equals(this.items_abyss_next)) {
                 e.setCancelled(true);
                 int next = this.inventories.indexOf(inv) + 1;
                 if (next < this.inventories.size()) {
                     e.getWhoClicked().openInventory(this.inventories.get(next));
                 }
-            } else if (is.equals(this.items_abyss_previous.getItem())) {
+            } else if (is.equals(this.items_abyss_previous)) {
                 e.setCancelled(true);
                 int previous = this.inventories.indexOf(inv) - 1;
                 if (previous >= 0) {
                     e.getWhoClicked().openInventory(this.inventories.get(previous));
                 }
-            } else if (is.equals(this.items_abyss_filler.getItem())) {
+            } else if (is.equals(this.items_abyss_filler)) {
                 e.setCancelled(true);
             }
         }
     }
 
-<<<<<<< HEAD
-    @Override
-    public void load() throws IOException {
-        this.command = new Command(Collections.emptyList());
-        Bukkit.getCommandMap().register(this.command.getName(), this.command);
-
-        this.second = this.interval + 1;
-        this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.getPlugin(), t1 -> {
-=======
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
         Component text;
         if (!this.items_abyss_enabled) {
@@ -190,64 +175,17 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         support.getFork().registerCommand(this.getPlugin(), "abyss", this.items_abyss_aliases, this);
 
         this.task = SupportManager.getInstance().getFork().runTimer(false, () -> {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
+            if (Bukkit.getOnlinePlayers().isEmpty()) {
+                this.second = this.interval + 1;
+                return;
+            }
+
             if (--this.second <= 0) {
-                List<CompletableFuture<Void>> futures = new ArrayList<>();
-                RegionsEntityReport report = new RegionsEntityReport();
+                HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
+
+                int creatures = 0, items = 0, projectiles = 0;
+
                 for (World world : this.getAllowedWorlds()) {
-<<<<<<< HEAD
-                    this.purgeAll(world, futures, report);
-                }
-
-                String message = this.alerts_enabled ? this.messages.get(this.second) : null;
-                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                        .orTimeout(5, TimeUnit.SECONDS)
-                        .whenComplete((v, t) -> {
-                            if (message != null) {
-                                Component text = Language.createComponent(message, true,
-                                        Placeholder.unparsed("remaining", Integer.toString(this.second)),
-                                        Placeholder.unparsed("items", report.getItems().toString()),
-                                        Placeholder.unparsed("creatures", report.getCreatures().toString()),
-                                        Placeholder.unparsed("projectiles", report.getProjectiles().toString())
-                                );
-
-                                this.sendAlert(text);
-                            }
-
-                            if (this.items_abyss_enabled) {
-                                String guiName = this.getLanguage().getString("items.abyss.gui.name", true);
-                                Collection<ItemStack> toStore = new ArrayList<>(this.items);
-                                this.items.clear();
-                                int page = 0;
-                                while (!toStore.isEmpty()) {
-                                    Inventory inv = Bukkit.createInventory(null, 54,
-                                            Language.getSerializer().deserialize(guiName.replace("<page>", Integer.toString(++page)))
-                                    );
-
-                                    for (int i = 45; i < 52; i++) {
-                                        inv.setItem(i, this.items_abyss_filler.getItem());
-                                    }
-                                    inv.setItem(52, this.items_abyss_previous.getItem());
-                                    inv.setItem(53, this.items_abyss_next.getItem());
-
-                                    toStore = inv.addItem(toStore.toArray(new ItemStack[0])).values();
-
-                                    this.inventories.add(inv);
-                                }
-
-                                this.opened = true;
-
-                                if (this.items_abyss_alerts) {
-                                    Component open = this.getLanguage().getComponent("items.abyss.open", true);
-                                    this.sendAlert(open);
-                                }
-                            }
-                        });
-
-                if (this.items_abyss_enabled) {
-                    Bukkit.getAsyncScheduler().runDelayed(this.getPlugin(), t2 -> {
-                        this.opened = false;
-=======
                     for (Entity ent : world.getEntities()) {
                         if (ent instanceof LivingEntity livingEntity) {
                             if (this.creatures_enabled && this.clearCreature(livingEntity)) {
@@ -324,42 +262,20 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
 
                     support.getFork().runLater(false, () -> {
                         this.items_abyss_opened = false;
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
-                        Set<HumanEntity> viewers = new HashSet<>();
                         this.inventories.forEach(inv -> {
-                            viewers.addAll(inv.getViewers());
+                            new HashSet<>(inv.getViewers()).forEach(HumanEntity::closeInventory);
                             inv.clear();
                         });
                         this.inventories.clear();
 
-                        Bukkit.getGlobalRegionScheduler().execute(this.getPlugin(), () -> viewers.forEach(HumanEntity::closeInventory));
-
                         if (this.items_abyss_alerts) {
-<<<<<<< HEAD
-                            Component close = this.getLanguage().getComponent("items.abyss.close", true);
-                            this.sendAlert(close);
-=======
                             this.sendAlert(this.getLanguage().getComponent("items.abyss.close", true));
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                         }
                     }, this.items_abyss_close, TimeUnit.SECONDS);
                 }
-
                 this.second = this.interval + 1;
             } else if (this.alerts_enabled && this.messages.containsKey(this.second)) {
-<<<<<<< HEAD
-                WorldsMonitor worldsMonitor = SupportManager.getInstance().getWorldsMonitor();
-
-                Component text = Language.createComponent(this.messages.get(this.second), true,
-                        Placeholder.unparsed("remaining", Integer.toString(this.second)),
-                        Placeholder.unparsed("items", Long.toString(worldsMonitor.getItems())),
-                        Placeholder.unparsed("creatures", Long.toString(worldsMonitor.getCreatures())),
-                        Placeholder.unparsed("projectiles", Long.toString(worldsMonitor.getProjectiles()))
-                );
-
-                this.sendAlert(text);
-=======
                 WorldsMonitor worldsMonitor = support.getWorldsMonitor();
                 this.sendAlert(
                         Language.createComponent(this.messages.get(this.second), true,
@@ -369,29 +285,14 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                                 Placeholder.unparsed("projectiles", Long.toString(worldsMonitor.getProjectiles()))
                         )
                 );
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             }
         }, 1L, 1L, TimeUnit.SECONDS);
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
     }
 
-<<<<<<< HEAD
-    public void sendAlert(Component component) {
-        Bukkit.getOnlinePlayers().stream()
-                .filter(p -> this.alerts_permission == null || p.hasPermission(this.alerts_permission))
-                .forEach(p -> {
-                    if (this.alerts_message) {
-                        p.sendMessage(component);
-                    }
-                    if (this.alerts_actionbar) {
-                        p.sendActionBar(component);
-                    }
-                });
-=======
     public void sendAlert(Component text) {
         if (this.alerts_message) this.alerts_audience.sendMessage(text);
         if (this.alerts_actionbar) this.alerts_audience.sendActionBar(text);
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     }
 
     public boolean clearCreature(LivingEntity ent) {
@@ -414,7 +315,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
             return this.creatures_stacked;
         }
 
-        if (ent.customName() != null) {
+        if (ent.getCustomName() != null) {
             return this.creatures_named;
         }
 
@@ -442,13 +343,9 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         this.alerts_actionbar = this.getSection().getBoolean("alerts.actionbar");
 
         String permission = this.getSection().getString("alerts.permission");
-<<<<<<< HEAD
-        this.alerts_permission = permission == null || permission.isBlank() ? null : permission;
-=======
         boolean permissionDisabled = permission == null || permission.isEmpty();
         this.alerts_audience = this.getPlugin().getAudiences()
                 .filter(s -> s instanceof Player && (permissionDisabled || s.hasPermission(permission)));
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
         this.creatures_enabled = this.getSection().getBoolean("creatures.enabled");
         if (this.creatures_enabled) {
@@ -477,11 +374,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                     double pitch = this.getSection().getDouble("items.abyss.open_sound.pitch");
                     String sound = this.getSection().getString("items.abyss.open_sound.sound");
 
-<<<<<<< HEAD
                     if (sound != null && !sound.isEmpty()) {
-=======
-                    if (Key.parseable(sound)) {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                         try {
                             this.items_abyss_open_sound = Sound.sound(
                                     Key.key(Key.MINECRAFT_NAMESPACE, sound.toLowerCase()),
@@ -492,24 +385,25 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
                         } catch (Exception e) {
                             this.items_abyss_open_sound = null;
                         }
-<<<<<<< HEAD
-                    }
-                }
-                this.items_abyss_permission = this.getSection().getString("items.abyss.permission");
-=======
-                    } else {
-                        this.items_abyss_open_sound = null;
                     }
                 }
                 this.items_abyss_permission = this.getSection().getString("items.abyss.command.permission");
                 this.items_abyss_aliases = this.getSection().getStringList("items.abyss.command.aliases");
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                 this.items_abyss_itemdespawn = this.getSection().getBoolean("items.abyss.item_despawn");
                 this.items_abyss_close = this.getSection().getInt("items.abyss.close");
                 ReflectionUtils.convertEnums(Material.class, this.items_abyss_blacklist, this.getSection().getStringList("items.abyss.blacklist"));
 
-                this.items_abyss_previous.setName(this.getLanguage().getString("items.abyss.gui.previous", false));
-                this.items_abyss_next.setName(this.getLanguage().getString("items.abyss.gui.next", false));
+                ItemMeta metaPrevious = this.items_abyss_previous.getItemMeta();
+                if (metaPrevious != null) {
+                    metaPrevious.setDisplayName(MessageUtils.fixColors(null, this.getLanguage().getString("items.abyss.gui.previous", false)));
+                    this.items_abyss_previous.setItemMeta(metaPrevious);
+                }
+
+                ItemMeta metaNext = this.items_abyss_next.getItemMeta();
+                if (metaNext != null) {
+                    metaNext.setDisplayName(MessageUtils.fixColors(null, this.getLanguage().getString("items.abyss.gui.next", false)));
+                    this.items_abyss_next.setItemMeta(metaNext);
+                }
             }
         }
 
@@ -547,175 +441,8 @@ public class WorldCleanerModule extends AbstractModule implements Listener {
         if (this.task != null && !this.task.isCancelled()) {
             this.task.cancel();
         }
-<<<<<<< HEAD
-=======
 
         SupportManager.getInstance().getFork().unregisterCommand("abyss");
     }
 }
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
-        if (this.command != null) {
-            this.command.unregister(Bukkit.getCommandMap());
-        }
-    }
-
-    public void purgeAll(World world, List<CompletableFuture<Void>> into, RegionsEntityReport report) {
-        HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
-        RegionScheduler scheduler = Bukkit.getServer().getRegionScheduler();
-
-        Map<SupportManager.RegionPos, List<Chunk>> regions = SupportManager.createRegionMap(world);
-        regions.forEach((regionPos, chunks) -> {
-            Executor executor = task -> scheduler.execute(this.getPlugin(), world, regionPos.getX() << 3, regionPos.getZ() << 3, task);
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                for (Chunk chunk : chunks) {
-                    Entity[] entities = chunk.getEntities();
-                    report.getEntities().add(entities.length);
-                    for (Entity ent : entities) {
-                        if (ent instanceof Mob creature) {
-                            if (this.isCreatures_enabled() && this.clearCreature(creature)) {
-                                if (this.isCreatures_dropitems()) creature.damage(Double.MAX_VALUE);
-                                else creature.remove();
-                                report.getCreatures().increment();
-                            }
-                        } else if (ent instanceof Item item) {
-                            if (this.isItems_enabled() && this.clearItem(item)) {
-                                ItemStack is = item.getItemStack();
-                                if (this.isItems_abyss_enabled() && !this.getItems_abyss_blacklist().contains(is.getType())) {
-                                    if (stacker != null) {
-                                        stacker.addItemsToList(item, items);
-                                    } else {
-                                        items.add(is);
-                                    }
-                                }
-                                item.remove();
-                                report.getItems().increment();
-                            }
-                        } else if (ent instanceof Projectile projectile) {
-                            if (this.isProjectiles_enabled() && this.clearProjectile(projectile)) {
-                                projectile.remove();
-                                report.getProjectiles().increment();
-                            }
-                        }
-                    }
-                }
-            }, executor);
-
-            into.add(future);
-        });
-    }
-
-    public void purgeCreatures(World world, List<CompletableFuture<Void>> into, LongAdder size) {
-        if (!this.isCreatures_enabled()) return;
-
-        RegionScheduler scheduler = Bukkit.getServer().getRegionScheduler();
-
-        Map<SupportManager.RegionPos, List<Chunk>> regions = SupportManager.createRegionMap(world);
-        regions.forEach((regionPos, chunks) -> {
-            Executor executor = task -> scheduler.execute(this.getPlugin(), world, regionPos.getX() << 3, regionPos.getZ() << 3, task);
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                for (Chunk chunk : chunks) {
-                    Entity[] entities = chunk.getEntities();
-                    for (Entity ent : entities) {
-                        if (ent instanceof Mob creature && this.clearCreature(creature)) {
-                            if (this.isCreatures_dropitems()) creature.damage(Double.MAX_VALUE);
-                            else creature.remove();
-                            size.increment();
-                        }
-                    }
-                }
-            }, executor);
-
-            into.add(future);
-        });
-    }
-
-    public void purgeItems(World world, List<CompletableFuture<Void>> into, LongAdder size) {
-        if (!this.isItems_enabled()) return;
-
-        HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
-        RegionScheduler scheduler = Bukkit.getServer().getRegionScheduler();
-
-        Map<SupportManager.RegionPos, List<Chunk>> regions = SupportManager.createRegionMap(world);
-        regions.forEach((regionPos, chunks) -> {
-            Executor executor = task -> scheduler.execute(this.getPlugin(), world, regionPos.getX() << 3, regionPos.getZ() << 3, task);
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                for (Chunk chunk : chunks) {
-                    Entity[] entities = chunk.getEntities();
-                    for (Entity ent : entities) {
-                        if (ent instanceof Item item && this.clearItem(item)) {
-                            ItemStack is = item.getItemStack();
-                            if (this.isItems_abyss_enabled() && !this.getItems_abyss_blacklist().contains(is.getType())) {
-                                if (stacker != null) {
-                                    stacker.addItemsToList(item, items);
-                                } else {
-                                    items.add(is);
-                                }
-                            }
-                            item.remove();
-                            size.increment();
-                        }
-                    }
-                }
-            }, executor);
-
-            into.add(future);
-        });
-    }
-
-    public void purgeProjectiles(World world, List<CompletableFuture<Void>> into, LongAdder size) {
-        if (!this.isProjectiles_enabled()) return;
-
-        RegionScheduler scheduler = Bukkit.getServer().getRegionScheduler();
-
-        Map<SupportManager.RegionPos, List<Chunk>> regions = SupportManager.createRegionMap(world);
-        regions.forEach((regionPos, chunks) -> {
-            Executor executor = task -> scheduler.execute(this.getPlugin(), world, regionPos.getX() << 3, regionPos.getZ() << 3, task);
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                for (Chunk chunk : chunks) {
-                    Entity[] entities = chunk.getEntities();
-                    for (Entity ent : entities) {
-                        if (ent instanceof Projectile projectile && this.clearProjectile(projectile)) {
-                            projectile.remove();
-                            size.increment();
-                        }
-                    }
-                }
-            }, executor);
-
-            into.add(future);
-        });
-    }
-
-    public class Command extends BukkitCommand {
-        public Command(List<String> aliases) {
-            super("abyss", "Abyss lagfixer command", "/abyss", aliases);
-        }
-
-        @Override
-        public boolean execute(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
-            Component text;
-            if (!items_abyss_enabled) {
-                text = Language.getMainValue("disabled_module", true, Placeholder.unparsed("module", "Abyss (" + this.getName() + ")"));
-            } else if (items_abyss_permission != null && !items_abyss_permission.isEmpty() && !sender.hasPermission(items_abyss_permission)) {
-                text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", items_abyss_permission));
-            } else if (!opened) {
-                text = getLanguage().getComponent("items.abyss.closed", true);
-            } else if (sender instanceof Player) {
-                if (inventories.isEmpty()) {
-                    text = getLanguage().getComponent("items.abyss.empty", true);
-                } else {
-                    ((Player) sender).openInventory(inventories.getFirst());
-                    text = getLanguage().getComponent("items.abyss.opened", true);
-                }
-            } else {
-                text = Language.getMainValue("player_only", true);
-            }
-
-            if (text != null) {
-                sender.sendMessage(text);
-            }
-            return false;
-        }
-    }
-}

@@ -77,3 +77,4 @@ public class ModulesMenu extends AbstractMenu {
         return MenuCommand.getInstance().getMainMenu();
     }
 }
+

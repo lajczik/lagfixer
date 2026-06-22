@@ -23,8 +23,8 @@ public class Language {
         yaml = new YamlConfiguration();
         mainValues = new HashMap<>();
         serializer = LegacyComponentSerializer.builder()
-                .character(LegacyComponentSerializer.AMPERSAND_CHAR)
-                .hexCharacter(LegacyComponentSerializer.HEX_CHAR)
+                .character('&')
+                .hexCharacter('#')
                 .hexColors()
                 .useUnusualXRepeatedCharacterHexFormat()
                 .build();
@@ -46,7 +46,7 @@ public class Language {
 
     public static Component createComponent(String message, boolean prefix, TagResolver.Single... placeholders) {
         Component component = MiniMessage.miniMessage().deserialize(message, placeholders);
-        return prefix ? Component.textOfChildren(ConfigManager.getInstance().getPrefix(), component) : component;
+        return prefix ? Component.empty().append(ConfigManager.getInstance().getPrefix()).append(component) : component;
     }
 
     public void loadMessages() {
@@ -68,14 +68,14 @@ public class Language {
 
     public Component getComponent(String key, boolean prefix, TagResolver.Single... placeholders) {
         if (!this.values.containsKey(key)) {
-            return null;
+            return Component.text("Unknown value - " + key);
         }
         return createComponent(this.values.get(key), prefix, placeholders);
     }
 
     public String getString(String key, boolean prefix, TagResolver.Single... placeholders) {
         Component component = this.getComponent(key, prefix, placeholders);
-        return component == null ? null : Language.getSerializer().serialize(component);
+        return component == null ? "Unknown value - " + key : Language.getSerializer().serialize(component);
     }
 }
 

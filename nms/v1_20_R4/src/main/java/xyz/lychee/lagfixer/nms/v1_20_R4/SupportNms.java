@@ -1,17 +1,5 @@
 package xyz.lychee.lagfixer.nms.v1_20_R4;
 
-<<<<<<< HEAD
-import io.papermc.paper.threadedregions.TickData;
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
-import xyz.lychee.lagfixer.LagFixer;
-import xyz.lychee.lagfixer.objects.ISupportNms;
-
-public class SupportNms implements ISupportNms {
-
-=======
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.level.ServerLevel;
@@ -36,27 +24,14 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class SupportNms extends ReflectionSupportNms {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     @Override
-    public TickReport getTickReport() {
-        long currTime = System.nanoTime();
-        DoubleArrayList tpsByRegion = new DoubleArrayList();
-        DoubleArrayList msptByRegion = new DoubleArrayList();
-
-        for (World world : Bukkit.getWorlds()) {
-            ((CraftWorld) world).getHandle().regioniser.computeForAllRegions(region -> {
-                TickData.TickReportData report = region.getData().getRegionSchedulingHandle().getTickReport15s(currTime);
-                if (report != null) {
-                    tpsByRegion.add(report.tpsData().segmentAll().average());
-                    msptByRegion.add(report.timePerTickData().segmentAll().average() / 1_000_000.0D);
-                }
-            });
+    public ItemStack createSkull(String base64) {
+        ItemStack is = new ItemStack(Material.PLAYER_HEAD);
+        ItemMeta meta = is.getItemMeta();
+        if (meta == null) {
+            return is;
         }
 
-<<<<<<< HEAD
-        if (tpsByRegion.isEmpty()) {
-            return new TickReport(20, 0);
-=======
         try {
             UUID uuid = UUID.randomUUID();
             GameProfile gameProfile = new GameProfile(uuid, uuid.toString().substring(0, 16));
@@ -71,21 +46,25 @@ public class SupportNms extends ReflectionSupportNms {
             return is;
         } catch (Throwable ex) {
             return super.createSkull(base64);
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
+    }
 
-        int middle = tpsByRegion.size() >> 1;
-        double medTps;
-        double medMspt;
-        if ((tpsByRegion.size() & 1) == 0) {
-            medTps = (tpsByRegion.getDouble(middle - 1) + tpsByRegion.getDouble(middle)) / 2.0d;
-            medMspt = (msptByRegion.getDouble(middle - 1) + msptByRegion.getDouble(middle)) / 2.0d;
-        } else {
-            medTps = tpsByRegion.getDouble(middle);
-            medMspt = msptByRegion.getDouble(middle);
+    @Override
+    public int getTileEntitiesCount(Chunk c) {
+        if (c.isLoaded()) {
+            return ((CraftChunk) c).getHandle(ChunkStatus.FULL).blockEntities.size();
         }
+        return 0;
+    }
 
-        return new TickReport(medMspt, medTps);
+    @Override
+    public int getPlayerPing(Player player) {
+        return player.getPing();
+    }
+
+    @Override
+    public double getTps() {
+        return 1_000_000_000.0 / ((CraftServer) Bukkit.getServer()).getServer().getAverageTickTimeNanos();
     }
 
     @Override

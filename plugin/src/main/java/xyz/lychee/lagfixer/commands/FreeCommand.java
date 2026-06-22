@@ -1,9 +1,9 @@
 package xyz.lychee.lagfixer.commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.managers.CommandManager;
+import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.lang.management.ManagementFactory;
@@ -25,16 +25,12 @@ public class FreeCommand extends CommandManager.Subcommand {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
-<<<<<<< HEAD
-        Bukkit.getAsyncScheduler().runNow(this.getCommandManager().getPlugin(), t -> {
-=======
         if (this.explicitGCDisabled) {
             MessageUtils.sendMessage(true, sender, "&7Unable to free RAM, you need to remove jvm argument: &e&n-XX:+DisableExplicitGC&7!");
             return false;
         }
 
         SupportManager.getInstance().getFork().runNow(true, null, () -> {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             Runtime runtime = Runtime.getRuntime();
 
             long before = runtime.totalMemory() - runtime.freeMemory();

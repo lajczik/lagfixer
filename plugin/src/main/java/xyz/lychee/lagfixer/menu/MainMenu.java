@@ -73,10 +73,7 @@ public class MainMenu extends AbstractMenu {
                 " &8{*} &7Items: &e" + worldsMonitor.getItems(),
                 " &8{*} &7Projectiles: &e" + worldsMonitor.getProjectiles(),
                 " &8{*} &7Vehicles: &e" + worldsMonitor.getVehicles(),
-<<<<<<< HEAD
-=======
                 " &8{*} &7Tile entities: &e" + worldsMonitor.getTiles(),
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                 " &8{*} &7Players: &e" + Bukkit.getOnlinePlayers().size() + "&8/&e" + Bukkit.getMaxPlayers(),
                 "",
                 "&eClick to open cleaner menu!"

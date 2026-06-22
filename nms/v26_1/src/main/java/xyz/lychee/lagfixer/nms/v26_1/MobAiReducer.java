@@ -38,29 +38,16 @@ import net.minecraft.world.item.Item;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftCreature;
-<<<<<<< HEAD
-<<<<<<<< HEAD:nms/v26_1/src/main/java/xyz/lychee/lagfixer/nms/v26_1/MobAiReducer.java
-========
-=======
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import xyz.lychee.lagfixer.managers.SupportManager;
-<<<<<<< HEAD
->>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_21_R6/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R6/MobAiReducer.java
-=======
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import xyz.lychee.lagfixer.modules.MobAiReducerModule;
 
 import java.util.*;
 
-<<<<<<< HEAD
-public class MobAiReducer extends MobAiReducerModule.NMS {
-=======
 public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     private final Map<PathfinderMob, Boolean> optimizedMobs = new MapMaker().weakKeys().concurrencyLevel(4).makeMap();
     private final Map<Class<? extends Entity>, TargetingConditions> temptTargeting = new HashMap<>();
     private final TargetingConditions breedTargeting = TargetingConditions.forNonCombat().ignoreLineOfSight();
@@ -143,32 +130,16 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
 
                 if (isAnimal && module.isBreedEnabled() && goalClass == BreedGoal.class) {
                     toRemove.add(pgw);
-<<<<<<< HEAD
-<<<<<<<< HEAD:nms/v26_1/src/main/java/xyz/lychee/lagfixer/nms/v26_1/MobAiReducer.java
-========
                     pgw.stop();
 
->>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_21_R6/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R6/MobAiReducer.java
-=======
-                    pgw.stop();
-
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                     toAdd.add(new WrappedGoal(pgw.getPriority(), new OptimizedBreedGoal(this.getModule(), (Animal) handle, this.breedTargeting)));
                     continue;
                 }
 
                 if (module.isTemptEnabled() && goalClass == TemptGoal.class && temptTargeting != null) {
                     toRemove.add(pgw);
-<<<<<<< HEAD
-<<<<<<<< HEAD:nms/v26_1/src/main/java/xyz/lychee/lagfixer/nms/v26_1/MobAiReducer.java
-========
                     pgw.stop();
 
->>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_21_R6/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R6/MobAiReducer.java
-=======
-                    pgw.stop();
-
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
                     toAdd.add(new WrappedGoal(pgw.getPriority(), new OptimizedTemptGoal(this.getModule(), handle, temptTargeting)));
                     continue;
                 }
@@ -191,11 +162,6 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
             this.optimizedMobs.keySet().removeIf(ent -> !ent.isAlive() || !ent.valid);
         }
     }
-<<<<<<< HEAD
-<<<<<<<< HEAD:nms/v26_1/src/main/java/xyz/lychee/lagfixer/nms/v26_1/MobAiReducer.java
-========
-=======
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onLoad(EntitiesLoadEvent e) {
@@ -221,8 +187,4 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
             }
         }
     }
-<<<<<<< HEAD
->>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_21_R6/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R6/MobAiReducer.java
-=======
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 }

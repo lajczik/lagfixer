@@ -1,19 +1,5 @@
 package xyz.lychee.lagfixer.nms.v1_21_R5;
 
-<<<<<<< HEAD
-import com.google.common.util.concurrent.AtomicDouble;
-import io.papermc.paper.threadedregions.TickData;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
-import xyz.lychee.lagfixer.LagFixer;
-import xyz.lychee.lagfixer.objects.ISupportNms;
-
-import java.util.concurrent.atomic.LongAdder;
-
-public class SupportNms implements ISupportNms {
-
-=======
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.level.ServerLevel;
@@ -38,30 +24,13 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class SupportNms extends ReflectionSupportNms {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     @Override
-    public TickReport getTickReport() {
-        long currTime = System.nanoTime();
-        AtomicDouble tpsByRegion = new AtomicDouble();
-        AtomicDouble msptByRegion = new AtomicDouble();
-        LongAdder regions = new LongAdder();
-
-        for (World world : Bukkit.getWorlds()) {
-            ((CraftWorld) world).getHandle().regioniser.computeForAllRegions(region -> {
-                TickData.TickReportData report = region.getData().getRegionSchedulingHandle().getTickReport15s(currTime);
-                if (report != null) {
-                    tpsByRegion.addAndGet(report.tpsData().segmentAll().average());
-                    msptByRegion.addAndGet(report.timePerTickData().segmentAll().average() / 1_000_000.0D);
-                    regions.increment();
-                }
-            });
+    public ItemStack createSkull(String base64) {
+        ItemStack is = new ItemStack(Material.PLAYER_HEAD);
+        ItemMeta meta = is.getItemMeta();
+        if (meta == null) {
+            return is;
         }
-<<<<<<< HEAD
-
-        int regionsInt = regions.intValue();
-        if (regionsInt == 0) {
-            return new TickReport(0, 20);
-=======
 
         try {
             UUID uuid = UUID.randomUUID();
@@ -77,10 +46,25 @@ public class SupportNms extends ReflectionSupportNms {
             return is;
         } catch (Throwable ex) {
             return super.createSkull(base64);
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
+    }
 
-        return new TickReport(msptByRegion.get() / regionsInt, tpsByRegion.get() / regionsInt);
+    @Override
+    public int getTileEntitiesCount(Chunk c) {
+        if (c.isLoaded()) {
+            return ((CraftChunk) c).getHandle(ChunkStatus.FULL).blockEntities.size();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getPlayerPing(Player player) {
+        return player.getPing();
+    }
+
+    @Override
+    public double getTps() {
+        return 1_000_000_000.0 / ((CraftServer) Bukkit.getServer()).getServer().getAverageTickTimeNanos();
     }
 
     @Override

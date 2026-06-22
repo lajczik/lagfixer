@@ -1,42 +1,5 @@
 package xyz.lychee.lagfixer.nms.v26_1;
 
-<<<<<<< HEAD
-import ca.spottedleaf.moonrise.common.time.TickData;
-import com.google.common.util.concurrent.AtomicDouble;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
-import xyz.lychee.lagfixer.objects.ISupportNms;
-
-import java.util.concurrent.atomic.LongAdder;
-
-public class SupportNms implements ISupportNms {
-
-    @Override
-    public TickReport getTickReport() {
-        long currTime = System.nanoTime();
-        AtomicDouble tpsByRegion = new AtomicDouble();
-        AtomicDouble msptByRegion = new AtomicDouble();
-        LongAdder regions = new LongAdder();
-
-        for (World world : Bukkit.getWorlds()) {
-            ((CraftWorld) world).getHandle().regioniser.computeForAllRegions(region -> {
-                TickData.TickReportData report = region.getData().getRegionSchedulingHandle().getTickReport15s(currTime);
-                if (report != null) {
-                    tpsByRegion.addAndGet(report.tpsData().segmentAll().average());
-                    msptByRegion.addAndGet(report.timePerTickData().segmentAll().average() / 1_000_000.0D);
-                    regions.increment();
-                }
-            });
-        }
-
-        int regionsInt = regions.intValue();
-        if (regionsInt == 0) {
-            return new TickReport(0, 20);
-        }
-
-        return new TickReport(msptByRegion.get() / regionsInt, tpsByRegion.get() / regionsInt);
-=======
 import com.google.common.collect.ImmutableMultimap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -142,6 +105,5 @@ public class SupportNms extends ReflectionSupportNms {
             mob.setSilent(!bl);
             mob.collides = !bl;
         }
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     }
 }

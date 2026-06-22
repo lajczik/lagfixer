@@ -1,16 +1,8 @@
-package xyz.lychee.lagfixer.nms.v26_1;
+package xyz.lychee.lagfixer.nms.v1_21_R6;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-<<<<<<<< HEAD:nms/v26_1/src/main/java/xyz/lychee/lagfixer/nms/v26_1/VehicleWrapper.java
-import net.minecraft.world.entity.vehicle.boat.Boat;
-import net.minecraft.world.entity.vehicle.boat.ChestBoat;
-import net.minecraft.world.entity.vehicle.boat.ChestRaft;
-import net.minecraft.world.entity.vehicle.boat.Raft;
-import net.minecraft.world.entity.vehicle.minecart.*;
-========
 import net.minecraft.world.entity.vehicle.*;
->>>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90:nms/v1_21_R6/src/main/java/xyz/lychee/lagfixer/nms/v1_21_R6/VehicleWrapper.java
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;

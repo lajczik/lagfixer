@@ -1,9 +1,5 @@
 package xyz.lychee.lagfixer.nms.v26_1;
 
-<<<<<<< HEAD
-import net.minecraft.world.entity.Entity;
-=======
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.entity.vehicle.boat.Boat;
@@ -15,16 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftBoat;
 import org.bukkit.craftbukkit.entity.CraftMinecart;
-<<<<<<< HEAD
-import org.bukkit.craftbukkit.entity.CraftMinecartChest;
-import org.bukkit.entity.Vehicle;
-import xyz.lychee.lagfixer.modules.VehicleMotionReducerModule;
-
-import java.util.IdentityHashMap;
-import java.util.function.Function;
-
-public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
-=======
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,7 +23,6 @@ import java.util.List;
 import java.util.function.Function;
 
 public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS implements Listener {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     private static final IdentityHashMap<Class<? extends VehicleEntity>, Function<VehicleEntity, VehicleEntity>> VEHICLES = new IdentityHashMap<>(10);
 
     static {
@@ -59,11 +44,7 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean optimizeVehicle(org.bukkit.entity.Entity vehicle) {
-=======
     public boolean optimizeVehicle(Entity vehicle) {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         if (vehicle instanceof CraftBoat boat) {
             if (!this.getModule().isBoat()) return false;
 
@@ -76,8 +57,6 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
         return false;
     }
 
-<<<<<<< HEAD
-=======
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawn(EntitiesLoadEvent e) {
         List<Entity> entities = e.getEntities();
@@ -86,7 +65,6 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
         }
     }
 
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     private boolean processEntity(VehicleEntity original) {
         if (original instanceof VehicleWrapper) return false;
 
@@ -95,17 +73,6 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
 
         VehicleEntity newVehicle = factory.apply(original);
         newVehicle.setSilent(true);
-<<<<<<< HEAD
-        copyLocation(original, newVehicle);
-        copyItems(original, newVehicle);
-
-        original.removeVehicle();
-        original.level().addFreshEntity(newVehicle);
-        return true;
-    }
-
-    private void copyItems(Entity from, Entity to) {
-=======
         this.copyLocation(original, newVehicle);
         original.level().addFreshEntity(newVehicle);
         this.copyItems(original, newVehicle);
@@ -114,7 +81,6 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
     }
 
     private void copyItems(VehicleEntity from, VehicleEntity to) {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         if (from instanceof ContainerEntity fromContainer && to instanceof ContainerEntity toContainer) {
             for (int i = 0; i < fromContainer.getContainerSize(); i++) {
                 ItemStack is = fromContainer.getItem(i);

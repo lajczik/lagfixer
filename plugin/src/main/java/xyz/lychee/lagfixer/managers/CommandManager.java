@@ -4,9 +4,11 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.defaults.BukkitCommand;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.lychee.lagfixer.LagFixer;
@@ -18,11 +20,10 @@ import xyz.lychee.lagfixer.utils.MessageUtils;
 import java.util.*;
 
 @Getter
-public class CommandManager extends AbstractManager {
+public class CommandManager extends AbstractManager implements Listener, TabExecutor {
     private static @Getter CommandManager instance;
     private final HashMap<String, Subcommand> subcommands = new HashMap<>();
     private final HashMap<String, Subcommand> subcommandsWithAliases = new HashMap<>();
-    private LagFixerCommand command;
 
     public CommandManager(LagFixer plugin) {
         super(plugin);
@@ -52,25 +53,30 @@ public class CommandManager extends AbstractManager {
         }
     }
 
-<<<<<<< HEAD
-=======
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!sender.hasPermission(this.permission)) {
-            Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", this.permission));
+        if (args.length > 0) {
+            Subcommand cmd = this.subcommandsWithAliases.get(args[0].toLowerCase());
+            if (cmd != null) {
+                if (!sender.hasPermission("lagfixer.command."+cmd.getName())) {
+                    Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", "lagfixer.command."+cmd.getName()));
+                    if (text == null) {
+                        return false;
+                    }
+                    this.getPlugin().getAudiences().sender(sender).sendMessage(text);
+                    return false;
+                }
+                String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
+                return cmd.execute(sender, subArgs);
+            }
+        }
+
+        if (!sender.hasPermission("lagfixer.command")) {
+            Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", "lagfixer.command"));
             if (text == null) {
                 return false;
             }
             this.getPlugin().getAudiences().sender(sender).sendMessage(text);
             return false;
-        }
-
-        if (args.length > 0) {
-            Subcommand cmd = this.subcommandsWithAliases.get(args[0].toLowerCase());
-            if (cmd != null) {
-                String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
-                cmd.execute(sender, subArgs);
-                return false;
-            }
         }
 
         StringBuilder help = new StringBuilder("Subcommands list:\n");
@@ -81,57 +87,56 @@ public class CommandManager extends AbstractManager {
                     .append(subCommand.getDescription())
                     .append("\n");
         }
+
         return MessageUtils.sendMessage(true, sender, help.toString());
     }
 
     @Nullable
     public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 1) {
-            List<String> completions = new ArrayList<>(this.subcommandsWithAliases.keySet());
-            if (!args[0].isEmpty()) {
-                completions.removeIf(str -> !str.startsWith(args[0]));
-            }
-            Collections.sort(completions);
-            return completions;
-        } else if (args.length >= 2) {
+        if (args.length >= 2) {
             String subCommandName = args[0].toLowerCase();
             Subcommand subCommand = this.subcommandsWithAliases.get(subCommandName);
 
             if (subCommand != null) {
                 String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
                 List<String> tabComplete = subCommand.tabComplete(commandSender, subArgs);
-                if (tabComplete != null && !tabComplete.isEmpty()) {
-                    return tabComplete;
-                }
+                return tabComplete != null && !tabComplete.isEmpty() ? tabComplete : Collections.emptyList();
             }
-            return Bukkit.getOnlinePlayers().stream()
-                    .map(HumanEntity::getName)
-                    .filter(s -> s.startsWith(args[1]))
-                    .toList();
         }
 
-        return Collections.emptyList();
+        List<String> completions = new ArrayList<>(this.subcommandsWithAliases.keySet());
+        Collections.sort(completions);
+
+        if (args.length == 1) {
+            if (!args[0].isEmpty()) {
+                completions.removeIf(str -> !str.startsWith(args[0]));
+            }
+            return completions;
+        }
+
+        return completions;
     }
 
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
     @Override
     public void load() {
         for (Subcommand subcommand : this.subcommands.values()) {
             subcommand.load();
         }
 
-        this.command = new LagFixerCommand(this.getPlugin().getConfig().getStringList("main.command_aliases"));
-        Bukkit.getCommandMap().register(this.command.getName(), this.command);
+        List<String> aliases = this.getPlugin().getConfig().getStringList("main.command_aliases");
+
+        SupportManager.getInstance().getFork()
+                .registerCommand(this.getPlugin(), "lagfixer", aliases, this);
+
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
     }
 
     @Override
     public void disable() {
+        HandlerList.unregisterAll(this);
+
         for (Subcommand subcommand : this.subcommands.values()) {
             subcommand.unload();
-        }
-
-        if (this.command != null) {
-            this.command.unregister(Bukkit.getCommandMap());
         }
     }
 
@@ -161,86 +166,6 @@ public class CommandManager extends AbstractManager {
         public abstract boolean execute(@NotNull CommandSender sender, @NotNull String[] args);
 
         public @Nullable List<String> tabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
-            return Collections.emptyList();
-        }
-    }
-
-    public class LagFixerCommand extends BukkitCommand {
-        public LagFixerCommand(List<String> aliases) {
-            super("lagfixer", "Main lagfixer command", "/lagfixer <" + String.join("|", subcommands.keySet()) + ">", aliases);
-        }
-
-        @Override
-        public boolean execute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-            if (args.length > 0) {
-                Subcommand cmd = subcommandsWithAliases.get(args[0].toLowerCase());
-                if (cmd != null) {
-                    if (!sender.hasPermission("lagfixer.command."+cmd.getName())) {
-                        Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", "lagfixer.command."+cmd.getName()));
-                        if (text != null) {
-                            sender.sendMessage(text);
-                        }
-                        return false;
-                    }
-                    String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
-                    return cmd.execute(sender, subArgs);
-                }
-            }
-
-            if (!sender.hasPermission("lagfixer.command")) {
-                Component text = Language.getMainValue("no_access", true, Placeholder.unparsed("permission", "lagfixer.command"));
-                if (text != null) {
-                    sender.sendMessage(text);
-                }
-                return false;
-            }
-
-            if (args.length > 0) {
-                Subcommand cmd = subcommandsWithAliases.get(args[0].toLowerCase());
-                if (cmd != null) {
-                    String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
-                    cmd.execute(sender, subArgs);
-                    return false;
-                }
-            }
-
-            StringBuilder help = new StringBuilder("Subcommands list:\n");
-            for (Subcommand subCommand : subcommands.values()) {
-                help.append("&8{*} &f/lagfixer &e")
-                        .append(subCommand.getName())
-                        .append(" &8- &7")
-                        .append(subCommand.getDescription())
-                        .append("\n");
-            }
-            return MessageUtils.sendMessage(true, sender, help.toString());
-        }
-
-        @Override
-        public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
-            if (args.length == 1) {
-                List<String> completions = new ArrayList<>(subcommandsWithAliases.keySet());
-                if (!args[0].isEmpty()) {
-                    completions.removeIf(str -> !str.startsWith(args[0]));
-                }
-                Collections.sort(completions);
-                return completions;
-            } else if (args.length >= 2) {
-                String subCommandName = args[0].toLowerCase();
-                Subcommand subCommand = subcommandsWithAliases.get(subCommandName);
-
-                if (subCommand != null) {
-                    String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
-                    List<String> tabComplete = subCommand.tabComplete(sender, subArgs);
-                    if (tabComplete != null && !tabComplete.isEmpty()) {
-                        return tabComplete;
-                    }
-                }
-                return Bukkit.getOnlinePlayers().stream()
-                        .map(HumanEntity::getName)
-                        .filter(s -> s.startsWith(args[1]))
-                        .collect(Collectors.toList());
-            }
-
             return Collections.emptyList();
         }
     }

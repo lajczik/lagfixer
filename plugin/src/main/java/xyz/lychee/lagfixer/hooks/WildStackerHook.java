@@ -54,4 +54,3 @@ public class WildStackerHook extends AbstractHook implements HookManager.Stacker
     public void disable() {
     }
 }
-

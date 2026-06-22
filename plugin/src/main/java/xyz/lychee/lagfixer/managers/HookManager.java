@@ -141,3 +141,4 @@ public class HookManager
         boolean isStacked(LivingEntity entity);
     }
 }
+

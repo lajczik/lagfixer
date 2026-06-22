@@ -1,4 +1,4 @@
-package xyz.lychee.lagfixer.nms.v1_20_R4;
+package xyz.lychee.lagfixer.nms.v1_21_R6;
 
 import com.google.common.collect.MapMaker;
 import net.minecraft.tags.ItemTags;
@@ -18,7 +18,9 @@ import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.animal.goat.Goat;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.sniffer.Sniffer;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.Piglin;
@@ -76,7 +78,7 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
     private void register(Class<? extends Entity> clazz, TagKey<Item> item) {
         this.temptTargeting.computeIfAbsent(clazz, k -> TargetingConditions.forNonCombat().ignoreLineOfSight())
                 .range(this.getModule().getTemptRange())
-                .selector(entity ->
+                .selector((entity, level) ->
                         entity.getMainHandItem().is(item) || (this.getModule().isTemptTriggerBothHands() && entity.getOffhandItem().is(item))
                 );
     }

@@ -24,6 +24,8 @@ messages:
     no_access: "<gray>Missing permission to this module: <yellow><permission>"
     disabled_module: "<gray>Module <yellow><module> <gray>is disabled, administration must enable this feature!"
     player_only: "<gray>Command can be only executed by player!"
+    gui:
+
 
   RedstoneLimiter:
     alert: "<gray>Blocked <yellow><ticks> <gray>redstone ticks at chunk in <gradient:#c48d00:#fffb00><location></gradient><gray>!"

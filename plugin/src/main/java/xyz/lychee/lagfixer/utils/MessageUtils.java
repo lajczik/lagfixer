@@ -59,9 +59,12 @@ public class MessageUtils {
     public static boolean sendMessage(boolean prefix, CommandSender sender, String message) {
         Component text = colors(sender, "&f" + message);
 
-        sender.sendMessage(prefix ?
-                Component.empty().append(ConfigManager.getInstance().getPrefix()).append(text) : text
-        );
+        LagFixer.getInstance()
+                .getAudiences()
+                .sender(sender)
+                .sendMessage(prefix ?
+                        Component.empty().append(ConfigManager.getInstance().getPrefix()).append(text) : text
+                );
 
         return false;
     }

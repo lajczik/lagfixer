@@ -21,16 +21,14 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-public class InstantLeafDecayModule
-        extends AbstractModule
-        implements Listener {
+public class InstantLeafDecayModule extends AbstractModule implements Listener {
     private static final EnumSet<BlockFace> FACES = EnumSet.of(BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH, BlockFace.DOWN, BlockFace.UP);
     private boolean dropItems;
     private boolean leavesDecay;
     private int treeDistance;
 
     public InstantLeafDecayModule(LagFixer plugin, ModuleManager manager) {
-        super(plugin, manager, Impact.LOW, "InstantLeafDecay",
+        super(plugin, manager, AbstractModule.Impact.LOW, "InstantLeafDecay",
                 new String[]{
                         "Ensures instant leaf removal, reducing leaf blocks for ticking.",
                         "Vital for server performance by eliminating gradual leaf block processing.",
@@ -39,7 +37,7 @@ public class InstantLeafDecayModule
                 }, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWYyZDE0NjkyZDhiMGUzNTI2YTZmYWY0MjY2NzI3YmQwMmFhYTdiMDUyN2IxODVhY2Y3ZjBhYTY2NzkzZmZkYyJ9fX0=");
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e) {
         Block block = e.getBlock();
         if (!this.canContinue(block.getWorld())) return;
@@ -49,7 +47,7 @@ public class InstantLeafDecayModule
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLeavesDecay(LeavesDecayEvent e) {
         Block block = e.getBlock();
         if (!this.canContinue(block.getWorld())) return;
@@ -110,4 +108,3 @@ public class InstantLeafDecayModule
         HandlerList.unregisterAll(this);
     }
 }
-

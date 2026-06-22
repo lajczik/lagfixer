@@ -1,7 +1,6 @@
 package xyz.lychee.lagfixer.menu;
 
 import lombok.Data;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.HumanEntity;
@@ -134,7 +133,7 @@ public class ConfigMenu extends AbstractMenu {
     }
 
     private void openModuleMenu(Player player, AbstractModule module) {
-        Bukkit.getRegionScheduler().run(this.getPlugin(), player.getLocation(), t -> player.openInventory(module.getMenu().getInv()));
+        SupportManager.getInstance().getFork().runNow(false, player.getLocation(), () -> player.openInventory(module.getMenu().getInv()));
     }
 
     @EventHandler

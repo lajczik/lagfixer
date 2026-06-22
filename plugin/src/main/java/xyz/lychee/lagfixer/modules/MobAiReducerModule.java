@@ -1,17 +1,14 @@
 package xyz.lychee.lagfixer.modules;
 
-import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.world.EntitiesLoadEvent;
+import org.bukkit.scheduler.BukkitTask;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
@@ -21,10 +18,6 @@ import xyz.lychee.lagfixer.utils.ReflectionUtils;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -32,8 +25,9 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
     private final EnumSet<EntityType> list = EnumSet.noneOf(EntityType.class);
     private final EnumSet<CreatureSpawnEvent.SpawnReason> reasons = EnumSet.noneOf(CreatureSpawnEvent.SpawnReason.class);
     private final HashSet<String> ai_list = new HashSet<>();
-    private ScheduledTask task;
+    private BukkitTask task;
     private NMS mobAiReducer;
+    private boolean async;
     private boolean ignore_models;
     private boolean animals;
     private boolean monsters;
@@ -82,24 +76,10 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
                 || !this.canContinue(e.getEntity().getWorld())
         ) return;
 
-<<<<<<< HEAD
-        this.mobAiReducer.optimize(e.getEntity(), false);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onLoad(EntitiesLoadEvent e) {
-        if (this.canContinue(e.getWorld())) {
-            for (Entity entity : e.getEntities()) {
-                if (this.isEnabled(entity)) {
-                    this.mobAiReducer.optimize(entity, false);
-                }
-            }
-=======
         if (this.async) {
             SupportManager.getInstance().getFork().runNow(true, e.getLocation(), () -> this.mobAiReducer.optimize(e.getEntity(), false));
         } else {
             this.mobAiReducer.optimize(e.getEntity(), false);
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         }
     }
 
@@ -123,33 +103,22 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         Bukkit.getPluginManager().registerEvents(this.mobAiReducer, this.getPlugin());
 
         if (this.force_load) {
-            RegionScheduler scheduler = Bukkit.getRegionScheduler();
-
-            this.getAllowedWorlds().forEach(world -> {
-                Map<SupportManager.RegionPos, List<Chunk>> regions = SupportManager.createRegionMap(world);
-                regions.forEach((regionPos, chunks) -> {
-                    Executor executor = task -> scheduler.execute(this.getPlugin(), world, regionPos.getX() << 3, regionPos.getZ() << 3, task);
-                    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                        for (Chunk chunk : chunks) {
-                            Entity[] entities = chunk.getEntities();
-                            for (Entity entity : entities) {
-                                if (this.isEnabled(entity)) {
-                                    this.mobAiReducer.optimize(entity, true);
-                                }
-                            }
-                        }
-                    }, executor);
-                });
-            });
+            this.getAllowedWorlds().forEach(w ->
+                    w.getLivingEntities()
+                            .stream()
+                            .filter(this::isEnabled)
+                            .forEach(ent -> this.mobAiReducer.optimize(ent, true))
+            );
         }
 
-        this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.getPlugin(), t -> this.mobAiReducer.purge(), 60, this.purge_interval, TimeUnit.SECONDS);
+        this.task = SupportManager.getInstance().getFork().runTimer(true, () -> this.mobAiReducer.purge(), 60, this.purge_interval, TimeUnit.SECONDS);
     }
 
     @Override
     public boolean loadConfig() {
         this.mobAiReducer = ReflectionUtils.createInstance("MobAiReducer", this);
 
+        this.async = this.getSection().getBoolean("async");
         this.ignore_models = HookManager.getInstance().noneModels() || this.getSection().getBoolean("ignore_models");
         this.animals = this.getSection().getBoolean("entities.animals");
         this.monsters = this.getSection().getBoolean("entities.monsters");
@@ -222,3 +191,4 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         public abstract void purge();
     }
 }
+

@@ -1,6 +1,5 @@
 package xyz.lychee.lagfixer.commands;
 
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -71,7 +70,7 @@ public class MapCommand extends CommandManager.Subcommand {
         if (!(sender instanceof Player)) {
             Component text = Language.getMainValue("player_only", true);
             if (text != null) {
-                sender.sendMessage(text);
+                LagFixer.getInstance().getAudiences().sender(sender).sendMessage(text);
             }
             return false;
         }
@@ -107,11 +106,7 @@ public class MapCommand extends CommandManager.Subcommand {
         private int bufferIndex;
         private int dataCount;
         private volatile boolean shouldRender = true;
-<<<<<<< HEAD
-        private ScheduledTask task;
-=======
         private BukkitTask task;
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
         public MapHandler(LagFixer plugin) throws AWTError {
             this.plugin = plugin;
@@ -150,18 +145,11 @@ public class MapCommand extends CommandManager.Subcommand {
         public void load() {
             int interval = this.plugin.getConfig().getInt("main.monitor.map.interval");
 
-<<<<<<< HEAD
-            this.task = Bukkit.getAsyncScheduler().runAtFixedRate(this.plugin, t -> {
-                SupportManager support = SupportManager.getInstance();
-                ResourceMonitor monitor = support.getResourceMonitor();
-                int pixelY = msptToPixelY(monitor.getMspt());
-=======
             this.task = SupportManager.getInstance().getFork().runTimer(true, () -> {
                 SupportManager support = SupportManager.getInstance();
                 ResourceMonitor monitor = support.getResourceMonitor();
                 boolean supportMspt = support.getFork().isSupportMspt();
                 int pixelY = supportMspt ? msptToPixelY(monitor.getMspt()) : tpsToPixelY(monitor.getTps());
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 
                 if (this.dataCount < MAX_DATA_POINTS) {
                     this.valuesBuffer[this.dataCount++] = pixelY;
@@ -173,7 +161,10 @@ public class MapCommand extends CommandManager.Subcommand {
                 if (!this.shouldRender) return;
 
                 renderGraph();
-                renderText(String.format("Mspt: %.1f Tps: %.1f", monitor.getMspt(), monitor.getTps()));
+                renderText(supportMspt ?
+                        String.format("Mspt: %.1f Tps: %.1f", monitor.getMspt(), monitor.getTps())
+                        : String.format("Tps: %.1f, Cpu: %.1f", monitor.getTps(), monitor.getCpuProcess())
+                );
 
                 for (int i = 0; i < this.pixels.length; i++) {
                     int rgb = this.pixels[i];
@@ -227,15 +218,12 @@ public class MapCommand extends CommandManager.Subcommand {
             return (int) Math.round(3 + (1.0 - scale) * 118.0);
         }
 
-<<<<<<< HEAD
-=======
         private int tpsToPixelY(double tps) {
             double clamped = Math.clamp(tps, 15.0, 20.0);
             double scale = (clamped - 15.0) / 5.0;
             return (int) Math.round(3 + scale * 118.0);
         }
 
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         private void renderText(String text) {
             MinecraftFont font = MinecraftFont.Font;
             int x = 10, y = 10;

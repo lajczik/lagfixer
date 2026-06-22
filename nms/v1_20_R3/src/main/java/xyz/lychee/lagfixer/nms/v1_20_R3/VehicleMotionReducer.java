@@ -1,26 +1,23 @@
 package xyz.lychee.lagfixer.nms.v1_20_R3;
 
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.*;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftBoat;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftMinecart;
-<<<<<<< HEAD
-=======
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.EntitiesLoadEvent;
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import xyz.lychee.lagfixer.modules.VehicleMotionReducerModule;
 
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.function.Function;
 
-public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
-    private static final IdentityHashMap<Class<? extends VehicleEntity>, Function<VehicleEntity, VehicleEntity>> VEHICLES = new IdentityHashMap<>(10);
+public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS implements Listener {
+    private static final IdentityHashMap<Class<? extends VehicleEntity>, Function<VehicleEntity, VehicleEntity>> VEHICLES = new IdentityHashMap<>(8);
 
     static {
         VEHICLES.put(Boat.class, e -> new VehicleWrapper.OBoat((Boat) e));
@@ -39,11 +36,7 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean optimizeVehicle(org.bukkit.entity.Entity vehicle) {
-=======
     public boolean optimizeVehicle(Entity vehicle) {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         if (vehicle instanceof CraftBoat boat) {
             if (!this.getModule().isBoat()) return false;
 
@@ -56,6 +49,14 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
         return false;
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onSpawn(EntitiesLoadEvent e) {
+        List<Entity> entities = e.getEntities();
+        for (Entity entity : entities) {
+            this.optimizeVehicle(entity);
+        }
+    }
+
     private boolean processEntity(VehicleEntity original) {
         if (original instanceof VehicleWrapper) return false;
 
@@ -64,19 +65,14 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
 
         VehicleEntity newVehicle = factory.apply(original);
         newVehicle.setSilent(true);
-        copyLocation(original, newVehicle);
-        copyItems(original, newVehicle);
-
-        original.removeVehicle();
+        this.copyLocation(original, newVehicle);
         original.level().addFreshEntity(newVehicle);
+        this.copyItems(original, newVehicle);
+        original.remove(net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
         return true;
     }
 
-<<<<<<< HEAD
-    private void copyItems(Entity from, Entity to) {
-=======
     private void copyItems(VehicleEntity from, VehicleEntity to) {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
         if (from instanceof ContainerEntity fromContainer && to instanceof ContainerEntity toContainer) {
             for (int i = 0; i < fromContainer.getContainerSize(); i++) {
                 ItemStack is = fromContainer.getItem(i);

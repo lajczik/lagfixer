@@ -139,7 +139,7 @@ public interface VehicleWrapper {
             super(EntityType.SPAWNER_MINECART, other.level());
 
             Optional.ofNullable(other.getSpawner().nextSpawnData)
-                    .flatMap(sd -> EntityType.by(sd.entityToSpawn()))
+                    .flatMap(sd -> EntityType.by(sd.getEntityToSpawn()))
                     .ifPresent(type ->
                             this.getSpawner().setEntityId(type, other.level(), other.level().getRandom(), this.blockPosition())
                     );

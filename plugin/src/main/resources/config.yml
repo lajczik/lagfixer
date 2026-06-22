@@ -14,13 +14,10 @@ main:
   # Displays LagFixer version info on hover.
   prefix_hover: true
 
-<<<<<<< HEAD
   # This option automatically updates the plugin config, removes unsupported options and adds new ones.
   # If you have problems with configuration, disable this option.
   config_formatter: true
 
-=======
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
   monitor:
     # Monitor for TPS, MSPT, CPU, and other metrics.
     resource:
@@ -49,16 +46,7 @@ main:
   # Optimized metrics available at https://bstats.org/plugin/bukkit/LagFixer/19292.
   bStats: true
 
-<<<<<<< HEAD
   command_aliases:
     - lf
     - antilag
     - lag
-=======
-  command:
-    permission: "lagfixer.command"
-    aliases:
-      - lf
-      - antilag
-      - lag
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90

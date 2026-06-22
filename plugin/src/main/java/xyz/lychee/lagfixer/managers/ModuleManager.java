@@ -68,7 +68,7 @@ public class ModuleManager extends AbstractManager {
                 }
 
                 module.setLoaded(success && enabled);
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 module.setLoaded(false);
                 this.getPlugin().getLogger().info(" &8• &cSkipping module " + module.getName() + ", reason: " + ex.getMessage());
                 this.getPlugin().printError(ex);

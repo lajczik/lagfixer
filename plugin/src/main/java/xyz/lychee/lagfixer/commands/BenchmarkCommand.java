@@ -1,8 +1,7 @@
 package xyz.lychee.lagfixer.commands;
 
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Data;
-import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import xyz.lychee.lagfixer.managers.CommandManager;
 import xyz.lychee.lagfixer.managers.ErrorsManager;
@@ -29,26 +28,21 @@ public class BenchmarkCommand extends CommandManager.Subcommand {
 
     @Override
     public boolean execute(@NotNull org.bukkit.command.CommandSender sender, @NotNull String[] args) {
-        if (benchmark) {
+        if (this.benchmark) {
             return MessageUtils.sendMessage(true, sender, "&7Benchmark is running, wait for results in console!");
         }
 
-<<<<<<< HEAD
-        ResourceMonitor resourceMonitor = SupportManager.getInstance().getResourceMonitor();
-        if (resourceMonitor.getMspt() > 10.0) {
-=======
         ResourceMonitor monitor = SupportManager.getInstance().getResourceMonitor();
         if (monitor.getMspt() > 10.0) {
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
             return MessageUtils.sendMessage(true, sender, "&7Server MSPT is too &chigh&7, the result may be incorrect!");
         }
 
-        long availableRam = resourceMonitor.getRamFree() + (resourceMonitor.getRamMax() - resourceMonitor.getRamTotal());
+        long availableRam = monitor.getRamFree() + (monitor.getRamMax() - monitor.getRamTotal());
         if (availableRam < 2048) {
             return MessageUtils.sendMessage(true, sender, "&7Server available RAM is too low, you need &c" + availableRam + "&8/&c2048MB");
         }
 
-        ScheduledTask task = Bukkit.getAsyncScheduler().runAtFixedRate(this.getCommandManager().getPlugin(), t -> {
+        BukkitTask task = SupportManager.getInstance().getFork().runTimer(true, () -> {
             if (this.benchmark) {
                 MessageUtils.sendMessage(true, sender, "&7Async benchmark in progress, wait for results...");
             }

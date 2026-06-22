@@ -6,19 +6,17 @@ import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftBoat;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftMinecart;
-<<<<<<< HEAD
-=======
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.EntitiesLoadEvent;
->>>>>>> 559dd4fc5cf73115924d60b1ed04a0a70832ae90
 import xyz.lychee.lagfixer.modules.VehicleMotionReducerModule;
 
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.function.Function;
 
-public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
+public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS implements Listener {
     private static final IdentityHashMap<Class<? extends Entity>, Function<Entity, Entity>> VEHICLES = new IdentityHashMap<>(8);
 
     static {
@@ -51,6 +49,14 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
         return false;
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onSpawn(EntitiesLoadEvent e) {
+        List<org.bukkit.entity.Entity> entities = e.getEntities();
+        for (org.bukkit.entity.Entity entity : entities) {
+            this.optimizeVehicle(entity);
+        }
+    }
+
     private boolean processEntity(Entity original) {
         if (original instanceof VehicleWrapper) return false;
 
@@ -58,12 +64,10 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
         if (factory == null) return false;
 
         Entity newVehicle = factory.apply(original);
-        newVehicle.setSilent(true);
-        copyLocation(original, newVehicle);
-        copyItems(original, newVehicle);
-
-        original.removeVehicle();
+        this.copyLocation(original, newVehicle);
         original.level().addFreshEntity(newVehicle);
+        this.copyItems(original, newVehicle);
+        original.remove(Entity.RemovalReason.DISCARDED);
         return true;
     }
 

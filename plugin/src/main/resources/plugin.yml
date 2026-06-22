@@ -1,0 +1,21 @@
+name: LagFixer
+version: ${lagfixer_version} [build ${lagfixer_build}]
+main: xyz.lychee.lagfixer.LagFixer
+author: lychee
+api-version: 1.13
+website: https://modrinth.com/plugin/lagfixer
+softdepend: [
+  PlaceholderAPI,
+  spark,
+  LevelledMobs,
+  RoseStacker,
+  UltimateStacker,
+  WildStacker,
+  ModelEngine,
+  MythicMobs,
+  StackMob
+]
+folia-supported: false
+
+libraries:
+  - com.github.oshi:oshi-core:7.2.0
