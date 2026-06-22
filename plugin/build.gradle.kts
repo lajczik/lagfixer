@@ -36,7 +36,7 @@ dependencies {
     compileOnly("com.mojang:authlib:3.11.50")
     compileOnly("org.apache.logging.log4j:log4j-core:2.17.2")
     compileOnly("org.jetbrains:annotations:26.1.0")
-    compileOnly("com.github.oshi:oshi-core:7.2.0")
+    compileOnly("com.github.oshi:oshi-core:7.3.1")
     compileOnly("org.apache.commons:commons-lang3:3.20.0")
 
     implementation("net.kyori:adventure-platform-bukkit:4.4.1")

@@ -15,3 +15,6 @@ softdepend: [
   StackMob
 ]
 folia-supported: false
+
+libraries:
+  - com.github.oshi:oshi-core:7.3.1
