@@ -51,6 +51,8 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
         this.register(EntityPanda.class, Blocks.BAMBOO.getItem());
         this.register(EntityFox.class, Items.SWEET_BERRIES);
         this.register(EntityStrider.class, Items.bx, Items.WARPED_FUNGUS_ON_A_STICK);
+        this.register(EntityHorseMule.class, Items.APPLE, Items.GOLDEN_APPLE, Items.GOLDEN_CARROT, Items.SUGAR, Blocks.HAY_BLOCK.getItem(), Items.WHEAT);
+        this.register(EntityLlamaTrader.class, Blocks.HAY_BLOCK.getItem(), Items.WHEAT);
     }
 
     private void register(Class<? extends Entity> clazz, Item... items) {

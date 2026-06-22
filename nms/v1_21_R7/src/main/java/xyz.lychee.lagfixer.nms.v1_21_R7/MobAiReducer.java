@@ -15,14 +15,19 @@ import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.animal.bee.Bee;
 import net.minecraft.world.entity.animal.camel.Camel;
+import net.minecraft.world.entity.animal.camel.CamelHusk;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.animal.cow.Cow;
-import net.minecraft.world.entity.animal.equine.Horse;
-import net.minecraft.world.entity.animal.equine.Llama;
+import net.minecraft.world.entity.animal.cow.MushroomCow;
+import net.minecraft.world.entity.animal.equine.*;
+import net.minecraft.world.entity.animal.feline.Cat;
 import net.minecraft.world.entity.animal.feline.Ocelot;
 import net.minecraft.world.entity.animal.fox.Fox;
 import net.minecraft.world.entity.animal.frog.Frog;
 import net.minecraft.world.entity.animal.goat.Goat;
+import net.minecraft.world.entity.animal.happyghast.HappyGhast;
+import net.minecraft.world.entity.animal.nautilus.Nautilus;
+import net.minecraft.world.entity.animal.nautilus.ZombieNautilus;
 import net.minecraft.world.entity.animal.panda.Panda;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.animal.pig.Pig;
@@ -75,7 +80,6 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
         this.register(Turtle.class, ItemTags.TURTLE_FOOD);
         this.register(Strider.class, ItemTags.STRIDER_FOOD);
         this.register(Rabbit.class, ItemTags.RABBIT_FOOD);
-        this.register(Piglin.class, ItemTags.PIGLIN_FOOD);
         this.register(Panda.class, ItemTags.PANDA_FOOD);
         this.register(Ocelot.class, ItemTags.OCELOT_FOOD);
         this.register(Llama.class, ItemTags.LLAMA_FOOD);
@@ -83,6 +87,16 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
         this.register(Camel.class, ItemTags.CAMEL_FOOD);
         this.register(Armadillo.class, ItemTags.ARMADILLO_FOOD);
         this.register(Sniffer.class, ItemTags.SNIFFER_FOOD);
+        this.register(Nautilus.class, ItemTags.NAUTILUS_FOOD);
+        this.register(ZombieNautilus.class, ItemTags.NAUTILUS_FOOD);
+        this.register(HappyGhast.class, ItemTags.HAPPY_GHAST_FOOD);
+        this.register(CamelHusk.class, ItemTags.CAMEL_HUSK_FOOD);
+        this.register(Cat.class, ItemTags.CAT_FOOD);
+        this.register(Donkey.class, ItemTags.HORSE_FOOD);
+        this.register(Mule.class, ItemTags.HORSE_FOOD);
+        this.register(MushroomCow.class, ItemTags.COW_FOOD);
+        this.register(TraderLlama.class, ItemTags.LLAMA_FOOD);
+        this.register(Piglin.class, ItemTags.PIGLIN_FOOD);
     }
 
     private void register(Class<? extends Entity> clazz, TagKey<Item> item) {
