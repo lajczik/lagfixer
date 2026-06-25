@@ -104,24 +104,23 @@ public class ErrorsManager extends AbstractManager {
 
         ThrowableKey key = new ThrowableKey(t);
         List<String> stackTrace = this.filterStackTrace(t);
-        if (stackTrace.isEmpty() || this.errors.containsKey(key)) return true;
+        if (stackTrace.isEmpty()) return true;
 
         StringBuilder message = new StringBuilder();
-        message.append("LagFixer error message:\n");
-        message.append("\n&8&m-------------------------------&r");
         message.append("\n");
-        message.append("\n&fAn error occurred in lagfixer:");
-        message.append("\n &7-> &c").append(t.getClass().getSimpleName()).append(": ").append(t.getMessage());
+        message.append("\n     &fAn error occurred in lagfixer:");
+        message.append("\n        &4&n").append(t.getClass().getSimpleName()).append("&r&8: &4").append(t.getMessage());
         for (String str : stackTrace) {
-            message.append("\n &7| &c").append(str);
+            message.append("\n        &7^ &c").append(str);
         }
         message.append("\n");
-        message.append("\n&fOur support has been informed about it, it will be fixed soon.");
-        message.append("\n&fMake sure the LagFixer configuration is done correctly.");
-        message.append("\n&fIf you have any doubts, contact support: &nhttps://discord.gg/CFmzJjgZdu&r");
+        message.append("\n   &fOur support has been informed about it, it will be fixed soon.");
+        message.append("\n   &fMake sure the LagFixer configuration is done correctly.");
+        message.append("\n   &fIf you have any doubts, contact support: &nhttps://discord.gg/CFmzJjgZdu&r");
         message.append("\n");
-        message.append("\n&8&m-------------------------------\n");
         this.getPlugin().getLogger().warning(message.toString());
+
+        if (this.errors.containsKey(key)) return false;
 
         this.errors.put(key, new Error(stackTrace, t));
 
@@ -194,13 +193,36 @@ public class ErrorsManager extends AbstractManager {
     }
 
     private List<String> filterStackTrace(Throwable ex) {
+        StackTraceElement[] stackTrace = ex.getStackTrace();
         List<String> list = new ArrayList<>();
-        for (StackTraceElement e : ex.getStackTrace()) {
-            if (!e.getClassName().contains("lagfixer")) continue;
+        int maxLines = 10;
+        int index = 0;
 
-            list.add(String.format("%s -> %s() at %d line", e.getFileName(), e.getMethodName(), e.getLineNumber()));
+        for (StackTraceElement element : stackTrace) {
+            if (index >= maxLines) {
+                int tracesLeft = stackTrace.length - index;
+                list.add("and " + tracesLeft + " traces more…");
+                return list;
+            }
+
+            String trace = formatStackTraceElement(element);
+            if (trace == null) continue;
+
+            list.add(trace);
+            index++;
         }
         return list;
+    }
+
+    private String formatStackTraceElement(StackTraceElement element) {
+        if (element.getFileName() == null || element.getLineNumber() < 0)
+            return null;
+
+        return String.format("%s$%s(%d)",
+                element.getClassName(),
+                element.getMethodName(),
+                element.getLineNumber()
+        );
     }
 
     private interface SendTask {
