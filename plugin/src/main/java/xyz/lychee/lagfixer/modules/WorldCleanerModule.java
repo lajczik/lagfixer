@@ -186,6 +186,8 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                 int creatures = 0, items = 0, projectiles = 0;
 
                 for (World world : this.getAllowedWorlds()) {
+                    if (world.getPlayers().isEmpty()) continue;
+
                     for (Entity ent : world.getEntities()) {
                         if (ent instanceof LivingEntity livingEntity) {
                             if (this.creatures_enabled && this.clearCreature(livingEntity)) {
