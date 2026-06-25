@@ -14,6 +14,7 @@ repositories {
     maven("https://repo.helpch.at/releases/")
     maven("https://central.sonatype.com/")
     maven("https://maven.google.com")
+    maven("https://repo.songoda.com/repository/minecraft-plugins/")
 }
 
 dependencies {
@@ -25,12 +26,12 @@ dependencies {
 
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
-    compileOnly("com.bgsoftware:WildStackerAPI:2025.2")
-    compileOnly("dev.rosewood:rosestacker:1.5.38")
+    compileOnly("com.bgsoftware:WildStackerAPI:2026.1")
+    compileOnly("dev.rosewood:rosestacker:1.5.41")
     compileOnly("com.ticxo.modelengine:ModelEngine:R4.0.9")
-    compileOnly("io.lumine:Mythic-Dist:5.9.5")
+    compileOnly("io.lumine:Mythic-Dist:5.12.0")
     compileOnly("com.songoda:UltimateStacker-API:1.0.0-SNAPSHOT")
-    compileOnly("uk.antiperson.stackmob:StackMob:5.10.3")
+    compileOnly("uk.antiperson.stackmob:StackMob:5.10.6")
     compileOnly("io.github.arcaneplugins:levelledmobs-plugin:4.0.3.1")
 
     compileOnly("com.mojang:authlib:3.11.50")
@@ -45,7 +46,7 @@ dependencies {
 
 tasks {
     processResources {
-        filteringCharset = "UTF-8"
+        filteringCharset = Charsets.UTF_8.name()
         filesMatching("plugin.yml") {
             expand(project.properties)
         }
