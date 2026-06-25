@@ -65,7 +65,6 @@ public class LagFixer extends JavaPlugin {
             TimingUtil t = TimingUtil.startNew();
             manager.load();
             this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fEnabled manager in &e" + t.stop() + "&f!");
-            Integer.parseInt("test");
         } catch (Exception ex) {
             this.printError(ex);
         }
