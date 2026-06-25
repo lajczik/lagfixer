@@ -10,7 +10,7 @@ val sonatypeRepo = "https://oss.sonatype.org/content/groups/public/"
 val jitpack = "https://jitpack.io"
 val mojang = "https://libraries.minecraft.net"
 
-version = "1.6.2"
+version = "1.6.3"
 extra["lagfixer_version"] = version
 extra["lagfixer_build"] = "145"
 
@@ -33,6 +33,7 @@ dependencies {
     implementation(project(":nms:v1_21_R6"))
     implementation(project(":nms:v1_21_R7"))
     implementation(project(":nms:v26_1"))
+    implementation(project(":nms:v26_2"))
 
     implementation(project(":support:common"))
     implementation(project(":support:spigot"))
