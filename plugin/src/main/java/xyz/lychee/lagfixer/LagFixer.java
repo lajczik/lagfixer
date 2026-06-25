@@ -28,12 +28,10 @@ public class LagFixer extends JavaPlugin {
         this.loadManager(new ConfigManager(this));
         this.loadManager(new SupportManager(this));
         this.loadManager(new HookManager(this));
-        this.loadManager(new MetricsManager(this));
         this.loadManager(new UpdaterManager(this));
         this.loadManager(new ModuleManager(this));
         this.loadManager(new CommandManager(this));
-        this.getLogger().info("&fRemember to leave a rating!&r &e&l★ ★ ★ ★ ★");
-        this.getLogger().info("&c❤ &fSupport us &e&nhttps://ko-fi.com/lajczik");
+        this.loadManager(new MetricsManager(this));
     }
 
     @Override
@@ -67,6 +65,7 @@ public class LagFixer extends JavaPlugin {
             TimingUtil t = TimingUtil.startNew();
             manager.load();
             this.getLogger().info("&8(&e" + manager.getClass().getSimpleName() + "&8) &7-> &fEnabled manager in &e" + t.stop() + "&f!");
+            Integer.parseInt("test");
         } catch (Exception ex) {
             this.printError(ex);
         }
