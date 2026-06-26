@@ -104,7 +104,7 @@ public class ErrorsManager extends AbstractManager {
 
         ThrowableKey key = new ThrowableKey(t);
         List<String> stackTrace = this.filterStackTrace(t);
-        if (stackTrace.isEmpty()) return true;
+        if (stackTrace.isEmpty() || stackTrace.stream().noneMatch(str -> str.contains("lagfixer"))) return true;
 
         StringBuilder message = new StringBuilder();
         message.append("\n");
