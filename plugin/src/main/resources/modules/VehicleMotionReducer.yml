@@ -10,6 +10,12 @@ VehicleMotionReducer:
 
     minecart:
       enabled: true
+      collides: false
+      pushable: false
+      silent: true
 
     boat:
       enabled: true
+      collides: false
+      pushable: false
+      silent: true

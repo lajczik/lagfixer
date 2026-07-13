@@ -1,5 +1,6 @@
 package xyz.lychee.lagfixer.nms.v1_21_R7;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.entity.vehicle.boat.Boat;
@@ -11,76 +12,72 @@ import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftBoat;
 import org.bukkit.craftbukkit.entity.CraftMinecart;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import xyz.lychee.lagfixer.modules.VehicleMotionReducerModule;
 
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.function.Function;
 
-public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS implements Listener {
-    private static final IdentityHashMap<Class<? extends VehicleEntity>, Function<VehicleEntity, VehicleEntity>> VEHICLES = new IdentityHashMap<>(10);
-
-    static {
-        VEHICLES.put(Raft.class, e -> new VehicleWrapper.ORaft((Raft) e));
-        VEHICLES.put(ChestRaft.class, e -> new VehicleWrapper.OChestRaft((ChestRaft) e));
-        VEHICLES.put(Boat.class, e -> new VehicleWrapper.OBoat((Boat) e));
-        VEHICLES.put(ChestBoat.class, e -> new VehicleWrapper.OChestBoat((ChestBoat) e));
-
-        VEHICLES.put(MinecartChest.class, e -> new VehicleWrapper.OMinecartChest((MinecartChest) e));
-        VEHICLES.put(MinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper((MinecartHopper) e));
-        VEHICLES.put(MinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace((MinecartFurnace) e));
-        VEHICLES.put(MinecartSpawner.class, e -> new VehicleWrapper.OMinecartSpawner((MinecartSpawner) e));
-        VEHICLES.put(MinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT((MinecartTNT) e));
-        VEHICLES.put(Minecart.class, e -> new VehicleWrapper.OMinecart((Minecart) e));
-    }
+public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
+    private final IdentityHashMap<Class<? extends Entity>, Function<Entity, Entity>> vehicles = new IdentityHashMap<>(10);
 
     public VehicleMotionReducer(VehicleMotionReducerModule module) {
         super(module);
+
+        vehicles.put(Raft.class, e -> new VehicleWrapper.ORaft(module, (Raft) e));
+        vehicles.put(ChestRaft.class, e -> new VehicleWrapper.OChestRaft(module, (ChestRaft) e));
+        vehicles.put(Boat.class, e -> new VehicleWrapper.OBoat(module, (Boat) e));
+        vehicles.put(ChestBoat.class, e -> new VehicleWrapper.OChestBoat(module, (ChestBoat) e));
+
+        vehicles.put(MinecartChest.class, e -> new VehicleWrapper.OMinecartChest(module, (MinecartChest) e));
+        vehicles.put(MinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper(module, (MinecartHopper) e));
+        vehicles.put(MinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace(module, (MinecartFurnace) e));
+        vehicles.put(MinecartSpawner.class, e -> new VehicleWrapper.OMinecartSpawner(module, (MinecartSpawner) e));
+        vehicles.put(MinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT(module, (MinecartTNT) e));
+        vehicles.put(Minecart.class, e -> new VehicleWrapper.OMinecart(module, (Minecart) e));
     }
 
     @Override
-    public boolean optimizeVehicle(Entity vehicle) {
+    public boolean optimize(org.bukkit.entity.Entity vehicle) {
         if (vehicle instanceof CraftBoat boat) {
             if (!this.getModule().isBoat()) return false;
 
-            return this.processEntity(boat.getHandle());
+            return this.processEntity(boat.getHandle(), this.getModule().isBoat_silent());
         } else if (vehicle instanceof CraftMinecart minecart) {
             if (!this.getModule().isMinecart()) return false;
 
-            return this.processEntity(minecart.getHandle());
+            return this.processEntity(minecart.getHandle(), this.getModule().isMinecart_silent());
         }
         return false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onSpawn(EntitiesLoadEvent e) {
-        List<Entity> entities = e.getEntities();
-        for (Entity entity : entities) {
-            this.optimizeVehicle(entity);
-        }
+    public void onLoad(EntitiesLoadEvent e) {
+        if (!this.getModule().canContinue(e.getWorld())) return;
+
+        e.getEntities().forEach(this::optimize);
     }
 
-    private boolean processEntity(VehicleEntity original) {
+    private boolean processEntity(Entity original, boolean silent) {
         if (original instanceof VehicleWrapper) return false;
 
-        Function<VehicleEntity, ? extends VehicleEntity> factory = VEHICLES.get(original.getClass());
+        Function<Entity, Entity> factory = this.vehicles.get(original.getClass());
         if (factory == null) return false;
 
-        VehicleEntity newVehicle = factory.apply(original);
-        newVehicle.setSilent(true);
+        Entity newVehicle = factory.apply(original);
+        newVehicle.setSilent(silent);
+
         this.copyLocation(original, newVehicle);
-        original.level().addFreshEntity(newVehicle);
         this.copyItems(original, newVehicle);
-        original.remove(net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
+
+        original.level().addFreshEntity(newVehicle);
+        original.remove(Entity.RemovalReason.DISCARDED);
         return true;
     }
 
-    private void copyItems(VehicleEntity from, VehicleEntity to) {
+    private void copyItems(Entity from, Entity to) {
         if (from instanceof ContainerEntity fromContainer && to instanceof ContainerEntity toContainer) {
             for (int i = 0; i < fromContainer.getContainerSize(); i++) {
                 ItemStack is = fromContainer.getItem(i);
@@ -92,7 +89,7 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS impleme
         }
     }
 
-    private void copyLocation(VehicleEntity from, VehicleEntity to) {
+    private void copyLocation(Entity from, Entity to) {
         to.setPos(from.xo, from.yo, from.zo);
         to.xo = from.xo;
         to.yo = from.yo;

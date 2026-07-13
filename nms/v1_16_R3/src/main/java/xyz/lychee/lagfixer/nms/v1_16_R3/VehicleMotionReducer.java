@@ -1,88 +1,92 @@
 package xyz.lychee.lagfixer.nms.v1_16_R3;
 
 import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftBoat;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import xyz.lychee.lagfixer.modules.VehicleMotionReducerModule;
 
 import java.util.IdentityHashMap;
 import java.util.function.Function;
 
-public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS implements Listener {
-    private static final IdentityHashMap<Class<? extends Entity>, Function<Entity, Entity>> VEHICLES = new IdentityHashMap<>(7);
-
-    static {
-        VEHICLES.put(EntityBoat.class, e -> new VehicleWrapper.OBoat((EntityBoat) e));
-        VEHICLES.put(EntityMinecartChest.class, e -> new VehicleWrapper.OMinecartChest((EntityMinecartChest) e));
-        VEHICLES.put(EntityMinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper((EntityMinecartHopper) e));
-        VEHICLES.put(EntityMinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace((EntityMinecartFurnace) e));
-        VEHICLES.put(EntityMinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT((EntityMinecartTNT) e));
-        VEHICLES.put(EntityMinecartRideable.class, e -> new VehicleWrapper.OMinecart((EntityMinecartRideable) e));
-    }
+public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
+    private final IdentityHashMap<Class<? extends Entity>, Function<Entity, Entity>> vehicles = new IdentityHashMap<>(10);
 
     public VehicleMotionReducer(VehicleMotionReducerModule module) {
         super(module);
+
+        vehicles.put(EntityBoat.class, e -> new VehicleWrapper.OBoat(module, (EntityBoat) e));
+
+        vehicles.put(EntityMinecartChest.class, e -> new VehicleWrapper.OMinecartChest(module, (EntityMinecartChest) e));
+        vehicles.put(EntityMinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper(module, (EntityMinecartHopper) e));
+        vehicles.put(EntityMinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace(module, (EntityMinecartFurnace) e));
+        vehicles.put(EntityMinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT(module, (EntityMinecartTNT) e));
+        vehicles.put(EntityMinecartRideable.class, e -> new VehicleWrapper.OMinecart(module, (EntityMinecartRideable) e));
     }
 
     @Override
-    public boolean optimizeVehicle(org.bukkit.entity.Entity vehicle) {
+    public boolean optimize(org.bukkit.entity.Entity vehicle) {
         if (vehicle instanceof CraftBoat boat) {
             if (!this.getModule().isBoat()) return false;
 
-            return this.processEntity(boat.getHandle());
+            return this.processEntity(boat.getHandle(), this.getModule().isBoat_silent());
         } else if (vehicle instanceof CraftMinecart minecart) {
             if (!this.getModule().isMinecart()) return false;
 
-            return this.processEntity(minecart.getHandle());
+            return this.processEntity(minecart.getHandle(), this.getModule().isMinecart_silent());
         }
         return false;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onSpawn(ChunkLoadEvent e) {
-        org.bukkit.entity.Entity[] entities = e.getChunk().getEntities();
-        for (org.bukkit.entity.Entity entity : entities) {
-            this.optimizeVehicle(entity);
+    public void onLoad(ChunkLoadEvent e) {
+        if (!this.getModule().canContinue(e.getWorld())) return;
+
+        for (org.bukkit.entity.Entity entity : e.getChunk().getEntities()) {
+            this.optimize(entity);
         }
     }
 
-    private boolean processEntity(Entity original) {
-        Function<Entity, Entity> function;
-        if (original instanceof VehicleWrapper || (function = VEHICLES.get(original.getClass())) == null) {
-            return false;
-        }
+    private boolean processEntity(Entity original, boolean silent) {
+        if (original instanceof VehicleWrapper) return false;
 
-        Entity newVehicle = function.apply(original);
-        newVehicle.setSilent(true);
+        Function<Entity, Entity> factory = this.vehicles.get(original.getClass());
+        if (factory == null) return false;
+
+        Entity newVehicle = factory.apply(original);
+        newVehicle.setSilent(silent);
+
         this.copyLocation(original, newVehicle);
-        original.getWorld().addEntity(newVehicle);
         this.copyItems(original, newVehicle);
+
+        original.getWorld().addEntity(newVehicle);
         original.die();
         return true;
     }
 
     private void copyItems(Entity from, Entity to) {
-        if (from instanceof EntityMinecartContainer && to instanceof EntityMinecartContainer) {
-            for (int i = 0; i < ((EntityMinecartContainer) from).getSize(); i++) {
-                ItemStack is = ((EntityMinecartContainer) from).getItem(i);
+        if (from instanceof EntityMinecartContainer fromContainer && to instanceof EntityMinecartContainer toContainer) {
+            for (int i = 0; i < fromContainer.getSize(); i++) {
+                ItemStack is = fromContainer.getItem(i);
                 if (!is.isEmpty()) {
-                    ((EntityMinecartContainer) to).setItem(i, is.cloneItemStack());
+                    toContainer.setItem(i, is.cloneItemStack());
                 }
             }
-            ((EntityMinecartContainer) from).clear();
+            fromContainer.clear();
         }
     }
 
     private void copyLocation(Entity from, Entity to) {
         to.setPosition(from.lastX, from.lastY, from.lastZ);
-        to.setMot(Vec3D.ORIGIN);
         to.lastX = from.lastX;
         to.lastY = from.lastY;
         to.lastZ = from.lastZ;
 
+        float yaw = Location.normalizeYaw(from.yaw);
+        to.yaw = yaw;
+        to.setHeadRotation(yaw);
     }
 }
