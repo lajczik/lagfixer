@@ -135,8 +135,7 @@ public class MobAiReducer extends MobAiReducerModule.NMS implements Listener {
             HashSet<WrappedGoal> toRemove = new HashSet<>();
 
             for (WrappedGoal pgw : goals) {
-                Goal goal = pgw.getGoal();
-                Class<?> goalClass = goal.getClass();
+                Class<?> goalClass = pgw.getGoal().getClass();
 
                 if (keepDedicated && !goalClass.getName().contains("ai.goal")) {
                     continue;
