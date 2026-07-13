@@ -27,6 +27,7 @@ EntityLimiter:
     reasons:
       - DEFAULT
       - EGG
+      - BREEDING
       - NATURAL
       - SPAWNER
       - SPAWNER_EGG
