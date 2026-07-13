@@ -199,7 +199,9 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                             }
                         } else if (ent instanceof Item item) {
                             if (this.items_enabled && this.clearItem(item)) {
-                                if (this.items_abyss_enabled && !this.items_abyss_blacklist.contains(item.getItemStack().getType())) {
+                                if (this.items_abyss_enabled
+                                        && !this.items_abyss_blacklist.contains(item.getItemStack().getType())
+                                        && item.getLocation().getY() > -64) {
                                     if (stacker != null) {
                                         stacker.addItemsToList(item, this.items);
                                     } else {
@@ -289,6 +291,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                 );
             }
         }, 1L, 1L, TimeUnit.SECONDS);
+
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
     }
 
@@ -389,6 +392,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                         }
                     }
                 }
+
                 this.items_abyss_permission = this.getSection().getString("items.abyss.command.permission");
                 this.items_abyss_aliases = this.getSection().getStringList("items.abyss.command.aliases");
                 this.items_abyss_itemdespawn = this.getSection().getBoolean("items.abyss.item_despawn");
