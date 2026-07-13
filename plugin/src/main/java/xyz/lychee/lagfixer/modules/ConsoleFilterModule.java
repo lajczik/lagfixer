@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class ConsoleFilterModule extends AbstractModule {
     private final Pattern ANSI_PATTERN = Pattern.compile("\\u001B\\[[;\\d]*[ -/]*[@-~]");
@@ -134,7 +134,7 @@ public class ConsoleFilterModule extends AbstractModule {
             printWriter.close();
         }
 
-        if (saveFiltered) {
+        if (saveFiltered && Files.size(this.logPath) > 0) {
             Path folder = getPlugin().getDataFolder().toPath().resolve("logs");
             String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -145,10 +145,10 @@ public class ConsoleFilterModule extends AbstractModule {
 
             Path archivePath = folder.resolve(date + " [" + count + "].log.gz");
             try (InputStream fis = Files.newInputStream(this.logPath);
-                 GZIPInputStream gis = new GZIPInputStream(fis);
-                 OutputStream os = Files.newOutputStream(archivePath)
+                 OutputStream os = Files.newOutputStream(archivePath);
+                 GZIPOutputStream gos = new GZIPOutputStream(os)
             ) {
-                gis.transferTo(os);
+                fis.transferTo(gos);
             }
 
             clearLogs(folder);
