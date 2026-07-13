@@ -17,7 +17,30 @@ import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
 
+import java.lang.reflect.Field;
+
 public class AbilityLimiterModule extends AbstractModule implements Listener {
+    private static final Enchantment UNBREAKING;
+
+    static {
+        Enchantment enchantment;
+        try {
+            Field f = Enchantment.class.getField("UNBREAKING");
+            enchantment = (Enchantment) f.get(null);
+        }
+        catch (Throwable ex1) {
+            try {
+                enchantment = Enchantment.DURABILITY;
+            }
+            catch (Throwable ex2) {
+                // if the Minecraft devs change their minds and come up with a different name again...
+                enchantment = null;
+            }
+        }
+
+        UNBREAKING = enchantment;
+    }
+
     private int trident_cooldown;
     private int elytra_cooldown;
     private int trident_durability;
@@ -71,8 +94,8 @@ public class AbilityLimiterModule extends AbstractModule implements Listener {
         if (meta == null) return;
 
         int duraLoss = defaultDuraLoss;
-        if (meta.hasEnchant(Enchantment.DURABILITY)) {
-            float lossChance = 100F / (is.getEnchantmentLevel(Enchantment.DURABILITY) + 1);
+        if (UNBREAKING != null && meta.hasEnchant(UNBREAKING)) {
+            float lossChance = 100F / (is.getEnchantmentLevel(UNBREAKING) + 1);
             for (int i = 0; i < defaultDuraLoss; i++) {
                 if (Math.random() * 100F < lossChance) {
                     duraLoss++;
