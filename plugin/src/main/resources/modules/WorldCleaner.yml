@@ -15,6 +15,15 @@ WorldCleaner:
       actionbar: false
       message: true
 
+      clear_sound:
+        enabled: true
+
+        # Sounds: https://www.digminecraft.com/lists/sound_list_pc.php
+        # If you have abyss enabled you can use "block.ender_chest.open"
+        sound: "entity.enderman.teleport"
+        pitch: 1.0
+        volume: 0.5
+
     # Command: /lagfixer clear items
     items:
       enabled: true
@@ -30,13 +39,6 @@ WorldCleaner:
         enabled: false
         # Configurable in lang.yml.
         alerts: true
-
-        open_sound:
-          enabled: true
-          # Sounds: https://www.digminecraft.com/lists/sound_list_pc.php
-          sound: "block.ender_chest.open"
-          pitch: 0.9
-          volume: 0.5
 
         command:
           # Leave empty to disable permission.

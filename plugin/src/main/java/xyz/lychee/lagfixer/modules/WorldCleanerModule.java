@@ -39,9 +39,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public class WorldCleanerModule extends AbstractModule implements Listener, CommandExecutor {
+public class WorldCleanerModule extends AbstractModule implements Listener, CommandExecutor, Runnable {
     private final HashSet<ItemStack> items = new HashSet<>();
-    private final HashMap<Integer, String> messages = new HashMap<>();
     private final EnumSet<EntityType> creatures_list = EnumSet.noneOf(EntityType.class);
     private final EnumSet<EntityType> projectiles_list = EnumSet.noneOf(EntityType.class);
     private final ArrayList<Inventory> inventories = new ArrayList<>();
@@ -50,13 +49,17 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
     private final ItemStack items_abyss_next;
     private final ItemStack items_abyss_filler;
     private final EnumSet<Material> items_blacklist = EnumSet.noneOf(Material.class);
+
     private BukkitTask task;
     private int second;
     private int interval;
+    private HashMap<Integer, String> messages;
+
     private boolean alerts_enabled;
     private Audience alerts_audience;
     private boolean alerts_actionbar;
     private boolean alerts_message;
+    private Sound alerts_clear_sound;
 
     private boolean creatures_enabled;
     private boolean creatures_named;
@@ -72,7 +75,6 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
     private boolean items_abyss_enabled;
     private volatile boolean items_abyss_opened = false;
     private boolean items_abyss_alerts;
-    private Sound items_abyss_open_sound;
     private boolean items_abyss_itemdespawn;
     private String items_abyss_permission;
     private List<String> items_abyss_aliases = Collections.emptyList();
@@ -170,59 +172,57 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
     }
 
     @Override
-    public void load() throws IOException {
-        SupportManager support = SupportManager.getInstance();
-        support.getFork().registerCommand(this.getPlugin(), "abyss", this.items_abyss_aliases, this);
+    public void run() {
+        if (Bukkit.getOnlinePlayers().isEmpty()) {
+            this.second = this.interval + 1;
+            return;
+        }
 
-        this.task = SupportManager.getInstance().getFork().runTimer(false, () -> {
-            if (Bukkit.getOnlinePlayers().isEmpty()) {
-                this.second = this.interval + 1;
-                return;
-            }
+        if (--this.second <= 0) {
+            HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
 
-            if (--this.second <= 0) {
-                HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
+            int creatures = 0, items = 0, projectiles = 0;
 
-                int creatures = 0, items = 0, projectiles = 0;
+            for (World world : this.getAllowedWorlds()) {
+                if (world.getPlayers().isEmpty()) continue;
 
-                for (World world : this.getAllowedWorlds()) {
-                    if (world.getPlayers().isEmpty()) continue;
-
-                    for (Entity ent : world.getEntities()) {
-                        if (ent instanceof LivingEntity livingEntity) {
-                            if (this.creatures_enabled && this.clearCreature(livingEntity)) {
-                                if (this.creatures_dropitems) {
-                                    livingEntity.damage(Double.MAX_VALUE);
+                for (Entity ent : world.getEntities()) {
+                    if (ent instanceof LivingEntity livingEntity) {
+                        if (this.creatures_enabled && this.clearCreature(livingEntity)) {
+                            if (this.creatures_dropitems) {
+                                livingEntity.damage(Double.MAX_VALUE);
+                            }
+                            ent.remove();
+                            creatures++;
+                        }
+                    } else if (ent instanceof Item item) {
+                        if (this.items_enabled && this.clearItem(item)) {
+                            if (this.items_abyss_enabled
+                                    && !this.items_abyss_blacklist.contains(item.getItemStack().getType())
+                                    && item.getLocation().getY() > -64) {
+                                if (stacker != null) {
+                                    stacker.addItemsToList(item, this.items);
+                                } else {
+                                    this.items.add(item.getItemStack().clone());
                                 }
-                                ent.remove();
-                                creatures++;
                             }
-                        } else if (ent instanceof Item item) {
-                            if (this.items_enabled && this.clearItem(item)) {
-                                if (this.items_abyss_enabled
-                                        && !this.items_abyss_blacklist.contains(item.getItemStack().getType())
-                                        && item.getLocation().getY() > -64) {
-                                    if (stacker != null) {
-                                        stacker.addItemsToList(item, this.items);
-                                    } else {
-                                        this.items.add(item.getItemStack().clone());
-                                    }
-                                }
-                                ent.remove();
-                                items++;
-                            }
-                        } else if (ent instanceof Projectile projectile) {
-                            if (this.projectiles_enabled && this.clearProjectile(projectile)) {
-                                ent.remove();
-                                projectiles++;
-                            }
+                            ent.remove();
+                            items++;
+                        }
+                    } else if (ent instanceof Projectile projectile) {
+                        if (this.projectiles_enabled && this.clearProjectile(projectile)) {
+                            ent.remove();
+                            projectiles++;
                         }
                     }
                 }
+            }
 
-                if (this.alerts_enabled && this.messages.containsKey(this.second)) {
+            if (this.alerts_enabled) {
+                String message = this.messages.get(this.second);
+                if (message != null) {
                     this.sendAlert(
-                            Language.createComponent(this.messages.get(this.second), true,
+                            Language.createComponent(message, true,
                                     Placeholder.unparsed("remaining", Integer.toString(this.second)),
                                     Placeholder.unparsed("items", Integer.toString(items)),
                                     Placeholder.unparsed("creatures", Integer.toString(creatures)),
@@ -231,68 +231,76 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                     );
                 }
 
-                if (this.items_abyss_enabled && !this.items.isEmpty()) {
-                    String guiName = this.getLanguage().getString("items.abyss.gui.name", true);
-                    Collection<ItemStack> toStore = new ArrayList<>(this.items);
-                    this.items.clear();
-                    int page = 0;
-                    while (!toStore.isEmpty()) {
-                        Inventory inv = Bukkit.createInventory(null, 54,
-                                MessageUtils.fixColors(null, guiName.replace("<page>", Integer.toString(++page)))
-                        );
-
-                        for (int i = 45; i < 52; i++) {
-                            inv.setItem(i, this.items_abyss_filler);
-                        }
-                        inv.setItem(52, this.items_abyss_previous);
-                        inv.setItem(53, this.items_abyss_next);
-
-                        toStore = inv.addItem(toStore.toArray(new ItemStack[0])).values();
-
-                        this.inventories.add(inv);
-                    }
-
-                    if (this.inventories.isEmpty()) {
-                        return;
-                    }
-
-                    this.items_abyss_opened = true;
-                    if (this.items_abyss_alerts) {
-                        this.sendAlert(this.getLanguage().getComponent("items.abyss.open", true));
-                        if (this.items_abyss_open_sound != null) {
-                            this.alerts_audience.playSound(this.items_abyss_open_sound);
-                        }
-                    }
-
-                    support.getFork().runLater(false, () -> {
-                        this.items_abyss_opened = false;
-
-                        this.inventories.forEach(inv -> {
-                            new HashSet<>(inv.getViewers()).forEach(HumanEntity::closeInventory);
-                            inv.clear();
-                        });
-                        this.inventories.clear();
-
-                        if (this.items_abyss_alerts) {
-                            this.sendAlert(this.getLanguage().getComponent("items.abyss.close", true));
-                        }
-                    }, this.items_abyss_close, TimeUnit.SECONDS);
+                if (this.alerts_clear_sound != null) {
+                    this.alerts_audience.playSound(this.alerts_clear_sound);
                 }
-                this.second = this.interval + 1;
-            } else if (this.alerts_enabled && this.messages.containsKey(this.second)) {
-                WorldsMonitor worldsMonitor = support.getWorldsMonitor();
-                this.sendAlert(
-                        Language.createComponent(this.messages.get(this.second), true,
-                                Placeholder.unparsed("remaining", Integer.toString(this.second)),
-                                Placeholder.unparsed("items", Long.toString(worldsMonitor.getItems())),
-                                Placeholder.unparsed("creatures", Long.toString(worldsMonitor.getCreatures())),
-                                Placeholder.unparsed("projectiles", Long.toString(worldsMonitor.getProjectiles()))
-                        )
-                );
             }
-        }, 1L, 1L, TimeUnit.SECONDS);
 
-        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+            if (this.items_abyss_enabled && !this.items.isEmpty()) {
+                String guiName = this.getLanguage().getString("items.abyss.gui.name", true);
+                Collection<ItemStack> toStore = new ArrayList<>(this.items);
+                this.items.clear();
+                int page = 0;
+                while (!toStore.isEmpty()) {
+                    Inventory inv = Bukkit.createInventory(null, 54,
+                            MessageUtils.fixColors(null, guiName.replace("<page>", Integer.toString(++page)))
+                    );
+
+                    for (int i = 45; i < 52; i++) {
+                        inv.setItem(i, this.items_abyss_filler);
+                    }
+                    inv.setItem(52, this.items_abyss_previous);
+                    inv.setItem(53, this.items_abyss_next);
+
+                    toStore = inv.addItem(toStore.toArray(new ItemStack[0])).values();
+
+                    this.inventories.add(inv);
+                }
+
+                if (this.inventories.isEmpty()) {
+                    return;
+                }
+
+                this.items_abyss_opened = true;
+                if (this.items_abyss_alerts) {
+                    this.sendAlert(this.getLanguage().getComponent("items.abyss.open", true));
+                }
+
+                SupportManager.getInstance().getFork().runLater(false, () -> {
+                    this.items_abyss_opened = false;
+
+                    this.inventories.forEach(inv -> {
+                        new HashSet<>(inv.getViewers()).forEach(HumanEntity::closeInventory);
+                        inv.clear();
+                    });
+                    this.inventories.clear();
+
+                    if (this.items_abyss_alerts) {
+                        this.sendAlert(this.getLanguage().getComponent("items.abyss.close", true));
+                    }
+                }, this.items_abyss_close, TimeUnit.SECONDS);
+            }
+            this.second = this.interval + 1;
+        } else if (this.alerts_enabled && this.messages.containsKey(this.second)) {
+            WorldsMonitor worldsMonitor = SupportManager.getInstance().getWorldsMonitor();
+            this.sendAlert(
+                    Language.createComponent(this.messages.get(this.second), true,
+                            Placeholder.unparsed("remaining", Integer.toString(this.second)),
+                            Placeholder.unparsed("items", Long.toString(worldsMonitor.getItems())),
+                            Placeholder.unparsed("creatures", Long.toString(worldsMonitor.getCreatures())),
+                            Placeholder.unparsed("projectiles", Long.toString(worldsMonitor.getProjectiles()))
+                    )
+            );
+        }
+    }
+
+    @Override
+    public void load() throws IOException {
+        SupportManager support = SupportManager.getInstance();
+        support.getFork().registerCommand(this.getPlugin(), "abyss", this.items_abyss_aliases, this);
+
+        this.task = support.getFork().runTimer(false, this, 1L, 1L, TimeUnit.SECONDS);
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
     }
 
     public void sendAlert(Component text) {
@@ -347,6 +355,27 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
         this.alerts_message = this.getSection().getBoolean("alerts.message");
         this.alerts_actionbar = this.getSection().getBoolean("alerts.actionbar");
 
+        boolean clear_sound_enabled = this.getSection().getBoolean("alerts.clear_sound.enabled");
+        Sound clear_sound = null;
+        if (clear_sound_enabled) {
+            double volume = this.getSection().getDouble("alerts.clear_sound.volume");
+            double pitch = this.getSection().getDouble("alerts.clear_sound.pitch");
+            String sound = this.getSection().getString("alerts.clear_sound.sound");
+
+            if (sound != null && !sound.isEmpty()) {
+                try {
+                    clear_sound = Sound.sound(
+                            Key.key(Key.MINECRAFT_NAMESPACE, sound.toLowerCase()),
+                            Sound.Source.MASTER,
+                            (float) Math.clamp(volume, 0.0, 1.0),
+                            (float) Math.clamp(pitch, 0.0, 2.0)
+                    );
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        this.alerts_clear_sound = clear_sound;
+
         String permission = this.getSection().getString("alerts.permission");
         boolean permissionDisabled = permission == null || permission.isEmpty();
         this.alerts_audience = this.getPlugin().getAudiences()
@@ -373,26 +402,6 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
             if (this.items_abyss_enabled) {
                 this.items_abyss_alerts = this.getSection().getBoolean("items.abyss.alerts");
 
-                boolean open_sound = this.getSection().getBoolean("items.abyss.open_sound.enabled");
-                if (open_sound) {
-                    double volume = this.getSection().getDouble("items.abyss.open_sound.volume");
-                    double pitch = this.getSection().getDouble("items.abyss.open_sound.pitch");
-                    String sound = this.getSection().getString("items.abyss.open_sound.sound");
-
-                    if (sound != null && !sound.isEmpty()) {
-                        try {
-                            this.items_abyss_open_sound = Sound.sound(
-                                    Key.key(Key.MINECRAFT_NAMESPACE, sound.toLowerCase()),
-                                    Sound.Source.MASTER,
-                                    (float) Math.clamp(volume, 0.0, 1.0),
-                                    (float) Math.clamp(pitch, 0.0, 2.0)
-                            );
-                        } catch (Exception e) {
-                            this.items_abyss_open_sound = null;
-                        }
-                    }
-                }
-
                 this.items_abyss_permission = this.getSection().getString("items.abyss.command.permission");
                 this.items_abyss_aliases = this.getSection().getStringList("items.abyss.command.aliases");
                 this.items_abyss_itemdespawn = this.getSection().getBoolean("items.abyss.item_despawn");
@@ -413,7 +422,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
             }
         }
 
-        this.messages.clear();
+        this.messages = new HashMap<>();
         for (String str : Language.getYaml().getStringList("messages." + this.getName() + ".countingdown")) {
             int equalSignIndex = str.indexOf('=');
             if (equalSignIndex == -1) {
