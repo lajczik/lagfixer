@@ -47,18 +47,20 @@ public class ReloadCommand extends CommandManager.Subcommand {
                 boolean enabled = m.getConfig().getBoolean(m.getName() + ".enabled");
 
                 try {
+                    if (m.isLoaded()) {
+                        m.disable();
+                        m.setLoaded(false);
+                    }
+
                     if (enabled) {
-                        if (!m.isLoaded()) {
-                            m.load();
-                            m.setLoaded(true);
-                        }
+                        m.load();
+                        m.setLoaded(true);
                         m.loadAllConfig();
                         plugin.getLogger().info("&rConfiguration for &e" + m.getName() + " &rsuccessfully reloaded!");
                     } else if (m.isLoaded()) {
-                        m.disable();
-                        m.setLoaded(false);
                         plugin.getLogger().info("&rSuccessfully disabled module &e" + m.getName() + "&r!");
                     }
+
                     m.getMenu().updateAll();
                 } catch (Exception ex) {
                     plugin.printError(ex);
