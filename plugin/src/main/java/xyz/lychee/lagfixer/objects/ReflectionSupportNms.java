@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -136,6 +137,14 @@ public class ReflectionSupportNms implements ISupportNms {
 
     @Override
     public void setSimulationDistance(World world, int simulation) {
+    }
+
+    @Override
+    public void hideEntity(Plugin plugin, Player player, Entity entity) {
+    }
+
+    @Override
+    public void showEntity(Plugin plugin, Player player, Entity entity) {
     }
 
     @Override

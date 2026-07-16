@@ -1,0 +1,84 @@
+AFKOptimizer:
+  enabled: true
+  worlds:
+    - '*'
+  values:
+    afk_check:
+      # How often LagFixer should check if player is afk
+      interval: 1000
+
+      # Available modes:
+      # 0 - player needs to change rotation and position (move mouse and move by one block)
+      # 1 - player needs to change rotation or position (move mouse or move by one block)
+      # 2 - player needs to change position (move by one block)
+      # 3 - player needs to change rotation (move mouse)
+      mode: 0
+
+    kick_afk_players:
+      enabled: false
+
+      # Kick player after 5min AFK
+      afk_time: 300
+
+    # Entities can be hidden only for 1.18.2+ (method is stable in 1.20.3+)
+    # but players can be hidden for any server version.
+    hide_entities:
+      enabled: true
+
+      # Hide mobs/players after 3min AFK
+      afk_time: 180
+
+      distance_search: 100
+      include_players: true
+
+    teleport_afk_players:
+      enabled: false
+
+      # Move to empty world after 10min AFK
+      afk_time: 600
+
+      teleport_back: false
+      location:
+        world: "afk_world"
+        x: 0
+        y: 100
+        z: 0
+
+    # Cancels packets AFTER they are generated (already used CPU).
+    #
+    # ✅ HELPS when: Network bandwidth is saturated (e.g., 45/50 Mbps)
+    # ❌ DOESN'T HELP when: CPU is the bottleneck (packets still generate)
+    #
+    # REQUIRES: PacketEvents plugin (auto-disables if missing)
+    optimize_packets:
+      enabled: false
+
+      # Format: "PACKET_NAME=SECONDS" (cancel after X seconds of AFK)
+      # Full list: https://javadocs.packetevents.com/com/github/retrooper/packetevents/protocol/packettype/PacketType.Play.Server.html
+      #
+      # ⚠️ NEVER cancel: KEEP_ALIVE, RESPAWN, WINDOW_ITEMS, SET_SLOT
+      # ⚠️ CHUNK_DATA causes desync - requires resync on return!
+      cancelled_packets:
+        # Early AFK (60s) - low impact
+        - "CHAT_MESSAGE=60"
+        - "PLAYER_LIST_HEADER_AND_FOOTER=60"
+        - "PARTICLE=60"
+
+        # Medium AFK (90-120s) - moderate bandwidth
+        - "UPDATE_LIGHT=90"
+        - "SCOREBOARD_OBJECTIVE=90"
+        - "SOUND_EFFECT=90"
+        - "EXPLOSION=90"
+        - "MULTI_BLOCK_CHANGE=120"
+        - "BLOCK_CHANGE=120"
+        - "ENTITY_METADATA=120"
+
+        # High bandwidth (uncomment if you have resync system)
+        # - "CHUNK_DATA=240"
+
+        # Optional - uncomment to save more bandwidth:
+        # - "SPAWN_ENTITY=120"
+        # - "SPAWN_ENTITY_LIVING=120"
+        # - "ENTITY_VELOCITY=90"
+        # - "ENTITY_HEAD_LOOK=90"
+        # - "BLOCK_DESTROY_PROGRESS=90"

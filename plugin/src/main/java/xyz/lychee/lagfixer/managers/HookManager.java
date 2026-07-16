@@ -36,6 +36,7 @@ public class HookManager
         this.add(new ModelEngineHook(plugin, this));
         this.add(new MythicMobsHook(plugin, this));
         this.add(new StackMobHook(plugin, this));
+        this.add(new PacketEventsHook(plugin, this));
     }
 
     protected void add(AbstractHook hook) {
@@ -100,9 +101,11 @@ public class HookManager
             try {
                 TimingUtil t = TimingUtil.startNew();
                 hook.load();
+                hook.setLoaded(true);
                 this.addLoaded(hook);
                 this.getPlugin().getLogger().info(" &8• &rSuccessfully loaded hook " + hook.getName() + " in " + t.stop() + "!");
             } catch (Exception ex) {
+                hook.setLoaded(false);
                 this.getPlugin().getLogger().info(" &8• &cError with enabling hook " + hook.getName() + ", reason: " + ex.getMessage());
                 this.getPlugin().printError(ex);
             }
@@ -123,6 +126,7 @@ public class HookManager
                 this.getPlugin().getLogger().info(" &8• &cError with disabling hook " + hook.getName() + ", reason: " + ex.getMessage());
                 this.getPlugin().printError(ex);
             }
+            hook.setLoaded(false);
         }
     }
 

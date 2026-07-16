@@ -16,6 +16,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import xyz.lychee.lagfixer.objects.ReflectionSupportNms;
 
 import java.lang.reflect.Method;
@@ -72,6 +73,16 @@ public class SupportNms extends ReflectionSupportNms {
             level.spigotConfig.viewDistance = clampedView;
             level.getChunkSource().setViewDistance(clampedView);
         }
+    }
+
+    @Override
+    public void hideEntity(Plugin plugin, Player player, Entity entity) {
+
+    }
+
+    @Override
+    public void showEntity(Plugin plugin, Player player, Entity entity) {
+
     }
 
     @Override

@@ -12,6 +12,7 @@ import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.managers.ModuleManager;
 import xyz.lychee.lagfixer.managers.SupportManager;
+import xyz.lychee.lagfixer.modules.AFKOptimizerModule;
 import xyz.lychee.lagfixer.modules.WorldCleanerModule;
 import xyz.lychee.lagfixer.objects.AbstractHook;
 import xyz.lychee.lagfixer.objects.ResourceMonitor;
@@ -66,11 +67,11 @@ public class PlaceholderAPIHook extends AbstractHook {
         }
 
         public String onPlaceholderRequest(Player p, @NotNull String id) {
-            return this.response(id);
+            return this.response(p, id);
         }
 
         public String onRequest(OfflinePlayer p, @NotNull String id) {
-            return this.response(id);
+            return this.response(p, id);
         }
 
         public boolean persist() {
@@ -81,11 +82,13 @@ public class PlaceholderAPIHook extends AbstractHook {
             return true;
         }
 
-        public String response(String id) {
+        public String response(OfflinePlayer player, String id) {
             SupportManager support = SupportManager.getInstance();
             ResourceMonitor resourceMonitor = support.getResourceMonitor();
             WorldsMonitor worldsMonitor = support.getWorldsMonitor();
-            WorldCleanerModule worldCleaner = ModuleManager.getInstance().get(WorldCleanerModule.class);
+            ModuleManager moduleManager = ModuleManager.getInstance();
+            WorldCleanerModule worldCleaner = moduleManager.get(WorldCleanerModule.class);
+            AFKOptimizerModule afkOptimizer = moduleManager.get(AFKOptimizerModule.class);
             Runtime runtime = Runtime.getRuntime();
 
             switch (id.toLowerCase()) {
@@ -116,25 +119,35 @@ public class PlaceholderAPIHook extends AbstractHook {
                 }
 
                 // ==================== Entity Counts ====================
-                case "entities":
-                case "entities_total": {
+                case "entities_total", "entities": {
                     return Integer.toString(worldsMonitor.getEntities());
                 }
-                case "entities_mobs":
-                case "mobs": {
+                case "entities_mobs", "mobs", "creatures": {
                     return Integer.toString(worldsMonitor.getCreatures());
                 }
-                case "entities_items":
-                case "items": {
+                case "entities_items", "items": {
                     return Integer.toString(worldsMonitor.getItems());
                 }
-                case "entities_projectiles":
-                case "projectiles": {
+                case "entities_projectiles", "projectiles": {
                     return Integer.toString(worldsMonitor.getProjectiles());
                 }
-                case "entities_vehicles":
-                case "vehicles": {
+                case "entities_vehicles", "vehicles": {
                     return Integer.toString(worldsMonitor.getVehicles());
+                }
+
+                case "afk_time": {
+                    AFKOptimizerModule.AfkPlayer afkPlayer = afkOptimizer.getAfk_players().get(player.getUniqueId());
+                    return afkPlayer == null ? "0" : afkPlayer.getAfkTime().toString();
+                }
+
+                case "is_afk_position", "is_afk_location": {
+                    AFKOptimizerModule.AfkPlayer afkPlayer = afkOptimizer.getAfk_players().get(player.getUniqueId());
+                    return Boolean.toString(afkPlayer != null && afkPlayer.isPositionAfk());
+                }
+
+                case "is_afk_rotation": {
+                    AFKOptimizerModule.AfkPlayer afkPlayer = afkOptimizer.getAfk_players().get(player.getUniqueId());
+                    return Boolean.toString(afkPlayer != null && afkPlayer.isRotationAfk());
                 }
 
                 // ==================== Memory Stats ====================

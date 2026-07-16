@@ -13,7 +13,8 @@ softdepend: [
   WildStacker,
   ModelEngine,
   MythicMobs,
-  StackMob
+  StackMob,
+  packetevents
 ]
 folia-supported: false
 
