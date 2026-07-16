@@ -25,17 +25,17 @@ import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
 public class ConsoleFilterModule extends AbstractModule {
-    private final Pattern ANSI_PATTERN = Pattern.compile("\\u001B\\[[;\\d]*[ -/]*[@-~]");
+    private static final Pattern ANSI_PATTERN = Pattern.compile("\\u001B\\[[;\\d]*[ -/]*[@-~]");
 
     private final CustomFilter filter = new CustomFilter();
-    private Path logPath;
+    private Path log_path;
     private BufferedWriter writer;
-    private PrintWriter printWriter;
+    private PrintWriter print_writer;
 
-    private int logsLimit;
+    private int logs_limit;
     private boolean filtering;
-    private boolean saveFiltered;
-    private boolean errorFiltering;
+    private boolean save_filtered;
+    private boolean error_filtering;
     private List<Pattern> patterns;
 
     public ConsoleFilterModule(LagFixer plugin, ModuleManager manager) {
@@ -49,7 +49,7 @@ public class ConsoleFilterModule extends AbstractModule {
     }
 
     private void clearLogs(Path directory) {
-        if (logsLimit < 1 || !Files.exists(directory)) return;
+        if (this.logs_limit < 1 || !Files.exists(directory)) return;
 
         try (Stream<Path> files = Files.list(directory)) {
             files.filter(p -> p.toString().endsWith(".log.gz"))
@@ -60,7 +60,7 @@ public class ConsoleFilterModule extends AbstractModule {
                             return 0L;
                         }
                     }).reversed())
-                    .skip(logsLimit)
+                    .skip(this.logs_limit)
                     .forEach(path -> {
                         try {
                             Files.deleteIfExists(path);
@@ -74,9 +74,9 @@ public class ConsoleFilterModule extends AbstractModule {
 
     public synchronized void write(String text) {
         try {
-            writer.write(text);
-            writer.newLine();
-            writer.flush();
+            this.writer.write(text);
+            this.writer.newLine();
+            this.writer.flush();
         } catch (IOException ex) {
             getPlugin().printError(ex);
         }
@@ -86,14 +86,14 @@ public class ConsoleFilterModule extends AbstractModule {
     public void load() throws IOException {
         Path folder = getPlugin().getDataFolder().toPath().resolve("logs");
         Files.createDirectories(folder);
-        this.logPath = folder.resolve("filtered_logs.txt");
+        this.log_path = folder.resolve("filtered_logs.txt");
 
-        if (!Files.exists(logPath)) {
-            Files.createFile(logPath);
+        if (!Files.exists(this.log_path)) {
+            Files.createFile(this.log_path);
         }
 
-        this.writer = Files.newBufferedWriter(logPath, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
-        this.printWriter = new PrintWriter(writer);
+        this.writer = Files.newBufferedWriter(this.log_path, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+        this.print_writer = new PrintWriter(writer);
 
         clearLogs(Paths.get("logs"));
 
@@ -115,10 +115,10 @@ public class ConsoleFilterModule extends AbstractModule {
 
     @Override
     public boolean loadConfig() {
-        this.logsLimit = getSection().getInt("logs_limit");
+        this.logs_limit = getSection().getInt("logs_limit");
         this.filtering = getSection().getBoolean("filter.enabled");
-        this.saveFiltered = getSection().getBoolean("filter.save_filtered");
-        this.errorFiltering = getSection().getBoolean("filter.error_filtering");
+        this.save_filtered = getSection().getBoolean("filter.save_filtered");
+        this.error_filtering = getSection().getBoolean("filter.error_filtering");
         this.patterns = getSection().getStringList("filter.patterns").stream()
                 .map(Pattern::compile)
                 .toList();
@@ -129,12 +129,12 @@ public class ConsoleFilterModule extends AbstractModule {
     public void disable() throws IOException {
         this.filtering = false;
 
-        if (writer != null) {
-            writer.close();
-            printWriter.close();
+        if (this.writer != null) {
+            this.writer.close();
+            this.print_writer.close();
         }
 
-        if (saveFiltered && Files.size(this.logPath) > 0) {
+        if (this.save_filtered && Files.size(this.log_path) > 0) {
             Path folder = getPlugin().getDataFolder().toPath().resolve("logs");
             String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
@@ -144,7 +144,7 @@ public class ConsoleFilterModule extends AbstractModule {
             }
 
             Path archivePath = folder.resolve(date + " [" + count + "].log.gz");
-            try (InputStream fis = Files.newInputStream(this.logPath);
+            try (InputStream fis = Files.newInputStream(this.log_path);
                  OutputStream os = Files.newOutputStream(archivePath);
                  GZIPOutputStream gos = new GZIPOutputStream(os)
             ) {
@@ -158,22 +158,22 @@ public class ConsoleFilterModule extends AbstractModule {
     private class CustomFilter extends AbstractFilter {
         @Override
         public Filter.Result filter(LogEvent event) {
-            if (!filtering || event.getLoggerName().equals("ErrorFilter") || event.getLoggerName().equals("LagFixer")) {
+            if (!ConsoleFilterModule.this.filtering || event.getLoggerName().equals("ErrorFilter") || event.getLoggerName().equals("LagFixer")) {
                 return Filter.Result.NEUTRAL;
             }
 
             String rawMsg = event.getMessage().getFormattedMessage();
             String cleanMsg = ANSI_PATTERN.matcher(rawMsg).replaceAll("");
 
-            if (errorFiltering && event.getMessage().getThrowable() != null) {
+            if (ConsoleFilterModule.this.error_filtering && event.getMessage().getThrowable() != null) {
                 LogManager.getLogger("ErrorFilter").error(cleanMsg);
                 write(cleanMsg);
-                event.getMessage().getThrowable().printStackTrace(printWriter);
-                printWriter.flush();
+                event.getMessage().getThrowable().printStackTrace(ConsoleFilterModule.this.print_writer);
+                ConsoleFilterModule.this.print_writer.flush();
                 return Filter.Result.DENY;
             }
 
-            for (Pattern pat : patterns) {
+            for (Pattern pat : ConsoleFilterModule.this.patterns) {
                 if (pat.matcher(cleanMsg).find()) {
                     write(cleanMsg);
                     return Filter.Result.DENY;
