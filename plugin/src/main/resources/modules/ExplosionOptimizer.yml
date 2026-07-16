@@ -59,13 +59,17 @@ ExplosionOptimizer:
       cancel_wither_skulls: true
 
       # Partial effects when explosions are disabled:
-      explosion_damage: # Damage entities but no block destruction
+      # Damage entities but no block destruction
+      explosion_damage:
         enabled: false
         multiplier: 2.5
-      explosion_sound: # Keep sounds for immersion
+
+      # Keep sounds for immersion
+      explosion_sound:
         enabled: true
         volume: 1.0
-      explosion_knockback: # Knockback but no block destruction
+
+      # Knockback but no block destruction
+      explosion_knockback:
         enabled: false
         multiplier: 0.6
-        use_newton_raphson: true # Faster than Math.sqrt
