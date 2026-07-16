@@ -2,6 +2,7 @@ package xyz.lychee.lagfixer.modules;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -103,12 +104,15 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         Bukkit.getPluginManager().registerEvents(this.mobAiReducer, this.getPlugin());
 
         if (this.force_load) {
-            this.getAllowedWorlds().forEach(w ->
+            // Needs to be synchronized because /lf reload works in async thread
+            this.getAllowedWorlds().forEach(w -> {
+                SupportManager.getInstance().getFork().runNow(false, new Location(w, 0, 100, 0), () -> {
                     w.getLivingEntities()
                             .stream()
                             .filter(this::isEnabled)
-                            .forEach(ent -> this.mobAiReducer.optimize(ent, true))
-            );
+                            .forEach(ent -> this.mobAiReducer.optimize(ent, true));
+                });
+            });
         }
 
         this.task = SupportManager.getInstance().getFork().runTimer(true, () -> this.mobAiReducer.purge(), 60, this.purge_interval, TimeUnit.SECONDS);
@@ -172,8 +176,12 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
     @Override
     public void disable() {
         HandlerList.unregisterAll(this);
-        if (this.task != null && !this.task.isCancelled())
+        if (this.task != null && !this.task.isCancelled()) {
             this.task.cancel();
+        }
+        if (this.mobAiReducer != null) {
+            HandlerList.unregisterAll(this.mobAiReducer);
+        }
     }
 
     @Getter
