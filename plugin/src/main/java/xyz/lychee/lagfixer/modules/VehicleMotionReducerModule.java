@@ -1,17 +1,19 @@
 package xyz.lychee.lagfixer.modules;
 
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPlaceEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.PlayerInventory;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.ModuleManager;
+import xyz.lychee.lagfixer.managers.SupportManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
 import xyz.lychee.lagfixer.utils.ReflectionUtils;
 
@@ -41,10 +43,10 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTJjMjA1MGVjYTBlZmRkMDMxZTY1OGI5OTZjMjM5YmY3ZGEzYWVmODY1NjEyMzY3ZWQ5ZDg5NWFlN2EwZGE5ZiJ9fX0=");
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityPlace(EntityPlaceEvent event) {
         Entity entity = event.getEntity();
-        if (!event.isCancelled() && this.canContinue(entity.getWorld()) && entity instanceof Vehicle vehicle) {
+        if (this.canContinue(entity.getWorld()) && entity instanceof Vehicle vehicle) {
             Player player = event.getPlayer();
 
             boolean cancel = this.vehicleMotionReducer.optimize(vehicle);
@@ -73,16 +75,19 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
 
     @Override
     public void load() {
-        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
-        this.getPlugin().getServer().getPluginManager().registerEvents(this.vehicleMotionReducer, this.getPlugin());
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
+        Bukkit.getPluginManager().registerEvents(this.vehicleMotionReducer, this.getPlugin());
 
         if (this.force_load) {
-            this.getAllowedWorlds().forEach(w ->
+            // Needs to be synchronized because /lf reload works in async thread
+            this.getAllowedWorlds().forEach(w -> {
+                SupportManager.getInstance().getFork().runNow(false, new Location(w, 0, 100, 0), () -> {
                     w.getLivingEntities()
                             .stream()
                             .filter(this::isEnabled)
-                            .forEach(ent -> this.vehicleMotionReducer.optimize(ent))
-            );
+                            .forEach(ent -> this.vehicleMotionReducer.optimize(ent));
+                });
+            });
         }
     }
 
@@ -112,6 +117,9 @@ public class VehicleMotionReducerModule extends AbstractModule implements Listen
     @Override
     public void disable() {
         HandlerList.unregisterAll(this);
+        if (this.vehicleMotionReducer != null) {
+            HandlerList.unregisterAll(this.vehicleMotionReducer);
+        }
     }
 
     @Getter
