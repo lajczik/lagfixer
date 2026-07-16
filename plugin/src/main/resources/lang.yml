@@ -53,3 +53,6 @@ messages:
           name: "<white>Abyss! <dark_gray>(<gray>page <page><dark_gray>)"
           previous: "<dark_gray>← <red><b>PREVIOUS PAGE!</b>"
           next: "<dark_gray>→ <green><b>NEXT PAGE!</b>"
+
+  AFKOptimizer:
+    afk_kick: "<gray>You have been kicked for being idle!"

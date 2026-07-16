@@ -29,7 +29,8 @@ public class ModuleManager extends AbstractManager {
                 new VehicleMotionReducerModule(plugin, this),
                 new InstantLeafDecayModule(plugin, this),
                 new AbilityLimiterModule(plugin, this),
-                new ExplosionOptimizerModule(plugin, this)
+                new ExplosionOptimizerModule(plugin, this),
+                new AFKOptimizerModule(plugin, this)
         );
     }
 
