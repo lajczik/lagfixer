@@ -33,10 +33,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 public class HopperOptimizerModule extends AbstractModule implements Listener {
     private final Set<Hopper> trackedHoppers = ConcurrentHashMap.newKeySet();
-    private final Map<String, AtomicInteger> chunkHopperCount = new ConcurrentHashMap<>();
+    private final Map<String, LongAdder> chunkHopperCount = new ConcurrentHashMap<>();
     private final Map<Hopper, Long> hopperLastActivity = new ConcurrentHashMap<>();
     private final Map<Hopper, Long> hopperLastTransfer = new ConcurrentHashMap<>();
     private final Map<Hopper, Integer> hopperTransferCount = new ConcurrentHashMap<>();
@@ -78,8 +79,7 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         if (event.getSource().getType() == InventoryType.HOPPER) {
             InventoryHolder holder = event.getSource().getHolder();
-            if (holder instanceof Hopper) {
-                Hopper hopper = (Hopper) holder;
+            if (holder instanceof Hopper hopper) {
                 if (shouldBlockTransfer(hopper, event)) {
                     event.setCancelled(true);
                     return;
@@ -126,10 +126,10 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
 
     private boolean shouldBlockTransfer(Hopper hopper, InventoryMoveItemEvent event) {
         String chunkKey = getChunkKey(hopper);
-        AtomicInteger count = chunkHopperCount.get(chunkKey);
+        LongAdder count = chunkHopperCount.get(chunkKey);
 
         if (chunkLimitEnabled && count != null &&
-                count.get() >= maxHoppersPerChunk &&
+                count.intValue() >= maxHoppersPerChunk &&
                 !trackedHoppers.contains(hopper)) {
             return true;
         }
@@ -182,7 +182,7 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
 
         if (chunkLimitEnabled) {
             String chunkKey = getChunkKey(hopper);
-            chunkHopperCount.computeIfAbsent(chunkKey, k -> new AtomicInteger(0)).incrementAndGet();
+            chunkHopperCount.computeIfAbsent(chunkKey, k -> new LongAdder()).increment();
         }
     }
 
@@ -194,10 +194,10 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
 
         if (chunkLimitEnabled) {
             String chunkKey = getChunkKey(hopper);
-            AtomicInteger count = chunkHopperCount.get(chunkKey);
+            LongAdder count = chunkHopperCount.get(chunkKey);
             if (count != null) {
-                count.decrementAndGet();
-                if (count.get() <= 0) {
+                count.decrement();
+                if (count.intValue() <= 0) {
                     chunkHopperCount.remove(chunkKey);
                 }
             }
@@ -295,7 +295,7 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
 
     @Override
     public void load() {
-        getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
         startOptimizationTasks();
     }
 
@@ -321,12 +321,6 @@ public class HopperOptimizerModule extends AbstractModule implements Listener {
         if (optimizationTask != null) optimizationTask.cancel();
         if (cleanupTask != null) cleanupTask.cancel();
         if (resetTask != null) resetTask.cancel();
-
-        trackedHoppers.clear();
-        hopperLastActivity.clear();
-        hopperLastTransfer.clear();
-        hopperTransferCount.clear();
-        chunkHopperCount.clear();
     }
 
     @Getter
