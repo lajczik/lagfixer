@@ -1,5 +1,6 @@
 package xyz.lychee.lagfixer.modules;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -27,12 +28,10 @@ public class AbilityLimiterModule extends AbstractModule implements Listener {
         try {
             Field f = Enchantment.class.getField("UNBREAKING");
             enchantment = (Enchantment) f.get(null);
-        }
-        catch (Throwable ex1) {
+        } catch (Throwable ex1) {
             try {
                 enchantment = Enchantment.DURABILITY;
-            }
-            catch (Throwable ex2) {
+            } catch (Throwable ex2) {
                 // if the Minecraft devs change their minds and come up with a different name again...
                 enchantment = null;
             }
@@ -112,7 +111,7 @@ public class AbilityLimiterModule extends AbstractModule implements Listener {
 
     @Override
     public void load() {
-        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package xyz.lychee.lagfixer.modules;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -103,7 +104,7 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
 
     @Override
     public void load() {
-        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
 
         if (this.overflow_enabled) {
             final int limit_creatures = (int) (this.creatures * this.overflow_multiplier);

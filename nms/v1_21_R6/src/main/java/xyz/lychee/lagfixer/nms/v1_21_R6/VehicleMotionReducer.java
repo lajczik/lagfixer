@@ -1,8 +1,6 @@
 package xyz.lychee.lagfixer.nms.v1_21_R6;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.vehicle.ContainerEntity;
-import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.entity.vehicle.*;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;

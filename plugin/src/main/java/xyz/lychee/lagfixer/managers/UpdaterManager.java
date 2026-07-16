@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -119,7 +120,7 @@ public class UpdaterManager extends AbstractManager implements Listener {
                         }
                     });
         }, 1L, 30L, TimeUnit.MINUTES);
-        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
     }
 
     private int calculateBuildsBehind(List<ModrinthVersion> versions) {

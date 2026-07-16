@@ -1,6 +1,7 @@
 package xyz.lychee.lagfixer.modules;
 
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -230,9 +231,8 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
 
     @Override
     public void load() throws Exception {
-        SupportManager support = SupportManager.getInstance();
-        this.task = support.getFork().runTimer(false, this, 1L, 1L, TimeUnit.MINUTES);
-        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
+        this.task = SupportManager.getInstance().getFork().runTimer(false, this, 1L, 1L, TimeUnit.MINUTES);
     }
 
     @Override
@@ -267,10 +267,10 @@ public class LagShieldModule extends AbstractModule implements Runnable, Listene
 
     @Override
     public void disable() {
+        HandlerList.unregisterAll(this);
         if (this.task != null) {
             this.task.cancel();
         }
-        HandlerList.unregisterAll(this);
     }
 }
 

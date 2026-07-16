@@ -2,10 +2,7 @@ package xyz.lychee.lagfixer.modules;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Tag;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class RedstoneLimiterModule extends AbstractModule implements Listener {
+public class RedstoneLimiterModule extends AbstractModule implements Listener, Runnable {
     private final Map<String, Long> cooldown = new ConcurrentHashMap<>();
     private final Map<Chunk, TickCounter> redstone_map = new ConcurrentHashMap<>();
     private final Map<Chunk, TickCounter> piston_map = new ConcurrentHashMap<>();
@@ -118,12 +115,15 @@ public class RedstoneLimiterModule extends AbstractModule implements Listener {
     }
 
     @Override
+    public void run() {
+        this.redstone_map.values().forEach(counter -> counter.complete(this.ticks_redstone, this.break_redstone));
+        this.piston_map.values().forEach(counter -> counter.complete(this.ticks_piston, this.break_piston));
+    }
+
+    @Override
     public void load() {
-        this.task = SupportManager.getInstance().getFork().runTimer(true, () -> {
-            this.redstone_map.values().forEach(counter -> counter.complete(this.ticks_redstone, this.break_redstone));
-            this.piston_map.values().forEach(counter -> counter.complete(this.ticks_piston, this.break_piston));
-        }, 1L, 2L, TimeUnit.SECONDS);
-        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+        Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
+        this.task = SupportManager.getInstance().getFork().runTimer(true, this, 1L, 2L, TimeUnit.SECONDS);
     }
 
     @Override
@@ -145,8 +145,6 @@ public class RedstoneLimiterModule extends AbstractModule implements Listener {
             this.task.cancel();
         }
         HandlerList.unregisterAll(this);
-        this.redstone_map.clear();
-        this.piston_map.clear();
     }
 
     public class TickCounter {
