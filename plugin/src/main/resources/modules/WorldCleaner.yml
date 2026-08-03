@@ -41,7 +41,7 @@ WorldCleaner:
         alerts: true
 
         command:
-          # Leave empty to disable permission.
+          # Required permission. Leave empty for everyone.
           permission: ""
           aliases: [ ]
 
