@@ -10,9 +10,9 @@ val sonatypeRepo = "https://oss.sonatype.org/content/groups/public/"
 val jitpack = "https://jitpack.io"
 val mojang = "https://libraries.minecraft.net"
 
-version = "1.6.6"
+version = "1.6.7"
 extra["lagfixer_version"] = version
-extra["lagfixer_build"] = "149"
+extra["lagfixer_build"] = "150"
 
 dependencies {
     implementation(project(":plugin"))
