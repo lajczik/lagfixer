@@ -104,16 +104,16 @@ public class CommandManager extends AbstractManager implements Listener, TabExec
             }
         }
 
-        List<String> completions = new ArrayList<>(this.subcommandsWithAliases.keySet());
-        Collections.sort(completions);
-
-        if (args.length == 1) {
-            if (!args[0].isEmpty()) {
-                completions.removeIf(str -> !str.startsWith(args[0]));
-            }
-            return completions;
+        if (args.length == 1 && !args[0].isBlank()) {
+            String arg = args[0].toLowerCase();
+            return this.subcommandsWithAliases.keySet()
+                    .stream()
+                    .filter(str -> str.startsWith(arg))
+                    .toList();
         }
 
+        List<String> completions = new ArrayList<>(this.subcommandsWithAliases.keySet());
+        Collections.sort(completions);
         return completions;
     }
 
