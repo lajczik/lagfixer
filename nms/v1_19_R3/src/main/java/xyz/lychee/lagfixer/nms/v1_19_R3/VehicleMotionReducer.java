@@ -65,7 +65,7 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
         this.copyItems(original, newVehicle);
 
         original.level.addFreshEntity(newVehicle);
-        original.remove(Entity.RemovalReason.DISCARDED);
+        original.remove(Entity.RemovalReason.UNLOADED_TO_CHUNK);
         return true;
     }
 
