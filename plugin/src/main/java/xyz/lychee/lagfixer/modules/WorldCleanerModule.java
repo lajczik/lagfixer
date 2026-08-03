@@ -107,11 +107,15 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
 
     @EventHandler
     public void onDespawn(ItemDespawnEvent e) {
-        if (this.items_disableitemdespawn && e.getEntity().getPickupDelay() < 10000) {
+        // fix for /give command which cause unintended behavior
+        if (e.getEntity().getPickupDelay() > 10000) return;
+
+        if (this.items_disableitemdespawn) {
             e.setCancelled(true);
             return;
         }
-        if (this.items_abyss_enabled && this.items_abyss_itemdespawn && !this.items_abyss_blacklist.contains(e.getEntity().getItemStack().getType())) {
+
+        if (this.items_abyss_enabled && this.items_abyss_itemdespawn && this.clearItem(e.getEntity())) {
             HookManager.StackerContainer stacker = HookManager.getInstance().getStackerHook();
             if (stacker != null) {
                 stacker.addItemsToList(e.getEntity(), this.items);
