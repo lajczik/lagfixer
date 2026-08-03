@@ -54,5 +54,13 @@ messages:
           previous: "<dark_gray>← <red><b>PREVIOUS PAGE!</b>"
           next: "<dark_gray>→ <green><b>NEXT PAGE!</b>"
 
+  TrashDisposal:
+    trash:
+      disabled_drop: "<gray>Dropping items is disabled in this world, use <yellow>/trash <gray>to dispose of your items!"
+      opened: "<gray>Trash has been successfully opened!"
+    gui:
+      global_name: "<white>Trash!"
+      individual_name: "<white><player>'s Trash!"
+
   AFKOptimizer:
     afk_kick: "<gray>You have been kicked for being idle!"
