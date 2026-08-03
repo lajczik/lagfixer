@@ -20,6 +20,7 @@ TrashDisposal:
       interval: 60
 
     # Send trashed items to WorldCleaner's Abyss instead of deleting them
+    # Items abandoned by rich players can be useful to the poorer ones
     # If store_items or cleanup is false, this is automatically forced to false
     abyss_integration: false
 
