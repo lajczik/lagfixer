@@ -30,7 +30,8 @@ public class ModuleManager extends AbstractManager {
                 new InstantLeafDecayModule(plugin, this),
                 new AbilityLimiterModule(plugin, this),
                 new ExplosionOptimizerModule(plugin, this),
-                new AFKOptimizerModule(plugin, this)
+                new AFKOptimizerModule(plugin, this),
+                new TrashDisposalModule(plugin, this)
         );
     }
 

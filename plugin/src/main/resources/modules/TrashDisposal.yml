@@ -1,0 +1,37 @@
+TrashDisposal:
+  enabled: true
+  worlds: # Use '*' to enable for all worlds.
+    - spawn
+    - afk
+  values:
+    # One shared trash for all players (true) or private per player (false)
+    global: false
+
+    # Store items in memory (true) or delete after close inventory (false)
+    # If global is true, this is automatically forced to true
+    store_items: true
+
+    cleanup:
+      # Enable automatic emptying of the trash
+      # If store_items is false, this is automatically forced to false
+      enabled: true
+
+      # How often to clean (in seconds)
+      interval: 60
+
+    # Send trashed items to WorldCleaner's Abyss instead of deleting them
+    # If store_items or cleanup is false, this is automatically forced to false
+    abyss_integration: false
+
+    # Prevent item dropping in worlds listed above
+    forced_trash: false
+
+    command:
+      # Required permission. Leave empty for everyone.
+      permission: ""
+      aliases:
+        - bin
+        - recyclebin
+        - garbage
+        - garbagebin
+        - wastebasket
