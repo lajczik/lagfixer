@@ -9,6 +9,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import xyz.lychee.lagfixer.managers.ConfigManager;
 import xyz.lychee.lagfixer.objects.AbstractModule;
+import xyz.lychee.lagfixer.utils.MessageUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +76,7 @@ public class Language {
 
     public String getString(String key, boolean prefix, TagResolver.Single... placeholders) {
         Component component = this.getComponent(key, prefix, placeholders);
-        return component == null ? "Unknown value - " + key : Language.getSerializer().serialize(component);
+        return component == null ? "Unknown value - " + key : MessageUtils.fixColors(null, Language.getSerializer().serialize(component));
     }
 }
 
