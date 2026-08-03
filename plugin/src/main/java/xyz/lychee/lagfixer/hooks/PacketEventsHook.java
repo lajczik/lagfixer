@@ -1,83 +1,88 @@
 package xyz.lychee.lagfixer.hooks;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.*;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import lombok.Getter;
-import lombok.Setter;
 import xyz.lychee.lagfixer.LagFixer;
 import xyz.lychee.lagfixer.managers.HookManager;
 import xyz.lychee.lagfixer.modules.AFKOptimizerModule;
 import xyz.lychee.lagfixer.objects.AbstractHook;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 public class PacketEventsHook extends AbstractHook {
-    private AFKOptimizerPacketsListener afkOptimizer;
+    private PacketEventsBridge bridge;
 
     public PacketEventsHook(LagFixer plugin, HookManager manager) {
         super(plugin, "packetevents", manager);
     }
 
+    @Override
+    public void load() {
+        this.bridge = new PacketEventsImplementation();
+    }
+
     public void register(AFKOptimizerModule module) {
-        EventManager eventManager = PacketEvents.getAPI().getEventManager();
-        if (this.afkOptimizer == null) {
-            this.afkOptimizer = new AFKOptimizerPacketsListener(module);
-            this.afkOptimizer.setListener(eventManager.registerListener(this.afkOptimizer, PacketListenerPriority.LOWEST));
+        if (this.bridge != null) {
+            this.bridge.registerAfk(module);
         }
-        this.afkOptimizer.reload();
     }
 
     public void unregisterAfkOptimizer() {
-        if (this.afkOptimizer != null) {
-            PacketEvents.getAPI().getEventManager()
-                    .unregisterListener(this.afkOptimizer.getListener());
-            this.afkOptimizer = null;
+        if (this.bridge != null) {
+            this.bridge.unregisterAfk();
         }
-    }
-
-    @Override
-    public void load() {
     }
 
     @Override
     public void disable() {
         this.unregisterAfkOptimizer();
     }
+}
 
-    @Getter
-    @Setter
-    public static class AFKOptimizerPacketsListener implements PacketListener {
-        private final AFKOptimizerModule module;
-        private final Map<PacketTypeCommon, Integer> cancelledPackets = Collections.synchronizedMap(new HashMap<>());
-        private PacketListenerCommon listener;
+interface PacketEventsBridge {
+    void registerAfk(AFKOptimizerModule module);
+    void unregisterAfk();
+}
 
-        public AFKOptimizerPacketsListener(AFKOptimizerModule module) {
-            this.module = module;
+class PacketEventsImplementation implements PacketEventsBridge, com.github.retrooper.packetevents.event.PacketListener {
+
+    private AFKOptimizerModule module;
+    private final java.util.Map<com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon, Integer> cancelledPackets =
+            java.util.Collections.synchronizedMap(new java.util.HashMap<>());
+    private com.github.retrooper.packetevents.event.PacketListenerCommon listener;
+
+    @Override
+    public void registerAfk(AFKOptimizerModule module) {
+        this.module = module;
+        if (this.listener == null) {
+            this.listener = com.github.retrooper.packetevents.PacketEvents.getAPI().getEventManager()
+                    .registerListener(this, com.github.retrooper.packetevents.event.PacketListenerPriority.LOWEST);
         }
+        this.reload();
+    }
 
-        public void reload() {
-            this.cancelledPackets.clear();
-            this.module.getCancelled_packets().forEach((name, time) -> {
-                try {
-                    PacketType.Play.Server type = PacketType.Play.Server.valueOf(name);
-                    this.cancelledPackets.put(type, time);
-                } catch (IllegalArgumentException ignored) {
-                }
-            });
+    @Override
+    public void unregisterAfk() {
+        if (this.listener != null) {
+            com.github.retrooper.packetevents.PacketEvents.getAPI().getEventManager().unregisterListener(this.listener);
+            this.listener = null;
         }
+    }
 
-        @Override
-        public void onPacketSend(PacketSendEvent event) {
-            Integer time = this.cancelledPackets.get(event.getPacketType());
-            if (time != null) {
-                AFKOptimizerModule.AfkPlayer afkPlayer = this.module.getAfk_players().get(event.getUser().getUUID());
-                if (afkPlayer != null && afkPlayer.getAfkTime().longValue() > time) {
-                    event.setCancelled(true);
-                }
+    public void reload() {
+        this.cancelledPackets.clear();
+        this.module.getCancelled_packets().forEach((name, time) -> {
+            try {
+                com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Server type =
+                        com.github.retrooper.packetevents.protocol.packettype.PacketType.Play.Server.valueOf(name);
+                this.cancelledPackets.put(type, time);
+            } catch (IllegalArgumentException ignored) {}
+        });
+    }
+
+    @Override
+    public void onPacketSend(com.github.retrooper.packetevents.event.PacketSendEvent event) {
+        Integer time = this.cancelledPackets.get(event.getPacketType());
+        if (time != null) {
+            AFKOptimizerModule.AfkPlayer afkPlayer = this.module.getAfk_players().get(event.getUser().getUUID());
+            if (afkPlayer != null && afkPlayer.getAfkTime().longValue() > time) {
+                event.setCancelled(true);
             }
         }
     }
