@@ -43,8 +43,7 @@ public class PlaceholderAPIHook extends AbstractHook {
         this.papi.unregister();
     }
 
-    public static class PapiImplementation
-            extends PlaceholderExpansion {
+    public static class PapiImplementation extends PlaceholderExpansion {
         private final LagFixer plugin;
 
         public PapiImplementation(LagFixer plugin) {
