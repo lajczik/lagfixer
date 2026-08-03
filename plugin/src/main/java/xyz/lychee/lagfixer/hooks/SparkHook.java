@@ -9,6 +9,7 @@ import me.lucko.spark.api.statistic.types.DoubleStatistic;
 import me.lucko.spark.api.statistic.types.GenericStatistic;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.scheduler.BukkitTask;
@@ -41,6 +42,7 @@ public class SparkHook extends AbstractHook implements Listener {
 
     @Override
     public void disable() {
+        HandlerList.unregisterAll(this);
         if (this.task != null) {
             this.task.cancel();
         }
