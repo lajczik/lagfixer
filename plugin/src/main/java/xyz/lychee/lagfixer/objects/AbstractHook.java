@@ -13,7 +13,6 @@ public abstract class AbstractHook {
     private final LagFixer plugin;
     private final HookManager manager;
     private final String name;
-    private boolean loaded = false;
 
     public AbstractHook(LagFixer plugin, String name, HookManager manager) {
         this.plugin = plugin;
@@ -28,5 +27,5 @@ public abstract class AbstractHook {
 
     public abstract void load() throws Exception;
 
-    public abstract void disable() throws Exception;
+    public abstract void disable();
 }
