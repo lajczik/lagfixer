@@ -33,7 +33,7 @@ dependencies {
     compileOnly("com.songoda:UltimateStacker-API:1.0.0-SNAPSHOT")
     compileOnly("uk.antiperson.stackmob:StackMob:5.10.6")
     compileOnly("io.github.arcaneplugins:levelledmobs-plugin:4.0.3.1")
-    compileOnly("io.github.toxicity188:bettermodel-bukkit-api:3.2.0")
+    compileOnly("io.github.toxicity188:bettermodel-bukkit-api:3.3.0")
     compileOnly("com.github.retrooper:packetevents-api:2.13.0")
 
     compileOnly("com.mojang:authlib:3.11.50")
