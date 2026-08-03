@@ -31,7 +31,6 @@ public class MessageUtils {
         String processed = applyPapi(sender, applyReplacements(message));
         return ChatColor.translateAlternateColorCodes('&', processed);
     }
-
     public static TextComponent colors(@Nullable CommandSender sender, String message) {
         if (message == null || message.isEmpty()) return Component.empty();
 
@@ -47,10 +46,10 @@ public class MessageUtils {
     }
 
     private static String applyPapi(@Nullable CommandSender sender, String text) {
-        if (sender instanceof Player) {
-            PlaceholderAPIHook papi = HookManager.getInstance().getHook(PlaceholderAPIHook.class);
+        if (sender instanceof Player player) {
+            PlaceholderAPIHook papi = HookManager.getInstance().getHookIfLoaded(PlaceholderAPIHook.class);
             if (papi != null) {
-                return papi.applyPlaceholders((Player) sender, text);
+                return papi.applyPlaceholders(player, text);
             }
         }
         return text;

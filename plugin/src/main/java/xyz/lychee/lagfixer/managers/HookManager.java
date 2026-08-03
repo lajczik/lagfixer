@@ -16,81 +16,76 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HookManager
-        extends AbstractManager {
+@Getter
+public class HookManager extends AbstractManager {
     private static @Getter HookManager instance;
     private final Map<String, AbstractHook> hooks = new HashMap<>();
     private final Map<Class<? extends AbstractHook>, AbstractHook> loadedHooks = new HashMap<>();
-    private final Map<String, ModelContainer> modelHooks = new HashMap<>();
-    private final Map<String, StackerContainer> stackerHooks = new HashMap<>();
+    private StackerContainer stackerHook;
+    private ModelContainer modelHook;
 
     public HookManager(LagFixer plugin) {
         super(plugin);
         instance = this;
 
-        this.add(new PlaceholderAPIHook(plugin, this));
-        this.add(new SparkHook(plugin, this));
-        this.add(new WildStackerHook(plugin, this));
-        this.add(new RoseStackerHook(plugin, this));
-        this.add(new UltimateStackerHook(plugin, this));
-        this.add(new ModelEngineHook(plugin, this));
-        this.add(new MythicMobsHook(plugin, this));
-        this.add(new StackMobHook(plugin, this));
-        this.add(new PacketEventsHook(plugin, this));
+        this.add(
+                // Models
+                new ModelEngineHook(plugin, this),
+                new MythicMobsHook(plugin, this),
+                new BetterModelHook(plugin, this),
+
+                // Stackers
+                new WildStackerHook(plugin, this),
+                new RoseStackerHook(plugin, this),
+                new UltimateStackerHook(plugin, this),
+                new StackMobHook(plugin, this),
+
+                // Mics
+                new PlaceholderAPIHook(plugin, this),
+                new SparkHook(plugin, this),
+                new PacketEventsHook(plugin, this)
+        );
     }
 
-    protected void add(AbstractHook hook) {
-        this.hooks.put(hook.getName(), hook);
+    protected void add(AbstractHook... hooks) {
+        for (AbstractHook hook : hooks) {
+            this.hooks.put(hook.getName(), hook);
+        }
     }
 
-    public @Nullable <T extends AbstractHook> T getHook(Class<T> clazz) {
+    public @Nullable <T extends AbstractHook> T getHookIfLoaded(Class<T> clazz) {
         return this.loadedHooks.containsKey(clazz) ? clazz.cast(this.loadedHooks.get(clazz)) : null;
     }
 
-    public @Nullable StackerContainer getStacker() {
-        for (StackerContainer stacker : this.stackerHooks.values()) {
-            return stacker;
-        }
-        return null;
-    }
-
-    public @Nullable ModelContainer getModel() {
-        for (ModelContainer model : this.modelHooks.values()) {
-            return model;
-        }
-        return null;
-    }
-
     public boolean hasModel(Entity entity) {
-        ModelContainer model = this.getModel();
+        ModelContainer model = this.getModelHook();
         return model != null && model.hasModel(entity);
     }
 
-    public boolean noneStackers() {
-        return this.stackerHooks.isEmpty();
+    public void loadHook(AbstractHook hook) throws Exception {
+        hook.load();
+        if (hook instanceof ModelContainer model) {
+            this.modelHook = model;
+        }
+        else if (hook instanceof StackerContainer stacker) {
+            this.stackerHook = stacker;
+        }
+        else {
+            this.loadedHooks.put(hook.getClass(), hook);
+        }
     }
 
-    public boolean noneModels() {
-        return this.modelHooks.isEmpty();
-    }
-
-    public void addLoaded(AbstractHook hook) {
-        this.loadedHooks.put(hook.getClass(), hook);
-
+    public void unloadHook(AbstractHook hook) {
+        hook.disable();
         if (hook instanceof ModelContainer) {
-            this.modelHooks.put(hook.getName(), (ModelContainer) hook);
+            this.modelHook = null;
         }
-
-        if (hook instanceof StackerContainer) {
-            this.stackerHooks.put(hook.getName(), (StackerContainer) hook);
+        else if (hook instanceof StackerContainer) {
+            this.stackerHook = null;
         }
-    }
-
-    public void removeLoaded(AbstractHook hook) {
-        hook.setLoaded(false);
-        this.loadedHooks.remove(hook.getClass());
-        this.modelHooks.remove(hook.getName());
-        this.stackerHooks.remove(hook.getName());
+        else {
+            this.loadedHooks.remove(hook.getClass());
+        }
     }
 
     @Override
@@ -100,12 +95,10 @@ public class HookManager
 
             try {
                 TimingUtil t = TimingUtil.startNew();
-                hook.load();
-                hook.setLoaded(true);
-                this.addLoaded(hook);
+                this.loadHook(hook);
                 this.getPlugin().getLogger().info(" &8• &rSuccessfully loaded hook " + hook.getName() + " in " + t.stop() + "!");
-            } catch (Exception ex) {
-                hook.setLoaded(false);
+            } catch (Throwable ex) {
+                this.unloadHook(hook);
                 this.getPlugin().getLogger().info(" &8• &cError with enabling hook " + hook.getName() + ", reason: " + ex.getMessage());
                 this.getPlugin().printError(ex);
             }
@@ -117,16 +110,9 @@ public class HookManager
         for (AbstractHook hook : this.hooks.values()) {
             if (!hook.isSupported()) continue;
 
-            try {
-                TimingUtil t = TimingUtil.startNew();
-                hook.disable();
-                this.removeLoaded(hook);
-                this.getPlugin().getLogger().info(" &8• &rSuccessfully disabled hook " + hook.getName() + " in " + t.stop() + "!");
-            } catch (Exception ex) {
-                this.getPlugin().getLogger().info(" &8• &cError with disabling hook " + hook.getName() + ", reason: " + ex.getMessage());
-                this.getPlugin().printError(ex);
-            }
-            hook.setLoaded(false);
+            TimingUtil t = TimingUtil.startNew();
+            this.unloadHook(hook);
+            this.getPlugin().getLogger().info(" &8• &rSuccessfully disabled hook " + hook.getName() + " in " + t.stop() + "!");
         }
     }
 

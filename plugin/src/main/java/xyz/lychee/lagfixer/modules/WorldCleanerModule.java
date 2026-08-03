@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 @Getter
 public class WorldCleanerModule extends AbstractModule implements Listener, CommandExecutor, Runnable {
-    private final HashSet<ItemStack> items = new HashSet<>();
+    private final List<ItemStack> items = Collections.synchronizedList(new ArrayList<>());
     private final EnumSet<EntityType> creatures_list = EnumSet.noneOf(EntityType.class);
     private final EnumSet<EntityType> projectiles_list = EnumSet.noneOf(EntityType.class);
     private final ArrayList<Inventory> inventories = new ArrayList<>();
@@ -112,7 +112,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
             return;
         }
         if (this.items_abyss_enabled && this.items_abyss_itemdespawn && !this.items_abyss_blacklist.contains(e.getEntity().getItemStack().getType())) {
-            HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
+            HookManager.StackerContainer stacker = HookManager.getInstance().getStackerHook();
             if (stacker != null) {
                 stacker.addItemsToList(e.getEntity(), this.items);
             } else {
@@ -179,7 +179,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
         }
 
         if (--this.second <= 0) {
-            HookManager.StackerContainer stacker = HookManager.getInstance().getStacker();
+            HookManager.StackerContainer stacker = HookManager.getInstance().getStackerHook();
 
             int creatures = 0, items = 0, projectiles = 0;
 
@@ -207,7 +207,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                                 }
                             }
                             ent.remove();
-                            items++;
+                            items += item.getItemStack().getAmount();
                         }
                     } else if (ent instanceof Projectile projectile) {
                         if (this.projectiles_enabled && this.clearProjectile(projectile)) {
@@ -243,7 +243,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                 int page = 0;
                 while (!toStore.isEmpty()) {
                     Inventory inv = Bukkit.createInventory(null, 54,
-                            MessageUtils.fixColors(null, guiName.replace("<page>", Integer.toString(++page)))
+                            guiName.replace("<page>", Integer.toString(++page))
                     );
 
                     for (int i = 45; i < 52; i++) {
@@ -313,17 +313,18 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
             return false;
         }
 
-        HookManager hm = HookManager.getInstance();
-        if (this.creatures_ignore_models && hm.hasModel(ent)) {
+        HookManager hookManager = HookManager.getInstance();
+        HookManager.ModelContainer model = hookManager.getModelHook();
+        if (this.creatures_ignore_models && model != null && model.hasModel(ent)) {
             return false;
         }
 
-        LevelledMobsHook lvlHook = hm.getHook(LevelledMobsHook.class);
-        if (lvlHook != null && lvlHook.isLevelled(ent)) {
+        LevelledMobsHook hook = hookManager.getHookIfLoaded(LevelledMobsHook.class);
+        if (hook != null && hook.isLevelled(ent)) {
             return this.creatures_levelled;
         }
 
-        HookManager.StackerContainer stacker = hm.getStacker();
+        HookManager.StackerContainer stacker = hookManager.getStackerHook();
         if (stacker != null && stacker.isStacked(ent)) {
             return this.creatures_stacked;
         }
@@ -387,7 +388,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
             this.creatures_dropitems = this.getSection().getBoolean("creatures.drop_items");
             this.creatures_stacked = this.getSection().getBoolean("creatures.stacked");
             this.creatures_levelled = this.getSection().getBoolean("creatures.levelled");
-            this.creatures_ignore_models = HookManager.getInstance().noneModels() || this.getSection().getBoolean("creatures.ignore_models");
+            this.creatures_ignore_models = HookManager.getInstance().getModelHook() == null || this.getSection().getBoolean("creatures.ignore_models");
             this.creatures_listmode = this.getSection().getBoolean("creatures.list_mode");
             ReflectionUtils.convertEnums(EntityType.class, this.creatures_list, this.getSection().getStringList("creatures.list"));
         }
@@ -410,13 +411,13 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
 
                 ItemMeta metaPrevious = this.items_abyss_previous.getItemMeta();
                 if (metaPrevious != null) {
-                    metaPrevious.setDisplayName(MessageUtils.fixColors(null, this.getLanguage().getString("items.abyss.gui.previous", false)));
+                    metaPrevious.setDisplayName(this.getLanguage().getString("items.abyss.gui.previous", false));
                     this.items_abyss_previous.setItemMeta(metaPrevious);
                 }
 
                 ItemMeta metaNext = this.items_abyss_next.getItemMeta();
                 if (metaNext != null) {
-                    metaNext.setDisplayName(MessageUtils.fixColors(null, this.getLanguage().getString("items.abyss.gui.next", false)));
+                    metaNext.setDisplayName(this.getLanguage().getString("items.abyss.gui.next", false));
                     this.items_abyss_next.setItemMeta(metaNext);
                 }
             }

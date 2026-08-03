@@ -116,6 +116,7 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
             final boolean checkItems = this.overflow_items;
             final boolean checkVehicles = this.overflow_vehicles;
             final boolean checkProjectiles = this.overflow_projectiles;
+            final HookManager.ModelContainer model = HookManager.getInstance().getModelHook();
 
             this.overflow_task = SupportManager.getInstance().getFork().runTimer(false, () -> {
                 this.getAllowedWorlds().forEach(w -> {
@@ -130,7 +131,7 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
                         for (Entity entity : entities) {
                             if (this.whitelist.contains(entity.getType())
                                     || (!this.overflow_named && entity.getCustomName() != null)
-                                    || (!this.ignore_models && HookManager.getInstance().hasModel(entity))) {
+                                    || (!this.ignore_models && model != null && model.hasModel(entity))) {
                                 continue;
                             }
 
@@ -169,7 +170,7 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
 
     @Override
     public boolean loadConfig() {
-        this.ignore_models = HookManager.getInstance().noneModels() || this.getSection().getBoolean("ignore_models");
+        this.ignore_models = HookManager.getInstance().getModelHook() == null || this.getSection().getBoolean("ignore_models");
         this.creatures = this.getSection().getInt("creatures");
         this.items = this.getSection().getInt("items");
         this.vehicles = this.getSection().getInt("vehicles");

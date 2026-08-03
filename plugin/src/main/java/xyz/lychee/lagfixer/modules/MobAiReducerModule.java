@@ -123,7 +123,7 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         this.mobAiReducer = ReflectionUtils.createInstance("MobAiReducer", this);
 
         this.async = this.getSection().getBoolean("async");
-        this.ignore_models = HookManager.getInstance().noneModels() || this.getSection().getBoolean("ignore_models");
+        this.ignore_models = HookManager.getInstance().getModelHook() == null || this.getSection().getBoolean("ignore_models");
         this.animals = this.getSection().getBoolean("entities.animals");
         this.monsters = this.getSection().getBoolean("entities.monsters");
         this.villagers = this.getSection().getBoolean("entities.villagers");

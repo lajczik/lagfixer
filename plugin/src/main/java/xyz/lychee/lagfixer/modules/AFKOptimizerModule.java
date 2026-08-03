@@ -107,7 +107,7 @@ public class AFKOptimizerModule extends AbstractModule implements Listener, Runn
                 long afkTime = afkPlayer.getAfkTime().longValue();
 
                 if (this.kick_afk_players_enabled && afkTime > this.kick_afk_time) {
-                    String kickMessage = MessageUtils.fixColors(player, this.getLanguage().getString("afk_kick", true));
+                    String kickMessage = this.getLanguage().getString("afk_kick", true);
                     SupportManager.getInstance().getFork()
                             .runNow(false, currentLocation, () -> {
                                 if (!player.isOnline()) return;
@@ -230,9 +230,9 @@ public class AFKOptimizerModule extends AbstractModule implements Listener, Runn
             }
         }
 
-        PacketEventsHook hook = HookManager.getInstance().getHook(PacketEventsHook.class);
+        PacketEventsHook hook = HookManager.getInstance().getHookIfLoaded(PacketEventsHook.class);
         this.cancelled_packets = new HashMap<>();
-        if (hook != null && hook.isLoaded()) {
+        if (hook != null) {
             this.optimize_packets = this.getSection().getBoolean("optimize_packets.enabled");
             if (this.optimize_packets) {
                 for (String str : this.getSection().getStringList("optimize_packets.cancelled_packets")) {
