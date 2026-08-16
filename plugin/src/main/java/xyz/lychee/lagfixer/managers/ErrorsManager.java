@@ -50,23 +50,24 @@ public class ErrorsManager extends AbstractManager {
     @Override
     public void load() {
         Logger logger = (Logger) LogManager.getRootLogger();
-
-        Iterator<Filter> it = logger.getFilters();
-        boolean initialized = false;
-        while (it.hasNext()) {
-            Filter filter = it.next();
-            if (filter instanceof CustomFilter) {
-                initialized = true;
-            }
-        }
-
-        if (!initialized) {
+        if (!this.containsFilter(logger)) {
             logger.addFilter(this.filter);
         }
 
         this.executor.scheduleAtFixedRate(this::processQueue, 1, 1, TimeUnit.MINUTES);
 
         this.getPlugin().getLogger().info(" &8• &rStarted listening console for LagFixer errors!");
+    }
+
+    public boolean containsFilter(Logger logger) {
+        Iterator<Filter> it = logger.getFilters();
+        while (it.hasNext()) {
+            Filter filter = it.next();
+            if (filter instanceof CustomFilter) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
