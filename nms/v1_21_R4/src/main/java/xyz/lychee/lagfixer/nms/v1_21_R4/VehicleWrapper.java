@@ -10,214 +10,214 @@ import java.util.Optional;
 
 public interface VehicleWrapper {
     class OBoat extends Boat implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
         @SuppressWarnings("unchecked")
-        OBoat(VehicleMotionReducerModule module, Boat b) {
+        OBoat(VehicleMotionReducer provider, Boat b) {
             super((EntityType<Boat>) b.getType(), b.level(), () -> b.getPickResult().getItem());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isBoat_collides();
+            return this.provider.getModule().isBoat_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isBoat_collides();
+            return this.provider.getModule().isBoat_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isBoat_pushable();
+            return this.provider.getModule().isBoat_pushable();
         }
     }
 
     class OChestBoat extends ChestBoat implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
         @SuppressWarnings("unchecked")
-        OChestBoat(VehicleMotionReducerModule module, ChestBoat cb) {
+        OChestBoat(VehicleMotionReducer provider, ChestBoat cb) {
             super((EntityType<ChestBoat>) cb.getType(), cb.level(), () -> cb.getPickResult().getItem());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isBoat_collides();
+            return this.provider.getModule().isBoat_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isBoat_collides();
+            return this.provider.getModule().isBoat_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isBoat_pushable();
+            return this.provider.getModule().isBoat_pushable();
         }
     }
 
     class ORaft extends Raft implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
-        ORaft(VehicleMotionReducerModule module, Raft r) {
+        ORaft(VehicleMotionReducer provider, Raft r) {
             super(EntityType.BAMBOO_RAFT, r.level(), () -> r.getPickResult().getItem());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isBoat_collides();
+            return this.provider.getModule().isBoat_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isBoat_collides();
+            return this.provider.getModule().isBoat_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isBoat_pushable();
+            return this.provider.getModule().isBoat_pushable();
         }
     }
 
     class OChestRaft extends ChestRaft implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
-        OChestRaft(VehicleMotionReducerModule module, ChestRaft cr) {
+        OChestRaft(VehicleMotionReducer provider, ChestRaft cr) {
             super(EntityType.BAMBOO_CHEST_RAFT, cr.level(), () -> cr.getPickResult().getItem());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isBoat_collides();
+            return this.provider.getModule().isBoat_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isBoat_collides();
+            return this.provider.getModule().isBoat_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isBoat_pushable();
+            return this.provider.getModule().isBoat_pushable();
         }
     }
 
     class OMinecart extends Minecart implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
-        OMinecart(VehicleMotionReducerModule module, Minecart m) {
+        OMinecart(VehicleMotionReducer provider, Minecart m) {
             super(EntityType.MINECART, m.level());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isMinecart_pushable();
+            return this.provider.getModule().isMinecart_pushable();
         }
     }
 
     class OMinecartChest extends MinecartChest implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
-        OMinecartChest(VehicleMotionReducerModule module, MinecartChest mc) {
+        OMinecartChest(VehicleMotionReducer provider, MinecartChest mc) {
             super(EntityType.CHEST_MINECART, mc.level());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isMinecart_pushable();
+            return this.provider.getModule().isMinecart_pushable();
         }
     }
 
     class OMinecartHopper extends MinecartHopper implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
-        OMinecartHopper(VehicleMotionReducerModule module, MinecartHopper mh) {
+        OMinecartHopper(VehicleMotionReducer provider, MinecartHopper mh) {
             super(EntityType.HOPPER_MINECART, mh.level());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isMinecart_pushable();
+            return this.provider.getModule().isMinecart_pushable();
         }
     }
 
     class OMinecartFurnace extends MinecartFurnace implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
-        OMinecartFurnace(VehicleMotionReducerModule module, MinecartFurnace mf) {
+        OMinecartFurnace(VehicleMotionReducer provider, MinecartFurnace mf) {
             super(EntityType.FURNACE_MINECART, mf.level());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isMinecart_pushable();
+            return this.provider.getModule().isMinecart_pushable();
         }
     }
 
     class OMinecartSpawner extends MinecartSpawner implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
-        OMinecartSpawner(VehicleMotionReducerModule module, MinecartSpawner other) {
+        OMinecartSpawner(VehicleMotionReducer provider, MinecartSpawner other) {
             super(EntityType.SPAWNER_MINECART, other.level());
 
-            this.module = module;
+            this.provider = provider;
             Optional.ofNullable(other.getSpawner().nextSpawnData)
                     .flatMap(sd -> sd.entityToSpawn().read("id", EntityType.CODEC))
                     .ifPresent(type ->
@@ -227,42 +227,42 @@ public interface VehicleWrapper {
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isMinecart_pushable();
+            return this.provider.getModule().isMinecart_pushable();
         }
     }
 
     class OMinecartTNT extends MinecartTNT implements VehicleWrapper {
-        private final VehicleMotionReducerModule module;
+        private final VehicleMotionReducer provider;
 
-        OMinecartTNT(VehicleMotionReducerModule module, MinecartTNT mt) {
+        OMinecartTNT(VehicleMotionReducer provider, MinecartTNT mt) {
             super(EntityType.TNT_MINECART, mt.level());
 
-            this.module = module;
+            this.provider = provider;
         }
 
         @Override
         public boolean canCollideWith(@NotNull Entity entity) {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean canBeCollidedWith() {
-            return this.module.isMinecart_collides();
+            return this.provider.getModule().isMinecart_collides();
         }
 
         @Override
         public boolean isPushable() {
-            return this.module.isMinecart_pushable();
+            return this.provider.getModule().isMinecart_pushable();
         }
     }
 }

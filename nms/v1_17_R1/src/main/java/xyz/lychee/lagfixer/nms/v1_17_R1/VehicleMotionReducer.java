@@ -20,14 +20,14 @@ public class VehicleMotionReducer extends VehicleMotionReducerModule.NMS {
     public VehicleMotionReducer(VehicleMotionReducerModule module) {
         super(module);
 
-        vehicles.put(Boat.class, e -> new VehicleWrapper.OBoat(module, (Boat) e));
+        vehicles.put(Boat.class, e -> new VehicleWrapper.OBoat(this, (Boat) e));
 
-        vehicles.put(MinecartChest.class, e -> new VehicleWrapper.OMinecartChest(module, (MinecartChest) e));
-        vehicles.put(MinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper(module, (MinecartHopper) e));
-        vehicles.put(MinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace(module, (MinecartFurnace) e));
-        vehicles.put(MinecartSpawner.class, e -> new VehicleWrapper.OMinecartSpawner(module, (MinecartSpawner) e));
-        vehicles.put(MinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT(module, (MinecartTNT) e));
-        vehicles.put(Minecart.class, e -> new VehicleWrapper.OMinecart(module, (Minecart) e));
+        vehicles.put(MinecartChest.class, e -> new VehicleWrapper.OMinecartChest(this, (MinecartChest) e));
+        vehicles.put(MinecartHopper.class, e -> new VehicleWrapper.OMinecartHopper(this, (MinecartHopper) e));
+        vehicles.put(MinecartFurnace.class, e -> new VehicleWrapper.OMinecartFurnace(this, (MinecartFurnace) e));
+        vehicles.put(MinecartSpawner.class, e -> new VehicleWrapper.OMinecartSpawner(this, (MinecartSpawner) e));
+        vehicles.put(MinecartTNT.class, e -> new VehicleWrapper.OMinecartTNT(this, (MinecartTNT) e));
+        vehicles.put(Minecart.class, e -> new VehicleWrapper.OMinecart(this, (Minecart) e));
     }
 
     @Override
