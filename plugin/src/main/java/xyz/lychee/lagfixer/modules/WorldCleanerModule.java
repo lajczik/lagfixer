@@ -150,6 +150,7 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
         }
     }
 
+    @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
         Component text;
         if (!this.items_abyss_enabled) {
@@ -201,17 +202,18 @@ public class WorldCleanerModule extends AbstractModule implements Listener, Comm
                         }
                     } else if (ent instanceof Item item) {
                         if (this.items_enabled && this.clearItem(item)) {
+                            ItemStack is = item.getItemStack();
                             if (this.items_abyss_enabled
-                                    && !this.items_abyss_blacklist.contains(item.getItemStack().getType())
+                                    && !this.items_abyss_blacklist.contains(is.getType())
                                     && item.getLocation().getY() > -64) {
                                 if (stacker != null) {
                                     stacker.addItemsToList(item, this.items);
                                 } else {
-                                    this.items.add(item.getItemStack().clone());
+                                    this.items.add(is.clone());
                                 }
                             }
                             ent.remove();
-                            items += item.getItemStack().getAmount();
+                            items += is.getAmount();
                         }
                     } else if (ent instanceof Projectile projectile) {
                         if (this.projectiles_enabled && this.clearProjectile(projectile)) {
