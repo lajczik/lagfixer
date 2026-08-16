@@ -56,27 +56,27 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
         );
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent e) {
         e.setCancelled(this.handleEvent(e.getLocation(), e.getSpawnReason(), e.getEntityType(), this.creatures, ent -> ent instanceof Mob));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onSpawn(SpawnerSpawnEvent e) {
         e.setCancelled(this.handleEvent(e.getLocation(), CreatureSpawnEvent.SpawnReason.SPAWNER, e.getEntityType(), this.creatures, ent -> ent instanceof Mob));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent e) {
         e.setCancelled(this.handleEvent(e.getItemDrop().getLocation(), null, e.getItemDrop().getType(), this.items, ent -> ent instanceof Item));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onVehicle(VehicleCreateEvent e) {
         e.setCancelled(this.handleEvent(e.getVehicle().getLocation(), null, e.getVehicle().getType(), this.vehicles, ent -> ent instanceof Vehicle));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onLaunch(ProjectileLaunchEvent e) {
         e.setCancelled(this.handleEvent(e.getEntity().getLocation(), null, e.getEntity().getType(), this.projectiles, ent -> ent instanceof Projectile));
     }
@@ -107,18 +107,14 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
 
         if (this.overflow_enabled) {
-            final int limit_creatures = (int) (this.creatures * this.overflow_multiplier);
-            final int limit_items = (int) (this.items * this.overflow_multiplier);
-            final int limit_vehicles = (int) (this.vehicles * this.overflow_multiplier);
-            final int limit_projectiles = (int) (this.projectiles * this.overflow_multiplier);
-
-            final boolean checkCreatures = this.overflow_creatures;
-            final boolean checkItems = this.overflow_items;
-            final boolean checkVehicles = this.overflow_vehicles;
-            final boolean checkProjectiles = this.overflow_projectiles;
-            final HookManager.ModelContainer model = HookManager.getInstance().getModelHook();
-
             this.overflow_task = SupportManager.getInstance().getFork().runTimer(false, () -> {
+                final int limit_creatures = (int) (this.creatures * this.overflow_multiplier);
+                final int limit_items = (int) (this.items * this.overflow_multiplier);
+                final int limit_vehicles = (int) (this.vehicles * this.overflow_multiplier);
+                final int limit_projectiles = (int) (this.projectiles * this.overflow_multiplier);
+
+                final HookManager.ModelContainer model = HookManager.getInstance().getModelHook();
+
                 this.getAllowedWorlds().forEach(w -> {
                     Chunk[] chunks = w.getLoadedChunks();
 
@@ -140,19 +136,19 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
                             switch (entity) {
                                 case Mob ignored -> {
                                     if (creatures < limit_creatures) creatures++;
-                                    else if (checkCreatures) removed = true;
+                                    else if (this.overflow_creatures) removed = true;
                                 }
                                 case Item ignored -> {
                                     if (items < limit_items) items++;
-                                    else if (checkItems) removed = true;
+                                    else if (this.overflow_items) removed = true;
                                 }
                                 case Vehicle ignored -> {
                                     if (vehicles < limit_vehicles) vehicles++;
-                                    else if (checkVehicles) removed = true;
+                                    else if (this.overflow_vehicles) removed = true;
                                 }
                                 case Projectile ignored -> {
                                     if (projectiles < limit_projectiles) projectiles++;
-                                    else if (checkProjectiles) removed = true;
+                                    else if (this.overflow_projectiles) removed = true;
                                 }
                                 default -> {
                                 }
@@ -179,8 +175,8 @@ public class EntityLimiterModule extends AbstractModule implements Listener {
         ReflectionUtils.convertEnums(CreatureSpawnEvent.SpawnReason.class, this.reasons, this.getSection().getStringList("reasons"));
         ReflectionUtils.convertEnums(EntityType.class, this.whitelist, this.getSection().getStringList("whitelist"));
 
-        this.overflow_interval = this.getSection().getInt("overflow_purge.interval");
-        this.overflow_enabled = this.overflow_interval > 0 && this.getSection().getBoolean("overflow_purge.enabled");
+        this.overflow_interval = Math.max(1, this.getSection().getInt("overflow_purge.interval"));
+        this.overflow_enabled = this.getSection().getBoolean("overflow_purge.enabled");
         if (this.overflow_enabled) {
             this.overflow_multiplier = this.getSection().getDouble("overflow_purge.limit_multiplier");
             this.overflow_creatures = this.creatures > 0 && this.getSection().getBoolean("overflow_purge.types.creatures");
