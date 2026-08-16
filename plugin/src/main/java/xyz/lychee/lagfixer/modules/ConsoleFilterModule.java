@@ -82,6 +82,17 @@ public class ConsoleFilterModule extends AbstractModule {
         }
     }
 
+    public boolean containsFilter(Logger logger) {
+        Iterator<Filter> it = logger.getFilters();
+        while (it.hasNext()) {
+            Filter filter = it.next();
+            if (filter instanceof CustomFilter) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void load() throws IOException {
         Path folder = getPlugin().getDataFolder().toPath().resolve("logs");
@@ -98,17 +109,7 @@ public class ConsoleFilterModule extends AbstractModule {
         clearLogs(Paths.get("logs"));
 
         Logger logger = (Logger) LogManager.getRootLogger();
-
-        Iterator<Filter> it = logger.getFilters();
-        boolean initialized = false;
-        while (it.hasNext()) {
-            Filter filter = it.next();
-            if (filter instanceof CustomFilter) {
-                initialized = true;
-            }
-        }
-
-        if (!initialized) {
+        if (!this.containsFilter(logger)) {
             logger.addFilter(this.filter);
         }
     }
