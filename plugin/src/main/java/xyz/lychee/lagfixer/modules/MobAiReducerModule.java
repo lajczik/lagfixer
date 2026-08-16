@@ -1,6 +1,11 @@
 package xyz.lychee.lagfixer.modules;
 
 import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -19,6 +24,7 @@ import xyz.lychee.lagfixer.utils.ReflectionUtils;
 
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -26,6 +32,7 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
     private final EnumSet<EntityType> list = EnumSet.noneOf(EntityType.class);
     private final EnumSet<CreatureSpawnEvent.SpawnReason> reasons = EnumSet.noneOf(CreatureSpawnEvent.SpawnReason.class);
     private final HashSet<String> ai_list = new HashSet<>();
+    private final ErrorFilter filter = new ErrorFilter();
     private BukkitTask task;
     private NMS mobAiReducer;
     private boolean async;
@@ -98,8 +105,24 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         };
     }
 
+    public boolean containsFilter(Logger logger) {
+        Iterator<Filter> it = logger.getFilters();
+        while (it.hasNext()) {
+            Filter filter = it.next();
+            if (filter instanceof ErrorFilter) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void load() {
+        Logger logger = (Logger) LogManager.getRootLogger();
+        if (!this.containsFilter(logger)) {
+            logger.addFilter(this.filter);
+        }
+
         Bukkit.getPluginManager().registerEvents(this, this.getPlugin());
         Bukkit.getPluginManager().registerEvents(this.mobAiReducer, this.getPlugin());
 
@@ -197,6 +220,20 @@ public class MobAiReducerModule extends AbstractModule implements Listener {
         public abstract void optimize(Entity entity, boolean init);
 
         public abstract void purge();
+    }
+
+    private static class ErrorFilter extends AbstractFilter {
+        @Override
+        public Filter.Result filter(LogEvent event) {
+            if (event.getThrown() instanceof NullPointerException npe
+                    && npe.getMessage() != null
+                    && npe.getMessage().contains(".isRunning()")
+            ) {
+                return Result.DENY;
+            }
+
+            return Filter.Result.NEUTRAL;
+        }
     }
 }
 
