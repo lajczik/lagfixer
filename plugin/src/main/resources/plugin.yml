@@ -14,6 +14,7 @@ softdepend: [
   ModelEngine,
   MythicMobs,
   StackMob,
+  BetterModel,
   packetevents
 ]
 folia-supported: false
