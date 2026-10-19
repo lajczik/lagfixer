@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("com.gradleup.shadow") version "9.6.1"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.23" apply false
 }
 
 val spigotRepo = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
@@ -10,9 +10,9 @@ val sonatypeRepo = "https://oss.sonatype.org/content/groups/public/"
 val jitpack = "https://jitpack.io"
 val mojang = "https://libraries.minecraft.net"
 
-version = "1.7.1"
+version = "1.7.2"
 extra["lagfixer_version"] = version
-extra["lagfixer_build"] = "151"
+extra["lagfixer_build"] = "152"
 
 dependencies {
     implementation(project(":plugin"))
@@ -34,6 +34,7 @@ dependencies {
     implementation(project(":nms:v1_21_R7", io.papermc.paperweight.util.constants.REOBF_CONFIG))
     implementation(project(":nms:v26_1", "default"))
     implementation(project(":nms:v26_2", "default"))
+    implementation(project(":nms:v26_3", "default"))
 
     implementation(project(":support:common"))
     implementation(project(":support:spigot"))
@@ -50,7 +51,6 @@ tasks {
         archiveClassifier.set("")
 
         relocate("net.kyori", "xyz.lychee.lagfixer.libs.kyori")
-        destinationDirectory.set(file("C:/Users/lajczi/Desktop/testowy/plugins"))
     }
 }
 
@@ -70,8 +70,8 @@ allprojects {
     }
 
     dependencies {
-        compileOnly("org.projectlombok:lombok:1.18.46")
-        annotationProcessor("org.projectlombok:lombok:1.18.46")
+        compileOnly("org.projectlombok:lombok:1.18.48")
+        annotationProcessor("org.projectlombok:lombok:1.18.48")
     }
 
     java {
