@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("com.gradleup.shadow") version "9.6.1"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.23" apply false
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.22" apply false
 }
 
 val spigotRepo = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
